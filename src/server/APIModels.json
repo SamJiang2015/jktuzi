@@ -2,13 +2,18 @@
 //  Models for all datatypes -- these are not part of the code
 //
 
-coach (教练): http://<domain>/coach/{username}
+
+coach (教练): http://<domain>/api/coach/{username}
 
 {
     "data" : {
         "id"         : 5,
-        "coachUserId": 45, // reference to the "user" entity of this coach; null if this coach was never a user in the system
+        "userId": 45, // reference to the "user" entity of this coach; null if this coach was never a user in the system
+        "groups"      : [group1, group2, ....], // list of groups that a coach manages
         "url"        : "joshTest", //same as username
+        "email"      : "zhaoyi@sina.com",   // duplicate of user entity?
+        "phone"      : "18888888888",       // duplicate of user entity?
+        "picture"    : null // id to profile picture
         "bio"        : "A real hoopy frood who really knows where his towel is at."
         "master" 	 : 1, // id of the coach that introduced this coach
         "managedUsers": [user1, user2, user3, user4] // array of users managed by this coach
@@ -20,26 +25,33 @@ coach (教练): http://<domain>/coach/{username}
     "success" : true
 }
 
-user (学员): http://<domain>/user/{id} 
+user (学员): http://<domain>/api/user/{id} 
 
 {
     "data" : {
         "id"         : 3,
-        "coach"	 	 : 5,  // 
+        "group"      : 12,
+//        "coaches"	 : [coach1, coach2 ...],  // array of coaches that manages this user // TO DECIDE: need this or just rely
+											  // on group
         "name"		 : "赵一"，
+        "email"      : "zhaoyi@sina.com",
+        "phone"      : "18888888888",
+        "城市"		 : "北京",			 : 
+        "picture"    : null // id to profile picture
         "nickName"   : "准马拉松选手",  //群昵称
         "birthdate"  : 093248302,
         "height"	 : 178, // 厘米 
         "bodyFatGoal": 21.2,  // 体脂率 %
         "weightGoal" : 120, // 斤
         "profession" : '长跑运动员',
-        "healthItems" : [hiId1, hiId2, ...] // array of ids to healthInfo stored for this user
-        "foodItems"	 : [fId1, fId2, ....]  // array of ids to foodInfo stored for this user
-        "exerciseItems": [eiId1, eIId2, ...] // array of ids to exerciseInfo stored for this user 
-        "bio"        : "A real hoopy frood who really knows where his towel is at."
-        "master" 	 : 1 // id of the USER that introduced this user -- TODO - should this cover coaches as well?
+        "healthItems" : [hiId1, hiId2, ...] // array of ids to healthIems stored for this user
+        "foodItems"	 : [fId1, fId2, ....]  // array of ids to foodItems stored for this user
+        "exerciseItems": [eiId1, eIId2, ...] // array of ids to exerciseItems stored for this user 
+        "master" 	 : 1， // id of the USER that introduced this user -- TODO - should this cover coaches as well?
         				 // or just make sure every coach has a corresponding user entity created for them
-		"notes"		 : '糖尿病患者'
+		"feePaid"	 : 199, //元
+		"level"	     : 1,, // 1-5
+		"notes"		 : '糖尿病患者',
         "created"    : 1376951504
     },
 
@@ -47,7 +59,26 @@ user (学员): http://<domain>/user/{id}
     "success" : true
 }
 
-healthItem (健康打卡信息): http://<domain>/healthinfo/?userId=3&date=3895390234
+group (期): http://<domain>/api/groups/; http://<domain>/api/group/{id}; 
+
+{
+    "data" : {
+        "id"         : 3,
+        "users"      : [user1, user2, ....],
+        "coaches"	 : [coach1, coach2 ...],  // array of coaches that manages this user 
+        "name"		 : "第12期"，
+        "nickName"   : "最棒组",  //昵称
+        "startdate"  : 093248302, //群里正式开始打卡日期
+        "created"    : 1376951504
+    },
+
+    "status"  : 200,
+    "success" : true
+}
+
+
+healthItem (健康打卡信息): http://<domain>/api/healthitems/?userId=3&date=3895390234
+						 http://<domain>/api/healthitem/:id
 
 {
     "data" : {
@@ -65,8 +96,8 @@ healthItem (健康打卡信息): http://<domain>/healthinfo/?userId=3&date=38953
     "success" : true
 }
 
-foodItem (食物打卡信息): http://<domain>/healthinfo/?userId=3&date=3895390234
-
+foodItem (食物打卡信息): http://<domain>/api/foodItems/?userId=3&date=3895390234
+						http://<domain>/api/foodItem/:id
 {
     "data" : {
         "id"         : 3,
@@ -85,8 +116,8 @@ foodItem (食物打卡信息): http://<domain>/healthinfo/?userId=3&date=3895390
 }
 
 
-exerciseItem (健身打卡信息):  http://<domain>/healthinfo/?userId=3&date=3895390234
-
+exerciseItem (健身打卡信息):  http://<domain>/api/exerciseItem/?userId=3&date=3895390234
+							http://<domain>/api/exerciseItem/:id
 {
     "data" : {
         "id"         : 3,
@@ -104,6 +135,24 @@ exerciseItem (健身打卡信息):  http://<domain>/healthinfo/?userId=3&date=38
     "status"  : 200,
     "success" : true
 }
+
+picture (照片): http://<domain>/picture/:id
+
+{
+    "data" : {
+        "id"         : 3,
+        "userId"	 : 5,
+        "type"       : 'profile', // profile, food, health, exercise
+        "infoDate"       : 2321224122, // 信息所对应的时间，不一定是用户上传的时间  
+        "created"    : 1376951504
+    },
+
+    "status"  : 200,
+    "success" : true
+}
+
+role: (学员变教练): PUT http://<domain>/api/changeRole?userId=32&role="coach"
+
 
 
 

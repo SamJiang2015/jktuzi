@@ -1,3 +1,6 @@
+body {
+  font: 13px Helvetica, Arial; }
+
 #chat-room #message-form {
   background: #000;
   padding: 3px;
@@ -34,6 +37,17 @@
 #chat-room #other {
   color: red;
   padding: 0; }
+
+
+
+.header #mainPage-navbar {
+  background-color: #232f3e; }
+
+.header .active {
+  font-weight: 900; }
+
+.header Input {
+  margin-right: 3px; }
 
 /*!
  * Bootstrap v3.3.5 (http://getbootstrap.com)

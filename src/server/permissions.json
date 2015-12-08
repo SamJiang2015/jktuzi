@@ -1,0 +1,31 @@
+//
+// Document the permission models 
+//
+
+role (角色): admin/coach/user 
+
+admin: can do anything to anybody; 
+
+{
+	group: can add new groups; view existing groups; delete groups.
+	coaches: can view any coaches' info; add new coach (trigger an email invite); delete a coach's account; update a coach's info; 
+		     reassign a coach to new groups
+
+	users: can view any users' info, add new users, delete existing users, convert a user to a coach;
+}
+
+coach: limit to the group the coach belongs to
+
+{
+	group: if managed by this coach --> read/update but cannot delete;  
+	coach: can view/update/delete own info;
+	users: if in a group that the coach manages: view, add, update, delete; BUT ONLY DURING THE PHASE THAT USERS DO NOT LOGIN
+}
+
+user: NO LOGIN during V1
+
+
+
+
+
+

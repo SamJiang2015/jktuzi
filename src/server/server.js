@@ -1,8 +1,13 @@
-var PORT = process.env.PORT || 3000;
+// server.js
+
+// BASE SETUP
+// ===================================================================
+
 var express = require('express');
 var app = express();
 var http = require('http').Server(app); // http is a built-in module in express
-var io = require('socket.io')(http);
+
+var PORT = process.env.PORT || 3000;
 
 app.use(express.static(__dirname + '/public'));
 

@@ -6,16 +6,18 @@ var Router = ReactRouter.Router;
 var Route = ReactRouter.Route;
 var createBrowserHistory = require('history/lib/createBrowserHistory');
 
-var ChatRoom = require('./ChatRoom/ChatRoom');
 var Main = require('./Main/Main');
-var JoinChat = require('./JoinRoom/JoinRoom');
+var auth = require('./auth');
 
+function requireAuth(nextState, replaceState) {
+  if (!auth.loggedIn()) {
+    replaceState({ nextPathname: nextState.location.pathname }, '/login');
+	}
+}
 
 ReactDOM.render((
 	<Router history={createBrowserHistory()}>
 		<Route path='/' component={Main}>
-			<Route path='join' component={JoinChat} />
-			<Route path='chatroom' component={ChatRoom} />
 		</Route>
 	</Router>),
 	document.getElementById('app') 

@@ -1,0 +1,18 @@
+Admin:
+
+1. log in;
+2. view a page showing a list of all the groups
+3. click on any group --> group page:
+	a. coaches list: names + profile pictures
+	b. users list: names + today's snapshot???
+	c. button to add new coach and user
+4. click on any coach --> coach detail page 
+	a. info of the coach
+	b. button to update and delete
+5. click on any user --> user page: 
+
+	a. basic info
+	b. health info
+	c. food info
+	d. exercise info
+	e. button to i. update ii. delete iii. 

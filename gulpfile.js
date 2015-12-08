@@ -15,9 +15,11 @@ var htmlreplace = require('gulp-html-replace');
 
 var path = {
 	HTML: './src/web/index.html',
-	ALL: ['./src/web/components/**/*.jsx', './src/web/components/**/*.scss', './src/web/scss/*', './src/web/index.html'],
-	JSX: ['./src/web/components/*.jsx', './src/web/components/**/*.jsx'],
-	SCSS: ['./src/web/components/*.scss','./src/web/components/**/*.scss', './src/web/scss/*.css'],
+	ALL: ['./src/web/**/*.jsx', './src/web/**/*.scss', './src/web/scss/*', './src/web/index.html'],
+	JSX: ['./src/web/*.jsx', './src/web/**/*.jsx'],
+	SCSS: ['./src/web/*.scss','./src/web/**/*.scss', './src/web/scss/*.css'],
+	FONTS: ['./src/web/fonts/*'],
+	IMAGES: ['./src/web/images/*'],
 	SERVER_JS: ['./src/server/*.js', './src/server/**/*.js'],
 	ENTRY_POINT: './src/web/components/app.jsx',	
 	OUT: 'build.js',
@@ -27,6 +29,8 @@ var path = {
 	DEST_WEB: 'dist/public',
 	DEST_WEB_SRC: 'dist/public/js',
 	DEST_WEB_CSS: 'dist/public/css',
+	DEST_WEB_FONTS: 'dist/public/fonts',
+	DEST_WEB_IMAGES: 'dist/public/images',
 	DEST_WEB_BUILD: 'dist/public/build'	
 };
 
@@ -68,6 +72,16 @@ gulp.task('copy-html', function() {
 	.pipe(gulp.dest(path.DEST_WEB));
 });
 
+gulp.task('copy-fonts', function() {
+	gulp.src(path.FONTS)
+	.pipe(gulp.dest(path.DEST_WEB_FONTS));
+});
+
+gulp.task('copy-images', function() {
+	gulp.src(path.IMAGES)
+	.pipe(gulp.dest(path.DEST_WEB_IMAGES));
+});
+
 // Development task 2: process scss files and copy to dist folder
 gulp.task('sass', function () {
   gulp.src(path.SCSS)
@@ -87,6 +101,8 @@ gulp.task('copy-server-js', function() {
 // Development task 4: main task
 gulp.task('watch', function() {
 	gulp.watch(path.HTML, ['copy-html']);
+	gulp.watch(path.FONTS, ['copy-fonts']);
+	gulp.watch(path.IMAGES, ['copy-images']);
 	gulp.watch(path.SCSS, ['sass']);
 	gulp.watch(path.SERVER_JS, ['copy-server-js']);
 
@@ -110,7 +126,7 @@ gulp.task('watch', function() {
 	.pipe(gulp.dest(path.DEST_WEB_SRC));
 });
 
-gulp.task('default', ['copy-server-js','copy-html', 'sass', 'watch']);
+gulp.task('default', ['copy-server-js','copy-html', 'copy-fonts', 'copy-images', 'sass', 'watch']);
 
 // Production task: concat all JS files, minify them and output to the build folder
 gulp.task('build', function() {
@@ -136,4 +152,4 @@ gulp.task('replaceHTML', function() {
 })
 
 
-gulp.task('production', ['copy-server-js','replaceHTML', 'sass', 'build']);
+gulp.task('production', ['copy-server-js','copy-fonts', 'copy-images','replaceHTML', 'sass', 'build']);
