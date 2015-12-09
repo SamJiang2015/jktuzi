@@ -1,6 +1,8 @@
 var React = require('react');
 var History = require('react-router').History;
+var Link = require('react-router').Link;
 
+// UI components
 var Panel = require('react-bootstrap/lib/panel');
 var Input = require('react-bootstrap/lib/input');
 var Glyphicon = require('react-bootstrap/lib/glyphicon');
@@ -29,13 +31,16 @@ module.exports = React.createClass({
 		    	return this.setState({ error: true });
 		    }
 
-		    const location = this.props.location;
 
-		    if (location.state && location.state.nextPathname) {
-		        this.history.replaceState(null, location.state.nextPathname);
-		    } else {
-		        this.history.replaceState(null, '/');
-		    }
+		    // const location = this.props.location;
+
+		    // if (location.state && location.state.nextPathname) {
+		    //     this.history.replaceState(null, location.state.nextPathname);
+		    // } else {
+		    //     this.history.replaceState(null, '/');
+		    // }
+		    this.history.replaceState(null, '/');
+
 		}.bind(this));
 	},
 
@@ -46,7 +51,7 @@ module.exports = React.createClass({
 		const mobileGlyphicon=<Glyphicon glyph="phone"/>;
 		const passwordGlyphicon=<Glyphicon glyph="lock"/>;
 		var errorMsg = <h4>登录信息不正确</h4>;	
-
+		
 		return (
 			<div className="login">
 		        <Panel  
@@ -56,7 +61,8 @@ module.exports = React.createClass({
 		            <form>
 		                <Input type="tel" ref="phone" placeholder="手机" hasFeedback feedbackIcon={mobileGlyphicon} />
 		                <Input type="password" ref="pass" placeholder="密码" hasFeedback feedbackIcon={passwordGlyphicon} />
-		                <Button bsStyle="success" block onClick={this.handleSubmit}>登录</Button>
+		                <Button bsStyle="info" block onClick={this.handleSubmit}>登录</Button>
+		                <p id="registrationLink"><Link to="/register">我要注册</Link></p>
 		                {this.state.error && errorMsg}
 		            </form>
 		        </Panel>

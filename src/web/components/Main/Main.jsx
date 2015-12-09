@@ -32,14 +32,6 @@ module.exports = React.createClass({
 
 	},
 
-	renderContent: function() {
-		if (this.state.isLoggedIn) {
-			return this.props.children;
-		} else {
-			return <Login />;
-		}
-	},
-
 	render: function() {
 
 		return (
@@ -50,7 +42,7 @@ module.exports = React.createClass({
 					handleLogin={this.handleLogin}
 					/>
 				<div className="container">	
-					{this.renderContent()}	
+					{this.props.children}
 				</div>
 
 

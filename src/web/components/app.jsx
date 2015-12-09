@@ -12,7 +12,9 @@ var auth = require('./auth');
 var Register = require('./Register/Register');
 var Login = require('./Login/Login');
 var Logout = require('./Logout/Logout');
-var TestContent = require('./TestContent');
+var Groups = require('./Group/Groups');
+var About = require('./About/About');
+var Intro = require('./Intro/Intro');
 
 function requireAuth(nextState, replaceState) {
   if (!auth.loggedIn()) {
@@ -23,10 +25,13 @@ function requireAuth(nextState, replaceState) {
 ReactDOM.render((
 	<Router history={createBrowserHistory()}>
 		<Route path='/' component={Main}>
-			<IndexRoute component={Register} />
+			<IndexRoute component={Groups} onEnter={requireAuth} />
 			<Route path='login' component={Login} />
+			<Route path='about' component={About} />
+			<Route path='intro' component={Intro} />
 			<Route path='logout' component={Logout} />
-			<Route path='TestContent' component={TestContent} onEnter={requireAuth} />
+			<Route path='register' component={Register} />
+			<Route path='groups' component={Groups} onEnter={requireAuth} />
 		</Route>
 	</Router>),
 	document.getElementById('app') 

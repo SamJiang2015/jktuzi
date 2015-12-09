@@ -14,38 +14,18 @@ var Input = require('react-bootstrap/lib/input');
 var Button = require('react-bootstrap/lib/button');
 var Glyphicon = require('react-bootstrap/lib/glyphicon');
 
+// package that provides a react-router wrapper for react-bootstrap elements
+var LinkContainer = require('react-router-bootstrap').LinkContainer;
+
 var auth = require('../auth');
 
 module.exports = React.createClass({
-
-	mixins: [History],
 
 	getInitialState: function() {
 		return {
 			error: false
 		}
 	},
-
-	handleSubmit: function(event) {
-		event.preventDefault();
-
-		const phone = this.refs.phone.value;
-		const pass = this.refs.pass.value;
-
-		auth.login(phone, pass, function(loggedIn) {
-		    if (!loggedIn)
-		    	return this.setState({ error: true });
-
-		    	const location = this.props.location;
-
-		    if (location.state && location.state.nextPathname) {
-		        this.history.replaceState(null, location.state.nextPathname)
-		    } else {
-		        this.history.replaceState(null, '/')
-		    }
-		}.bind(this));
-	},
-
 
 	// left part of the navbar
 	renderNavbarHeader: function() {
@@ -62,16 +42,13 @@ module.exports = React.createClass({
 	},
 
 	// right part of the navbar -- if the user is logged in, render a few links 
-	renderNavbarItems: function() {
+	renderNavbarItemsLoggedIn: function() {
 		return (
-            <Nav>
-                <NavItem eventKey={1}>
-                	<Link to="/groups">我的群</Link>
-            	</NavItem>
-                <NavItem eventKey={2}>
-                	<Link to="/stat">打卡统计</Link>
-            	</NavItem>          
-                <NavDropdown eventKey={3} title={this.props.user.name + '教练'} id="navbar-dropdown">
+            <Nav pullRight>
+                <LinkContainer to="/groups"><NavItem eventKey={1}>我的群</NavItem></LinkContainer>
+                <LinkContainer to="/trainees"><NavItem eventKey={2}>我的学员</NavItem></LinkContainer>
+                <LinkContainer to="/stat"><NavItem eventKey={3}>打卡统计</NavItem></LinkContainer>   
+                <NavDropdown eventKey={3} title={this.props.user + '教练'} id="navbar-dropdown">
                 	<MenuItem eventKey={3.1}>
                 		<Link to="/user-info">注册信息</Link>
                 		</MenuItem>
@@ -88,19 +65,15 @@ module.exports = React.createClass({
 	},
 
 	// right part of the navbar -- if the user is not logged in, render the login form
-	renderNavbarLoginForm: function() {
-
-		const mobileGlyphicon=<Glyphicon glyph="phone"/>;
-		const passwordGlyphicon=<Glyphicon glyph="lock"/>;
+	renderNavbarItemsNotLoggedIn: function() {
 
 		return (
-            <Navbar.Form pullRight onSubmit={this.handleSubmit}>
-                <Input type="tel" ref="phone" placeholder="手机" hasFeedback feedbackIcon={mobileGlyphicon} />	
-                <Input type="password" ref="pass" placeholder="密码" hasFeedback feedbackIcon={passwordGlyphicon} />
-                <Button type="submit" bsStyle="success" onClick={this.props.handleLogin}>登录</Button>
-            </Navbar.Form>
+            <Nav pullRight>
+                <LinkContainer to="/about"><NavItem eventKey={1}>关于PiPi</NavItem></LinkContainer>
+                <LinkContainer to="/intro"><NavItem eventKey={2}>功能说明</NavItem></LinkContainer>
+                <LinkContainer to="/register"><NavItem eventKey={3}>我要注册</NavItem></LinkContainer>   
+        	</Nav>
 		);
-
 	},
 
 	render: function() {
@@ -109,7 +82,7 @@ module.exports = React.createClass({
         		<Navbar inverse fixedTop id="mainPage-navbar">
 	            	{this.renderNavbarHeader()}	
 					<Navbar.Collapse>	            		
-	            		{this.props.isLoggedIn? this.renderNavbarItems():this.renderNavbarLoginForm()}
+	            		{this.props.isLoggedIn? this.renderNavbarItemsLoggedIn():this.renderNavbarItemsNotLoggedIn()}
 	            	</Navbar.Collapse>
 		        </Navbar>
 		    </div> );

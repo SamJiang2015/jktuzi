@@ -10,4 +10,19 @@
 		    background-color: #2f726a;
 	}
 
+	#registrationLink {
+		margin-top: 3px; 
+
+		a {
+			color: white;
+		}
+
+		a:hover {
+			color: yellow;
+		}
+
+		a:active {
+			color: red;
+		}
+	}
 }
