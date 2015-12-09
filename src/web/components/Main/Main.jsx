@@ -3,6 +3,8 @@ var ReactRouter = require('react-router');
 var Link = ReactRouter.Link;
 var auth = require('../auth');
 var Header = require('../Header/Header');
+var Footer = require('../Footer/Footer');
+var Login = require('../Login/Login');
 
 module.exports = React.createClass({   
 		
@@ -21,11 +23,21 @@ module.exports = React.createClass({
 	componentWillMount: function() {
 		//hook up with auth service so that main will be updated if user login status changes
 	    auth.onChange = this.updateAuth;
-	    //auth.login();
+	    
+	    // log the user in if the user still has a valid token stored
+	    auth.login();
 	},
 
 	handleLogin: function() {
 
+	},
+
+	renderContent: function() {
+		if (this.state.isLoggedIn) {
+			return this.props.children;
+		} else {
+			return <Login />;
+		}
 	},
 
 	render: function() {
@@ -36,8 +48,12 @@ module.exports = React.createClass({
 					isLoggedIn={this.state.isLoggedIn}
 					user={this.state.isLoggedIn? auth.getUser():null}
 					handleLogin={this.handleLogin}
-					/>		
-				{this.props.children}
+					/>
+				<div className="container">	
+					{this.renderContent()}	
+				</div>
+
+
 			</div>);
 	}
 });

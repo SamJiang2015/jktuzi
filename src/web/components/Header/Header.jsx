@@ -1,6 +1,7 @@
 var React = require('react');
-var ReactRouter = require('react-router');
-var Link = ReactRouter.Link;
+var Link = require('react-router').Link;
+var History = require('react-router').History;
+
 
 // all the React Bootstrap components we are going to use
 // for the header component
@@ -13,8 +14,38 @@ var Input = require('react-bootstrap/lib/input');
 var Button = require('react-bootstrap/lib/button');
 var Glyphicon = require('react-bootstrap/lib/glyphicon');
 
+var auth = require('../auth');
 
 module.exports = React.createClass({
+
+	mixins: [History],
+
+	getInitialState: function() {
+		return {
+			error: false
+		}
+	},
+
+	handleSubmit: function(event) {
+		event.preventDefault();
+
+		const phone = this.refs.phone.value;
+		const pass = this.refs.pass.value;
+
+		auth.login(phone, pass, function(loggedIn) {
+		    if (!loggedIn)
+		    	return this.setState({ error: true });
+
+		    	const location = this.props.location;
+
+		    if (location.state && location.state.nextPathname) {
+		        this.history.replaceState(null, location.state.nextPathname)
+		    } else {
+		        this.history.replaceState(null, '/')
+		    }
+		}.bind(this));
+	},
+
 
 	// left part of the navbar
 	renderNavbarHeader: function() {
@@ -63,9 +94,9 @@ module.exports = React.createClass({
 		const passwordGlyphicon=<Glyphicon glyph="lock"/>;
 
 		return (
-            <Navbar.Form pullRight>
-                <Input type="tel" placeholder="手机" hasFeedback feedbackIcon={mobileGlyphicon} />	
-                <Input type="password" placeholder="密码" hasFeedback feedbackIcon={passwordGlyphicon} />
+            <Navbar.Form pullRight onSubmit={this.handleSubmit}>
+                <Input type="tel" ref="phone" placeholder="手机" hasFeedback feedbackIcon={mobileGlyphicon} />	
+                <Input type="password" ref="pass" placeholder="密码" hasFeedback feedbackIcon={passwordGlyphicon} />
                 <Button type="submit" bsStyle="success" onClick={this.props.handleLogin}>登录</Button>
             </Navbar.Form>
 		);

@@ -1,12 +1,18 @@
 var React = require('react');
-var Auth = require('../Auth');
+var auth = require('../auth');
+var Login = require('../Login/Login');
 
 module.exports = React.createClass({
-  componentDidMount() {
+  componentDidMount: function() {
     auth.logout()
   },
 
-  render() {
-    return <p>You are now logged out</p>
+  render: function() {
+  	return (
+  		<div>
+  			<p> 请重新登录</p>
+    		<Login />
+		</div>
+    	);
   }
 })
