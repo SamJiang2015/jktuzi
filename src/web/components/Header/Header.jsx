@@ -49,16 +49,16 @@ module.exports = React.createClass({
                 <LinkContainer to="/trainees"><NavItem eventKey={2}>我的学员</NavItem></LinkContainer>
                 <LinkContainer to="/stat"><NavItem eventKey={3}>打卡统计</NavItem></LinkContainer>   
                 <NavDropdown eventKey={3} title={this.props.user + '教练'} id="navbar-dropdown">
-                	<MenuItem eventKey={3.1}>
-                		<Link to="/user-info">注册信息</Link>
-                		</MenuItem>
-                	<MenuItem eventKey={3.1}>
-                		<Link to="/preference">账户设置</Link>
-            		</MenuItem>
+                	<LinkContainer to="/user-info">
+                		<MenuItem eventKey={3.1}>注册信息</MenuItem>
+            		</LinkContainer>
+                	<LinkContainer to="/preference">
+                		<MenuItem eventKey={3.1}>账户设置</MenuItem>
+            		</LinkContainer>
                 	<MenuItem divider />
-                	<MenuItem eventKey={3.1}>
-                		<Link to="/logout">退出登录</Link>
-            		</MenuItem>
+                	<LinkContainer to="/logout">
+                		<MenuItem eventKey={3.1}>退出登录</MenuItem>
+            		</LinkContainer>
             	</NavDropdown>
         	</Nav>
 		);
