@@ -36,7 +36,10 @@ module.exports = React.createClass({
 	},
 
 	handleNavClick(e) {
-		if (this.state.navExpanded) {
+		// if user clicked on a <span>, this is likely a dropdown menu within 
+		// the nav menu, if so, cannot collapse the nav menu
+		// Todo: is there a better way to tell than checking for 'span' ????
+		if (e.target.nodeName.toLowerCase() !== 'span' && this.state.navExpanded) {
 			this.setState({
 				navExpanded: false
 			});
@@ -84,7 +87,7 @@ module.exports = React.createClass({
 	renderNavbarItemsNotLoggedIn: function() {
 
 		return (
-            <Nav pullRight onClick={this.handleNavClick}>
+            <Nav pullRight>
                 <LinkContainer to="/about"><NavItem eventKey={1}>关于PiPi</NavItem></LinkContainer>
                 <LinkContainer to="/intro"><NavItem eventKey={2}>功能说明</NavItem></LinkContainer>
                 <LinkContainer to="/register"><NavItem eventKey={3}>我要注册</NavItem></LinkContainer>   
@@ -97,7 +100,7 @@ module.exports = React.createClass({
 		    <div className="header">
         		<Navbar inverse fixedTop expanded={this.state.navExpanded} onToggle={this.handleToggle} id="mainPage-navbar">
 	            	{this.renderNavbarHeader()}	
-					<Navbar.Collapse>	            		
+					<Navbar.Collapse onClick={this.handleNavClick}>	            		
 	            		{this.props.isLoggedIn? this.renderNavbarItemsLoggedIn():this.renderNavbarItemsNotLoggedIn()}
 	            	</Navbar.Collapse>
 		        </Navbar>
