@@ -28,14 +28,13 @@ module.exports = React.createClass({
 		}
 	},
 
-	handleToggle(navExpanded) {
-
+	handleToggle: function(navExpanded) {
 		this.setState({
 			navExpanded: navExpanded
 		});
 	},
 
-	handleNavClick(e) {
+	handleNavClick: function(e) {
 		// if user clicked on a <span>, this is likely a dropdown menu within 
 		// the nav menu, if so, cannot collapse the nav menu
 		// Todo: is there a better way to tell than checking for 'span' ????
@@ -51,11 +50,11 @@ module.exports = React.createClass({
 		return (
 			<Navbar.Header>
 				<Navbar.Brand>
-	      			<Link to="/">
+	      			<Link to="/" onClick={this.handleNavClick}>
 	          			PiPi健康生活
 	      			</Link>
 				</Navbar.Brand>
-				<Navbar.Toggle onClick={this.handleToggle} />
+				<Navbar.Toggle  />
 			</Navbar.Header>
 			);
 	},
