@@ -1,4 +1,6 @@
 var React = require('react');
+var Link = require('react-router').Link;
+
 var Panel = require('react-bootstrap/lib/panel');
 var Input = require('react-bootstrap/lib/input');
 var Glyphicon = require('react-bootstrap/lib/glyphicon');
@@ -27,6 +29,7 @@ module.exports = React.createClass({
 		                <Input type="password" placeholder="设定密码" hasFeedback feedbackIcon={passwordGlyphicon} />
 		                <Input type="password" placeholder="确认密码" hasFeedback feedbackIcon={passwordGlyphicon} />
 		                <Button bsStyle="info" block>现在加入</Button>
+		                <p id="loginLink"><Link to="/login">我要登录</Link></p>
 		            </form>
 		        </Panel>
 	        </div>

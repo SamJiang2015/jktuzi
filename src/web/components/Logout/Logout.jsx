@@ -9,8 +9,8 @@ module.exports = React.createClass({
 
   render: function() {
   	return (
-  		<div>
-  			<p> 请重新登录</p>
+  		<div className="logout">
+  			<p>谢谢您使用PiPi！欢迎您再来！</p>
     		<Login />
 		</div>
     	);
