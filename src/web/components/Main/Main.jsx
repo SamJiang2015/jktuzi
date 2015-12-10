@@ -1,7 +1,7 @@
 var React = require('react');
 var ReactRouter = require('react-router');
 var Link = ReactRouter.Link;
-var auth = require('../auth');
+var auth = require('../../utils/auth');
 var Header = require('../Header/Header');
 var Footer = require('../Footer/Footer');
 var Login = require('../Login/Login');
@@ -28,10 +28,6 @@ module.exports = React.createClass({
 	    auth.login();
 	},
 
-	handleLogin: function() {
-
-	},
-
 	render: function() {
 
 		return (
@@ -39,7 +35,6 @@ module.exports = React.createClass({
 				<Header 
 					isLoggedIn={this.state.isLoggedIn}
 					user={this.state.isLoggedIn? auth.getUser():null}
-					handleLogin={this.handleLogin}
 					/>
 				<div className="container">	
 					{this.props.children}

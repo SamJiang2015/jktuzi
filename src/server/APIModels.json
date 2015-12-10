@@ -2,6 +2,22 @@
 //  Models for all datatypes -- these are not part of the code
 //
 
+account (账户): http://<domain>/v1/api/account
+
+{
+    "data" : {
+        "id"          :  1,
+        "mobile"      :  18688888888,
+        "name"        :  "张三"
+        "password"    :  ,
+        "userCreated" :  0/1,        
+        "userId"      :  null,
+        "coachCreated":  0/1,
+        "coachId"     :  null,
+        "created"     : 
+
+    }
+}
 
 coach (教练): http://<domain>/api/coach/{username}
 

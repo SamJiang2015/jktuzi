@@ -7,14 +7,14 @@ var Route = ReactRouter.Route;
 var IndexRoute = ReactRouter.IndexRoute;
 var createBrowserHistory = require('history/lib/createBrowserHistory');
 
-var Main = require('./Main/Main');
-var auth = require('./auth');
-var Register = require('./Register/Register');
-var Login = require('./Login/Login');
-var Logout = require('./Logout/Logout');
-var Groups = require('./Group/Groups');
-var About = require('./About/About');
-var Intro = require('./Intro/Intro');
+var Main = require('./components/Main/Main');
+var auth = require('./utils/auth');
+var Register = require('./components/Register/Register');
+var Login = require('./components/Login/Login');
+var Logout = require('./components/Logout/Logout');
+var Groups = require('./components/Group/Groups');
+var About = require('./components/About/About');
+var Intro = require('./components/Intro/Intro');
 
 function requireAuth(nextState, replaceState) {
   if (!auth.loggedIn()) {

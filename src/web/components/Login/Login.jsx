@@ -8,7 +8,7 @@ var Input = require('react-bootstrap/lib/input');
 var Glyphicon = require('react-bootstrap/lib/glyphicon');
 var Button = require('react-bootstrap/lib/button');
 
-var auth = require('../auth');
+var auth = require('../../utils/auth');
 
 module.exports = React.createClass({
 

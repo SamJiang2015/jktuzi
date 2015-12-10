@@ -21,7 +21,7 @@ var path = {
 	FONTS: ['./src/web/fonts/*'],
 	IMAGES: ['./src/web/images/*'],
 	SERVER_JS: ['./src/server/*.js', './src/server/**/*.js'],
-	ENTRY_POINT: './src/web/components/app.jsx',	
+	ENTRY_POINT: './src/web/app.jsx',	
 	OUT: 'build.js',
 	OUT_CSS: 'style.css',
 	MINIFIED_OUT: 'build.min.js',

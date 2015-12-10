@@ -17,8 +17,6 @@ var Glyphicon = require('react-bootstrap/lib/glyphicon');
 // package that provides a react-router wrapper for react-bootstrap elements
 var LinkContainer = require('react-router-bootstrap').LinkContainer;
 
-var auth = require('../auth');
-
 module.exports = React.createClass({
 
 	getInitialState: function() {
@@ -97,7 +95,11 @@ module.exports = React.createClass({
 	render: function() {
 	   	return (
 		    <div className="header">
-        		<Navbar inverse fixedTop expanded={this.state.navExpanded} onToggle={this.handleToggle} id="mainPage-navbar">
+        		<Navbar 
+        			inverse 
+        			fixedTop 
+        			expanded={this.state.navExpanded} 
+        			onToggle={this.handleToggle} >
 	            	{this.renderNavbarHeader()}	
 					<Navbar.Collapse onClick={this.handleNavClick}>	            		
 	            		{this.props.isLoggedIn? this.renderNavbarItemsLoggedIn():this.renderNavbarItemsNotLoggedIn()}

@@ -1,5 +1,5 @@
 var React = require('react');
-var auth = require('../auth');
+var auth = require('../../utils/auth');
 var Login = require('../Login/Login');
 
 module.exports = React.createClass({
