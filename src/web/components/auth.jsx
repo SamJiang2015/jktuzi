@@ -24,7 +24,9 @@ module.exports = {
           try {
             localStorage.token = res.token;
           } catch (e) {
-            alert('您的浏览器不支持本地储存信息。请确认您没有启用"无痕浏览"后再尝试登录。')
+            alert('您的浏览器不支持本地储存信息。请确认您没有启用"无痕浏览"后再尝试登录。');
+            this.onChange(false);
+            return;
           }
 
           if (cb) cb(true)

@@ -50,7 +50,7 @@ module.exports = React.createClass({
 			);
 		const mobileGlyphicon=<Glyphicon glyph="phone"/>;
 		const passwordGlyphicon=<Glyphicon glyph="lock"/>;
-		var errorMsg = <h4>登录信息不正确</h4>;	
+		var errorMsg = <p className="error">登录信息不正确</p>;	
 		
 		return (
 			<div className="login">

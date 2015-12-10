@@ -23,8 +23,24 @@ module.exports = React.createClass({
 
 	getInitialState: function() {
 		return {
-			error: false
+			error: false,
+			navExpanded: false
 		}
+	},
+
+	handleToggle(navExpanded) {
+
+		this.setState({
+			navExpanded: navExpanded
+		});
+	},
+
+	handleNavClick(e) {
+		if (this.state.navExpanded) {
+			this.setState({
+				navExpanded: false
+			});
+		}		
 	},
 
 	// left part of the navbar
@@ -36,7 +52,7 @@ module.exports = React.createClass({
 	          			PiPi健康生活
 	      			</Link>
 				</Navbar.Brand>
-				<Navbar.Toggle />
+				<Navbar.Toggle onClick={this.handleToggle} />
 			</Navbar.Header>
 			);
 	},
@@ -68,7 +84,7 @@ module.exports = React.createClass({
 	renderNavbarItemsNotLoggedIn: function() {
 
 		return (
-            <Nav pullRight>
+            <Nav pullRight onClick={this.handleNavClick}>
                 <LinkContainer to="/about"><NavItem eventKey={1}>关于PiPi</NavItem></LinkContainer>
                 <LinkContainer to="/intro"><NavItem eventKey={2}>功能说明</NavItem></LinkContainer>
                 <LinkContainer to="/register"><NavItem eventKey={3}>我要注册</NavItem></LinkContainer>   
@@ -79,7 +95,7 @@ module.exports = React.createClass({
 	render: function() {
 	   	return (
 		    <div className="header">
-        		<Navbar inverse fixedTop id="mainPage-navbar">
+        		<Navbar inverse fixedTop expanded={this.state.navExpanded} onToggle={this.handleToggle} id="mainPage-navbar">
 	            	{this.renderNavbarHeader()}	
 					<Navbar.Collapse>	            		
 	            		{this.props.isLoggedIn? this.renderNavbarItemsLoggedIn():this.renderNavbarItemsNotLoggedIn()}
