@@ -1,14 +1,19 @@
 var Fetch = require('whatwg-fetch');
+var PORT = process.env.PORT || 3000;
 var rootUrl = 'http://10.10.10.110:3000/api/v1/';
-require('es6-promise').polyfill();
+//var rootUrl = 'http://pipifit.herokuapp.com/api/v1/'; 
+console.log('rootUrl: ' + rootUrl);
 
-var auth = require('./auth');
+// need this for browsers that do not support fetch (IEs, android)
+require('es6-promise').polyfill();
 
 module.exports = {
   get: function(url) {
     return fetch(rootUrl + url, {
       headers: {
-        'Authorization': auth.getToken()
+        'Auth': localStorage.token,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'              
       }
     })
     .then(function(response){
@@ -17,7 +22,7 @@ module.exports = {
   },
 
   post: function(url, payload, needAuth) {
-    var token = needAuth? auth.getToken() : '';
+    var token = needAuth? localStorage.token : '';
 
     return fetch(rootUrl + url, {
       method: 'post',
@@ -33,18 +38,13 @@ module.exports = {
     })
   },
 
-  login: function(url, payload) {
-    return fetch(rootUrl + url, {
-      method: 'post',
-      body: JSON.stringify(payload)
-    })
-  },   
-
   put: function(url, payload) {
     return fetch(rootUrl + url, {
       method: 'put',
       headers: {
-        'Authorization': auth.getToken()
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',        
+        'Auth': localStorage.token
       },
       body: JSON.stringify(payload)
     })
@@ -57,7 +57,9 @@ module.exports = {
     return fetch(rootUrl + url, {
       method: 'delete',
       headers: {
-        'Authorization': auth.getToken()
+        'Auth': localStorage.token,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'        
       },
     })
     .then(function(response) {

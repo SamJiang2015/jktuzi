@@ -22,6 +22,7 @@ app.use(bodyParser.json());
 app.use(function(req, res, next) {
 	console.log('\n' + new Date(Date.now()).toString() + ' ' + 
 		req.method + ' ' + req.protocol+'://'+req.hostname+req.originalUrl);
+	console.log('Auth header: ' + req.get('Auth'));
 	console.log(req.body);
 	console.log('\n');
 	next();
@@ -35,7 +36,7 @@ app.get('/*', function(req, res) {
 });
 
 db.sequelize.sync({
-	force: true
+	force: false
 }).then(function() {
 	app.listen(PORT, function() {
 		console.log('Server started on port ' + PORT);

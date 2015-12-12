@@ -62,7 +62,7 @@ router.delete('/login',
 
 		//delete the token instance
 		req.token.destroy().then(function(){
-			res.status(204).json(util.formatOutput({}, 204, true));
+			res.status(200).json(util.formatOutput({}, 200, true));
 		}, function() {
 			res.status(500).json(util.formatOutput({error: 'internal server error'}, 500, false));
 		});

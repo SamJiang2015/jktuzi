@@ -70,7 +70,20 @@ module.exports = {
   },
 
   logout: function(cb) {
-    delete localStorage.token;
+    if (localStorage.token) {
+      // call the DB to delete the token stored on server side
+      // we don't care what the function returns; it is okay even 
+      // if the token was not deleted properly since we already
+      // removed it from client side.    
+      Api.delete('accounts/login')
+          .then(function(json) {
+            //do nothing
+            console.log(json);
+          });
+
+      // remove the stored token on the client side
+      delete localStorage.token;
+    }
 
     if (cb) {
       cb();

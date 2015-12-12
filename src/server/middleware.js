@@ -27,10 +27,10 @@ module.exports = function(db) {
 
 				req.token = tokenInstance;
 
-				return db.user.findByToken(token);
+				return db.account.findByToken(token);
 
-			}).then(function(user) {
-				req.user = user; // store the retrieved user for route handler
+			}).then(function(account) {
+				req.account = account; // store the retrieved account for route handler
 				next();
 			}).catch(function(e) {
 				console.log(e);

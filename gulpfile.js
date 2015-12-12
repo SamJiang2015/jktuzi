@@ -144,7 +144,7 @@ gulp.task('build', function() {
 	})
 		.bundle()
 		.pipe(source(path.MINIFIED_OUT))
-//		.pipe(streamify(uglify()))
+		.pipe(streamify(uglify()))
 		.pipe(gulp.dest(path.DEST_WEB_BUILD));
 	});
 
