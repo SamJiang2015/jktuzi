@@ -2,9 +2,11 @@
 // Auth.jsx
 //
 
+var Api = require('./api');
+
 module.exports = {
   
-  login: function(phone, pass, cb) {
+  login: function(mobile, pass, cb) {
 
     cb = arguments[arguments.length - 1];
 
@@ -18,13 +20,15 @@ module.exports = {
       return;
     }
 
-    if (phone && pass) {
-      pretendRequest(phone, pass, function(res) {
+    if (mobile && pass) {
+      loginRequest(mobile, pass, function(res) {
         if (res.authenticated) {
           try {
             localStorage.token = res.token;
+            this.accountName = res.name;
           } catch (e) {
             alert('您的浏览器不支持本地储存信息。请确认您没有启用"无痕浏览"后再尝试登录。');
+            if (cb) cb(false);
             this.onChange(false);
             return;
           }
@@ -39,8 +43,26 @@ module.exports = {
     }
   },
 
+  register: function(mobile, name, pass, cb) {
+
+    cb = arguments[arguments.length - 1];
+
+    if (mobile && name && pass) {
+      Api.post('accounts', {mobile: mobile, name: name, password: pass})
+      .then(function(json){
+        cb(json.success);
+        })
+      .catch(function (e) {
+        console.log('Error when calling register: ' + e.toString());
+        cb(false);
+      });    
+    } else {
+      cb(false);
+    }
+  },
+
   getUser: function() {
-    return '姜山';
+    return this.accountName;
   },
 
   getToken: function() {
@@ -61,18 +83,38 @@ module.exports = {
   },
 
   // will be set to the UpdateAuth method from the main component
-  onChange: function() {}
+  onChange: function() {},
+
+  // will be set once a login is successfully called
+  accountName: ''
 }
 
-function pretendRequest(phone, pass, cb) {
-  setTimeout(function() {
-    if (phone === '12345' && pass === 'password1') {
+function loginRequest(mobile, pass, cb) {
+
+  Api.post('accounts/login', {mobile: mobile, password: pass})
+  .then(function(json){
+    if (json.success) {
       cb({
         authenticated: true,
-        token: Math.random().toString(36).substring(7)
+        token: json.data.token,
+        name: json.data.name
       })
     } else {
-      cb({ authenticated: false })
+      cb({authenticated: false});
     }
-  }, 0)
+  });
+
+  // setTimeout(function() {
+  //   if (phone === '12345' && pass === 'password1') {
+  //     cb({
+  //       authenticated: true,
+  //       token: Math.random().toString(36).substring(7)
+  //     })
+  //   } else {
+  //     cb({ authenticated: false })
+  //   }
+  // }, 0)
 }
+
+
+

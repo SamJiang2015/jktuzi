@@ -1,6 +1,8 @@
 var Fetch = require('whatwg-fetch');
-var rootUrl = 'http://localhost:3000/v1/api/';
-var auth = require('../components/auth')
+var rootUrl = 'http://10.10.10.110:3000/api/v1/';
+require('es6-promise').polyfill();
+
+var auth = require('./auth');
 
 module.exports = {
   get: function(url) {
@@ -14,11 +16,15 @@ module.exports = {
     })
   },
 
-  post: function(url, payload) {
+  post: function(url, payload, needAuth) {
+    var token = needAuth? auth.getToken() : '';
+
     return fetch(rootUrl + url, {
       method: 'post',
       headers: {
-        'Authorization': auth.getToken()
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Auth': token
       },
       body: JSON.stringify(payload)
     })
@@ -26,6 +32,13 @@ module.exports = {
       return response.json()
     })
   },
+
+  login: function(url, payload) {
+    return fetch(rootUrl + url, {
+      method: 'post',
+      body: JSON.stringify(payload)
+    })
+  },   
 
   put: function(url, payload) {
     return fetch(rootUrl + url, {

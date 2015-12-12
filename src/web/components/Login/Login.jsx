@@ -20,7 +20,7 @@ module.exports = React.createClass({
 		}
 	},
 
-	handleSubmit: function(event) {
+	handleLogin: function(event) {
 		event.preventDefault();
 
 		const phone = this.refs.phone.getValue();
@@ -61,7 +61,7 @@ module.exports = React.createClass({
 		            <form>
 		                <Input type="tel" ref="phone" placeholder="手机" hasFeedback feedbackIcon={mobileGlyphicon} />
 		                <Input type="password" ref="pass" placeholder="密码" hasFeedback feedbackIcon={passwordGlyphicon} />
-		                <Button bsStyle="info" block onClick={this.handleSubmit}>登录</Button>
+		                <Button bsStyle="info" block onClick={this.handleLogin}>登录</Button>
 		                <p id="registrationLink"><Link to="/register">我要注册</Link></p>
 		                {this.state.error && errorMsg}
 		            </form>

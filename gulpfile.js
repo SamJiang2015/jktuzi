@@ -21,11 +21,13 @@ var path = {
 	FONTS: ['./src/web/fonts/*'],
 	IMAGES: ['./src/web/images/*'],
 	SERVER_JS: ['./src/server/*.js', './src/server/**/*.js'],
+	SERVER_DB: ['./src/server/data/*.sqlite'],
 	ENTRY_POINT: './src/web/app.jsx',	
 	OUT: 'build.js',
 	OUT_CSS: 'style.css',
 	MINIFIED_OUT: 'build.min.js',
 	DEST: 'dist',
+	DEST_SERVER_DB: 'dist/data',
 	DEST_WEB: 'dist/public',
 	DEST_WEB_SRC: 'dist/public/js',
 	DEST_WEB_CSS: 'dist/public/css',
@@ -97,6 +99,10 @@ gulp.task('copy-server-js', function() {
 	.pipe(gulp.dest(path.DEST));
 });
 
+gulp.task('copy-server-data-dir', function() {
+	gulp.src(path.SERVER_DB)
+	.pipe(gulp.dest(path.DEST_SERVER_DB));
+});
 
 // Development task 4: main task
 gulp.task('watch', function() {
@@ -126,7 +132,7 @@ gulp.task('watch', function() {
 	.pipe(gulp.dest(path.DEST_WEB_SRC));
 });
 
-gulp.task('default', ['copy-server-js','copy-html', 'copy-fonts', 'copy-images', 'sass', 'watch']);
+gulp.task('default', ['copy-server-js', 'copy-server-data-dir', 'copy-html', 'copy-fonts', 'copy-images', 'sass', 'watch']);
 
 // Production task: concat all JS files, minify them and output to the build folder
 gulp.task('build', function() {
