@@ -51,7 +51,6 @@ module.exports = function(sequelize, DataTypes) {
 					notEmpty: true // name can't be empty
 				}
 			},			
-
 			salt: {
 				type: DataTypes.STRING
 			},
@@ -126,7 +125,8 @@ module.exports = function(sequelize, DataTypes) {
 							var bytes = cryptojs.AES.decrypt(decodedJWT.token, 'abc123!@#!');
 							var tokenData = JSON.parse(bytes.toString(cryptojs.enc.Utf8));
 
-							account.findById(tokenData.id).then(function(account){
+							account.findById(tokenData.id)
+							.then(function(account){
 								if(account) {
 									resolve(account);
 								} else {
@@ -145,7 +145,7 @@ module.exports = function(sequelize, DataTypes) {
 				// helper function to hide password/password-hash/salt from being returned
 				toPublicJSON: function() {
 					var json = this.toJSON();
-					return _.pick(json, 'id', 'mobile', 'name', 'token', 'createdAt', 'updatedAt');
+					return _.pick(json, 'id', 'mobile', 'name', 'token', 'roleId', 'createdAt', 'updatedAt');
 				},
 				// generate an auth token using the account id
 				generateToken: function(type) {

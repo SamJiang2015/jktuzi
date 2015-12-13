@@ -5,6 +5,8 @@ var auth = require('../../utils/auth');
 var Header = require('../Header/Header');
 var Footer = require('../Footer/Footer');
 var Login = require('../Login/Login');
+var RoleName = require('../../utils/constants').RoleName;
+
 
 module.exports = React.createClass({   
 		
@@ -35,6 +37,7 @@ module.exports = React.createClass({
 				<Header 
 					isLoggedIn={this.state.isLoggedIn}
 					user={this.state.isLoggedIn? auth.getUser():null}
+					roleName={this.state.isLoggedIn? auth.getRoleName():null}
 					/>
 				<div className="container">	
 					{this.props.children}

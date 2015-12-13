@@ -5,9 +5,11 @@
 //
 
 var Sequelize = require('sequelize');
-var env = process.env.NODE_ENV || 'development'; // Heroku sets this env varisable to 'production'
-var sequelize;
+var Role = require('./constants.js').Role;
 
+var env = process.env.NODE_ENV || 'development'; // Heroku sets this env varisable to 'production'
+
+var sequelize;
 if (env === 'production') {
 	// we are running on Heroku
 	sequelize = new Sequelize(
@@ -28,6 +30,7 @@ var db = {};
 
 db.account = sequelize.import(__dirname + '/models/account.js');
 db.token = sequelize.import(__dirname + '/models/token.js');
+db.role = sequelize.import(__dirname + '/models/role.js');
 // db.trainer = sequelize.import(__dirname + '/models/trainer.js');
 // db.trainee = sequelize.import(__dirname + '/models/trainee.js');
 // db.group   = sequelize.import(__dirname + '/models/group.js');
@@ -35,6 +38,12 @@ db.token = sequelize.import(__dirname + '/models/token.js');
 db.sequelize = sequelize;
 
 // setting up association between todos and user
+db.account.belongsTo(db.role, {
+	foreignKey: {
+		allowNull: false,
+		defaultValue: Role.Trainee.id
+	}
+});
 // db.todo.belongsTo(db.user);
 // db.user.hasMany(db.todo);
 

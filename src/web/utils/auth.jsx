@@ -3,6 +3,7 @@
 //
 
 var Api = require('./api');
+var Constants = require('./constants');
 
 module.exports = {
   
@@ -26,6 +27,7 @@ module.exports = {
           try {
             localStorage.token = res.token;
             this.accountName = res.name;
+            this.role = res.role;
           } catch (e) {
             alert('您的浏览器不支持本地储存信息。请确认您没有启用"无痕浏览"后再尝试登录。');
             if (cb) cb(false);
@@ -69,6 +71,14 @@ module.exports = {
     return localStorage.token;
   },
 
+  getRole: function() {
+    return this.role;
+  },
+
+  getRoleName: function() {
+    return Constants.RoleName[this.role];
+  },
+
   logout: function(cb) {
     if (localStorage.token) {
       // call the DB to delete the token stored on server side
@@ -78,7 +88,6 @@ module.exports = {
       Api.delete('accounts/login')
           .then(function(json) {
             //do nothing
-            console.log(json);
           });
 
       // remove the stored token on the client side
@@ -99,7 +108,9 @@ module.exports = {
   onChange: function() {},
 
   // will be set once a login is successfully called
-  accountName: ''
+  accountName: '',
+
+  role: Constants.RoleValue.Trainee
 }
 
 function loginRequest(mobile, pass, cb) {
@@ -110,7 +121,8 @@ function loginRequest(mobile, pass, cb) {
       cb({
         authenticated: true,
         token: json.data.token,
-        name: json.data.name
+        name: json.data.name,
+        role: json.data.roleId
       })
     } else {
       cb({authenticated: false});

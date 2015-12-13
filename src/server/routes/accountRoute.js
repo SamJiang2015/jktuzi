@@ -44,6 +44,8 @@ router.post('/login',
 				return db.token.create({
 					token: token
 				});
+			}, function() {
+				res.status(401).json(util.formatOutput(e||'', 401, false));
 			})
 			.then(function(tokenInstance) {
 				accountInstance = accountInstance.toPublicJSON();

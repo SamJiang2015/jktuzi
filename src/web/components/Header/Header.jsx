@@ -64,7 +64,7 @@ module.exports = React.createClass({
                 <LinkContainer to="/groups"><NavItem eventKey={1}>我的群</NavItem></LinkContainer>
                 <LinkContainer to="/trainees"><NavItem eventKey={2}>我的学员</NavItem></LinkContainer>
                 <LinkContainer to="/stat"><NavItem eventKey={3}>打卡统计</NavItem></LinkContainer>   
-                <NavDropdown eventKey={3} title={this.props.user + '教练'} id="navbar-dropdown">
+                <NavDropdown eventKey={3} title={this.props.user + this.props.roleName} id="navbar-dropdown">
                 	<LinkContainer to="/user-info">
                 		<MenuItem eventKey={3.1}>注册信息</MenuItem>
             		</LinkContainer>

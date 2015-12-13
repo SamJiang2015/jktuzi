@@ -1,6 +1,5 @@
 var Fetch = require('whatwg-fetch');
-var PORT = process.env.PORT || 3000;
-var rootUrl = 'http://10.10.10.110:3000/api/v1/';
+var rootUrl = 'http://10.10.10.112:3000/api/v1/';
 //var rootUrl = 'http://pipifit.herokuapp.com/api/v1/'; 
 console.log('rootUrl: ' + rootUrl);
 
