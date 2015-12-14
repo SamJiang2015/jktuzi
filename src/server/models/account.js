@@ -50,7 +50,14 @@ module.exports = function(sequelize, DataTypes) {
 				validate: {
 					notEmpty: true // name can't be empty
 				}
-			},			
+			},
+			// whether the user has completed info (if so a row in trainee table should have been created)
+			infoCompleted: {
+				type: DataTypes.BOOLEAN,
+				allowNull: false,
+				unique: false,
+				defaultValue: false
+			},		
 			salt: {
 				type: DataTypes.STRING
 			},
@@ -74,6 +81,7 @@ module.exports = function(sequelize, DataTypes) {
 					this.setDataValue('password_hash', hashedPassword);
 				}
 			}
+			// roleId -- foreign key to the role table added through the .belongto call in db.js
 		}, 
 		//
 		// other options (hook, classMethods, instanceMethods, etc.)
@@ -145,7 +153,7 @@ module.exports = function(sequelize, DataTypes) {
 				// helper function to hide password/password-hash/salt from being returned
 				toPublicJSON: function() {
 					var json = this.toJSON();
-					return _.pick(json, 'id', 'mobile', 'name', 'token', 'roleId', 'createdAt', 'updatedAt');
+					return _.pick(json, 'id', 'mobile', 'name', 'token', 'roleId', 'infoCompleted','createdAt', 'updatedAt');
 				},
 				// generate an auth token using the account id
 				generateToken: function(type) {

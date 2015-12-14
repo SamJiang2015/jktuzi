@@ -7,6 +7,9 @@ var Constants = require('./constants');
 
 module.exports = {
   
+  /*
+  ** login
+  */
   login: function(mobile, pass, cb) {
 
     cb = arguments[arguments.length - 1];
@@ -28,6 +31,7 @@ module.exports = {
             localStorage.token = res.token;
             this.accountName = res.name;
             this.role = res.role;
+            this.infoCompleted = res.infoCompleted;
           } catch (e) {
             alert('您的浏览器不支持本地储存信息。请确认您没有启用"无痕浏览"后再尝试登录。');
             if (cb) cb(false);
@@ -45,6 +49,9 @@ module.exports = {
     }
   },
 
+  /*
+  ** handles registration
+  */
   register: function(mobile, name, pass, cb) {
 
     cb = arguments[arguments.length - 1];
@@ -63,22 +70,9 @@ module.exports = {
     }
   },
 
-  getUser: function() {
-    return this.accountName;
-  },
-
-  getToken: function() {
-    return localStorage.token;
-  },
-
-  getRole: function() {
-    return this.role;
-  },
-
-  getRoleName: function() {
-    return Constants.RoleName[this.role];
-  },
-
+  /*
+  ** handles logging out
+  */
   logout: function(cb) {
     if (localStorage.token) {
       // call the DB to delete the token stored on server side
@@ -100,6 +94,29 @@ module.exports = {
     this.onChange(false);
   },
 
+  /*
+  ** getting functions
+  */
+  getUser: function() {
+    return this.accountName;
+  },
+
+  getToken: function() {
+    return localStorage.token;
+  },
+
+  getRole: function() {
+    return this.role;
+  },
+
+  getRoleName: function() {
+    return Constants.RoleName[this.role];
+  },
+
+  getInfoCompleted: function() {
+    return this.infoCompleted;
+  },
+
   loggedIn: function() {
     return !!localStorage.token;
   },
@@ -110,19 +127,27 @@ module.exports = {
   // will be set once a login is successfully called
   accountName: '',
 
-  role: Constants.RoleValue.Trainee
+  role: Constants.RoleValue.Trainee,
+
+  infoCompleted: false
 }
 
+/*
+** login helper function that talks to the server 
+*/
 function loginRequest(mobile, pass, cb) {
 
   Api.post('accounts/login', {mobile: mobile, password: pass})
   .then(function(json){
+    console.log(json);
+    
     if (json.success) {
       cb({
         authenticated: true,
         token: json.data.token,
         name: json.data.name,
-        role: json.data.roleId
+        role: json.data.roleId,
+        infoCompleted: json.data.infoCompleted
       })
     } else {
       cb({authenticated: false});

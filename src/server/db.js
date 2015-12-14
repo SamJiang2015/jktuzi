@@ -32,18 +32,42 @@ db.account = sequelize.import(__dirname + '/models/account.js');
 db.token = sequelize.import(__dirname + '/models/token.js');
 db.role = sequelize.import(__dirname + '/models/role.js');
 // db.trainer = sequelize.import(__dirname + '/models/trainer.js');
-// db.trainee = sequelize.import(__dirname + '/models/trainee.js');
+db.trainee = sequelize.import(__dirname + '/models/trainee.js');
 // db.group   = sequelize.import(__dirname + '/models/group.js');
 
 db.sequelize = sequelize;
 
-// setting up association between todos and user
+/*
+** setting up association
+**/
+
+// each account has a roleId column
 db.account.belongsTo(db.role, {
 	foreignKey: {
 		allowNull: false,
 		defaultValue: Role.Trainee.id
 	}
 });
+
+// each trainee has an account column, which can be null
+// in the current phase (since trainers will manually enter trainee info)
+db.trainee.belongsTo(db.account, {
+	as: 'traineeAccount',
+	foreignKey: {
+		name: 'accountId',
+		allowNull: true
+	}
+});
+
+// each trainee also has a sponsor, track that with the sponsor's account id
+db.trainee.belongsTo(db.account, {
+	as: 'traineeSponsorAccount',
+	foreignKey: {
+		name: 'sponsorAccountId',
+		allowNull: false
+	}
+});
+
 // db.todo.belongsTo(db.user);
 // db.user.hasMany(db.todo);
 

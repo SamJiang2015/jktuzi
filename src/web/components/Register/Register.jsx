@@ -20,7 +20,7 @@ module.exports = React.createClass({
 		}
 	},
 
-	// this way user can click on 注册 again, 
+	// this way user can click on 注册 again
   	componentWillReceiveProps: function(nextProps){
 		this.setState({
 			registered: false
