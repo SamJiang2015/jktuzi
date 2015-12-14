@@ -15,10 +15,10 @@ module.exports = React.createClass({
 				<div className="panel-body">
 					<table className="table table-responsive table-striped table-condensed">
 						<tbody>
-							<tr>
-								<td>姓名</td>
-								<td>{this.props.fieldValues.name}</td>
-							</tr>					
+							<tr> 
+								<td>邮箱</td> 
+								<td>{this.props.fieldValues.email}</td>
+							</tr>						
 							<tr> 
 								<td>生日</td> 
 								<td>{this.props.fieldValues.birthdate}</td>
@@ -27,10 +27,6 @@ module.exports = React.createClass({
 							<tr>
 								<td>性别</td>
 								<td>{this.props.fieldValues.isMale===null? '': (this.props.fieldValues.isMale?'男':'女')}</td>
-							</tr>
-							<tr> 
-								<td>邮箱</td> 
-								<td>{this.props.fieldValues.email}</td>
 							</tr>
 							<tr> 
 								<td>职业</td> 
@@ -70,8 +66,12 @@ module.exports = React.createClass({
 							</tr>							
 							<tr>
 								<td>介绍人</td> 
-								<td>{this.props.fieldValues.sponsor}</td>
+								<td>{this.props.fieldValues.sponsorName}</td>
 							</tr>
+							<tr>
+								<td>介绍人手机</td> 
+								<td>{this.props.fieldValues.sponsorMobile}</td>
+							</tr>							
 						</tbody>
 					</table>
 

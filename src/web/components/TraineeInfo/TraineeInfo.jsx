@@ -37,10 +37,10 @@ var Confirmation = require('./Confirmation');
 var Success = require('./Success');
 
 var Api = require('../../utils/api');
+var Auth = require('../../utils/auth');
 
 var fieldValues = {
 	// basic info:
-	name: null,
 	isMale: null,
 	nickname: null,
 	signature: null, 
@@ -55,7 +55,8 @@ var fieldValues = {
 	bodyfatGoal: null,
 	habbit: null,
 	// sponsor:
-	sponsor: null
+	sponsorName: null,
+	sponsorMobile: null
 }
 
 module.exports = React.createClass({
@@ -85,16 +86,24 @@ module.exports = React.createClass({
 	submitTraineeInfo: function() {
 		//call Api to submit the info, upon success return this.nextStep()
 		// if fails, show error and do not advance
-      	Api.post('trainees', fieldValues, true)
+      	Api.post('accounts/'+ Auth.getAccountId() +'/traineeInfo', fieldValues, true)
       	.then(function(json){
         	console.log(json);
 
-        	// show the success page
-			this.nextStep();
-        })
+        	if (json.success) {
+
+        		// flip the flag cached at server-side;
+        		Auth.setInfoCompleted(true);
+
+	       		// show the success page
+				this.nextStep();
+			} else {
+				//todo: handle error case
+				alert("信息有误。请核对信息后再试。")；
+			}
+        }.bind(this))
       	.catch(function (e) {
         	console.log('Error when calling submitTraineeInfo: ' + e.toString());
-
       	});    
 	},
 

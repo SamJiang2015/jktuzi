@@ -9,7 +9,8 @@ var bodyParser = require('body-parser');
 var Role = require('./constants.js').Role;
 
 // Route handlers
-var accountRoutes = require('./routes/accountRoute.js')
+var accountRoutes = require('./routes/accountRoute.js');
+var traineeRoutes = require('./routes/traineeRoute.js');
 
 var app = express();
 var PORT = process.env.PORT || 3000;

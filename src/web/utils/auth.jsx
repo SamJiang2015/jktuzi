@@ -32,6 +32,7 @@ module.exports = {
             this.accountName = res.name;
             this.role = res.role;
             this.infoCompleted = res.infoCompleted;
+            this.accountId = res.accountId;
           } catch (e) {
             alert('您的浏览器不支持本地储存信息。请确认您没有启用"无痕浏览"后再尝试登录。');
             if (cb) cb(false);
@@ -97,8 +98,12 @@ module.exports = {
   /*
   ** getting functions
   */
-  getUser: function() {
+  getAccountName: function() {
     return this.accountName;
+  },
+
+  getAccountId: function() {
+    return this.accountId;
   },
 
   getToken: function() {
@@ -117,6 +122,10 @@ module.exports = {
     return this.infoCompleted;
   },
 
+  setInfoCompleted: function(infoCompleted) {
+    this.infoCompleted = infoCompleted;
+  },
+
   loggedIn: function() {
     return !!localStorage.token;
   },
@@ -126,9 +135,8 @@ module.exports = {
 
   // will be set once a login is successfully called
   accountName: '',
-
+  accountId: null,
   role: Constants.RoleValue.Trainee,
-
   infoCompleted: false
 }
 
@@ -144,6 +152,7 @@ function loginRequest(mobile, pass, cb) {
     if (json.success) {
       cb({
         authenticated: true,
+        accountId: json.data.id,
         token: json.data.token,
         name: json.data.name,
         role: json.data.roleId,

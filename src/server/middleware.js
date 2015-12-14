@@ -5,6 +5,7 @@
 //
 
 var cryptojs = require('crypto-js');
+var util = require('./util.js');
 
 module.exports = function(db) {
 
@@ -22,7 +23,7 @@ module.exports = function(db) {
 
 				if (!tokenInstance) {
 					// no token found in DB
-					throw new Error();
+					throw new Error('auth token not found');
 				}
 
 				req.token = tokenInstance;
@@ -34,7 +35,8 @@ module.exports = function(db) {
 				next();
 			}).catch(function(e) {
 				console.log(e);
-				res.status(401).send();
+				res.status(401).json(util.formatOutput({errorMsg: e.toString()}, 401, false));
+				res.end();
 			});
 		}
 	}

@@ -26,13 +26,13 @@ function requireAuth(nextState, replaceState) {
 ReactDOM.render((
 	<Router history={createBrowserHistory()}>
 		<Route path='/' component={Main}>
-			<IndexRoute component={TraineeInfo} onEnter={requireAuth} />
+			<Route path='groups' component={Groups} onEnter={requireAuth} />
 			<Route path='login' component={Login} />
 			<Route path='about' component={About} />
 			<Route path='intro' component={Intro} />
 			<Route path='logout' component={Logout} />
 			<Route path='register' component={Register} />
-			<Route path='groups' component={Groups} onEnter={requireAuth} />
+			<Route path='myInfo' component={TraineeInfo} onEnter={requireAuth} />			
 		</Route>
 	</Router>),
 	document.getElementById('app') 

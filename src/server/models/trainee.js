@@ -37,20 +37,20 @@ module.exports = function(sequelize, DataTypes) {
 				type: DataTypes.BOOLEAN,
 				allowNull: false
 			},
-			sex: {
-				type: DataTypes.VIRTUAL, // this property does not get stored, but remains accessible
-				allowNull: false,
-				validate: {
-					isIn: ['f', 'm'] // password should be at least 6 letters long
-				},
-				set: function(value) {
-					this.setDataValue('sex', value);
-					this.setDataValue('isMale', value==='m');
-				},
-				get: function() {
-					return (this.isMale)?'m':'f';
-				}
-			},			
+			// sex: {
+			// 	type: DataTypes.VIRTUAL, // this property does not get stored, but remains accessible
+			// 	allowNull: false,
+			// 	validate: {
+			// 		isIn: ['f', 'm'] // password should be at least 6 letters long
+			// 	},
+			// 	set: function(value) {
+			// 		this.setDataValue('sex', value);
+			// 		this.setDataValue('isMale', value==='m');
+			// 	},
+			// 	get: function() {
+			// 		return (this.isMale)?'m':'f';
+			// 	}
+			// },			
 			nickname: {
 				type: DataTypes.STRING,
 				allowNull: false,
@@ -58,11 +58,20 @@ module.exports = function(sequelize, DataTypes) {
 					len: [1, 20]
 				}
 			},
+			email: {
+				type: DataTypes.STRING,
+				allowNull: true,
+				validate: {
+					isEmail: true,
+					len: [4, 50]
+				}
+			},
 			birthdate: {
 				type: DataTypes.DATE,
 				allowNull: false 
 				// ToDo: add validation
 			},
+			// cm 
 			height: {
 				type: DataTypes.INTEGER,
 				allowNull: false,
@@ -71,6 +80,7 @@ module.exports = function(sequelize, DataTypes) {
 					max: 300
 				}
 			},
+			// 斤
 			weight: {
 				type: DataTypes.FLOAT,
 				allowNull: false,
@@ -79,12 +89,13 @@ module.exports = function(sequelize, DataTypes) {
 					max: 500
 				}				
 			},
+			// %
 			bodyfat: {
 				type: DataTypes.FLOAT,
 				allowNull: false,
 				validate: {
-					min: 0.03,
-					max: 0.50
+					min: 3,
+					max: 50
 				}				
 			},
 			profession: {
@@ -101,6 +112,7 @@ module.exports = function(sequelize, DataTypes) {
 					len: [1, 100]
 				}
 			},
+			// 斤
 			weightGoal: {
 				type: DataTypes.FLOAT,
 				allowNull: true,
@@ -109,12 +121,13 @@ module.exports = function(sequelize, DataTypes) {
 					max: 500
 				}
 			},
+			// %
 			bodyfatGoal: {
 				type: DataTypes.FLOAT,
 				allowNull: true,
 				validate: {
-					min: 0.03,
-					max: 0.50
+					min: 3,
+					max: 50
 				}				
 			},
 			signature: {
@@ -122,6 +135,21 @@ module.exports = function(sequelize, DataTypes) {
 				allowNull: true,
 				validate: {
 					len: [1, 100]
+				}
+			},
+			sponsorName: {
+				type: DataTypes.STRING,
+				allowNull: true,
+				validate: {
+					len: [2, 100]
+				}
+			},
+			sponsorMobile: {
+				type: DataTypes.STRING,
+				allowNull: false,
+				validate: {
+					isNumeric: true, // only allow numbers
+					len: [11, 20] // valid mobile number should have at least 11 digits
 				}
 			}
 		}

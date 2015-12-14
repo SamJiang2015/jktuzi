@@ -16,7 +16,8 @@ module.exports = React.createClass({
 		var data = {
 			nickname: this.refs.nickname.getValue().trim(),
 			signature: this.refs.signature.getValue().trim(),
-			sponsor: this.refs.sponsor.getValue().trim()
+			sponsorName: this.refs.sponsorName.getValue().trim(),
+			sponsorMobile: this.refs.sponsorMobile.getValue().trim()
 		};
 
 		//to do - input validation happens here
@@ -63,13 +64,23 @@ module.exports = React.createClass({
 						<div className="form-group">							
 							<Input 
 								type="text" 
-								label="介绍人(请填写真实姓名)" 
-								ref="sponsor" 
+								label="您加入PiPi的介绍人(请填写真实姓名)" 
+								ref="sponsorName" 
 								maxLength="20"
-								defaultValue={this.props.fieldValues.sponsor}						
+								defaultValue={this.props.fieldValues.sponsorName}						
 								className="form-control" 
 							/>
 						</div>
+						<div className="form-group">							
+							<Input 
+								type="number" 
+								label="您的介绍人在PiPi注册时使用的手机号码" 
+								ref="sponsorMobile" 
+								maxLength="20"
+								defaultValue={this.props.fieldValues.sponsorMobile}						
+								className="form-control" 
+							/>
+						</div>						
 						<div className="form-group">		
 			              	<div className="col-xs-4 col-xs-offset-2">				
 								<Button 

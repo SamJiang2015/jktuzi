@@ -41,7 +41,6 @@ module.exports = React.createClass({
 		e.preventDefault();
 
 		var data = {
-			name: this.refs.name.getValue().trim(),
 			isMale: this.refs.male.checked ? this.refs.male.checked:(this.refs.female.checked ? false : null),
 			birthdate: this.refs.birthdate.getValue().trim(), 
 			email: this.refs.email.getValue().trim(),
@@ -69,11 +68,11 @@ module.exports = React.createClass({
 				<div className="panel-body">
 					<form>
 						<div className="form-group">
-							<label className="control-label">真实姓名</label>						
+							<label className="control-label">邮箱</label>						
 							<Input 
-								type="text"  
-								ref="name" 
-								defaultValue={this.props.fieldValues.name}						
+								type="email"  
+								ref="email" 
+								defaultValue={this.props.fieldValues.email}						
 								className="form-control" />
 						</div>
 
@@ -110,16 +109,7 @@ module.exports = React.createClass({
 										女
 								</label>
 						</div>
-						
-						<div className="form-group">
-							<label className="control-label">邮箱</label>						
-							<Input 
-								type="email"  
-								ref="email" 
-								defaultValue={this.props.fieldValues.email}						
-								className="form-control" />
-						</div>
-						
+												
 						<div className="form-group">
 							<label className="control-label">职业</label>												
 							<Input 

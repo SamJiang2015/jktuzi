@@ -64,7 +64,7 @@ db.trainee.belongsTo(db.account, {
 	as: 'traineeSponsorAccount',
 	foreignKey: {
 		name: 'sponsorAccountId',
-		allowNull: false
+		allowNull: true
 	}
 });
 

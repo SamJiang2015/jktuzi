@@ -48,6 +48,7 @@ module.exports = function(sequelize, DataTypes) {
 				allowNull: false,
 				unique: false,
 				validate: {
+					len: [1, 100],
 					notEmpty: true // name can't be empty
 				}
 			},
