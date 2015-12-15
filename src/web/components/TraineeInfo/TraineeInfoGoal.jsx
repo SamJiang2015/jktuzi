@@ -54,6 +54,15 @@ module.exports = React.createClass({
 		}
 	},
 
+	handleInputChange: function(e) {
+		e.preventDefault();
+
+		this.setState({
+			error: false,
+			errorMsg: ''
+		})
+	},	
+
 	renderError: function() {
 		if (this.state.error) {
 			return (<p className="error">{this.state.errorMsg}</p>);
@@ -83,7 +92,8 @@ module.exports = React.createClass({
 								max="350"
 								ref="weightGoal" 
 								defaultValue={this.props.fieldValues.weightGoal}  												
-								className="form-control" />
+								className="form-control" 
+								onChange={this.handleInputChange}/>
 						</div>
 
 						<div className="form-group">
@@ -95,7 +105,8 @@ module.exports = React.createClass({
 								max="50"
 								ref="bodyfatGoal" 
 								defaultValue={this.props.fieldValues.bodyfatGoal}  												
-								className="form-control" />
+								className="form-control" 
+								onChange={this.handleInputChange}/>
 						</div>
 
 						{this.renderError()}						

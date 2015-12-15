@@ -25,18 +25,22 @@ module.exports = React.createClass({
 		return {
 			isMale: null,
 			error: false,
-			errorMsg: null
+			errorMsg: ''
 		}
 	},
 
 	handleSexInput: function(e) {
 		if (e.target.value==='male') {
 			this.setState({
-				isMale: true
+				isMale: true,
+				error: false,
+				errorMsg: ''
 			});
 		} else {
 			this.setState({
-				isMale: false
+				isMale: false,
+				error: false,
+				errorMsg: ''
 			});
 
 		}
@@ -81,6 +85,15 @@ module.exports = React.createClass({
 		}
 	},
 	
+	handleInputChange: function(e) {
+		e.preventDefault();
+
+		this.setState({
+			error: false,
+			errorMsg: ''
+		})
+	},
+
 	renderError: function() {
 		if (this.state.error) {
 			return (<p className="error">{this.state.errorMsg}</p>);
@@ -131,7 +144,8 @@ module.exports = React.createClass({
 								ref="birthdate"
 								required  // this is a required field 
 								defaultValue={this.props.fieldValues.birthdate===null?'':this.props.fieldValues.birthdate}						
-								className="form-control" />
+								className="form-control" 
+								onChange={this.handleInputChange}/>
 						</div>
 
 						<div className="form-group">
@@ -140,7 +154,8 @@ module.exports = React.createClass({
 								type="email"  
 								ref="email" 
 								defaultValue={this.props.fieldValues.email}						
-								className="form-control" />
+								className="form-control" 
+								onChange={this.handleInputChange}/>
 						</div>
 												
 						<div className="form-group">
@@ -149,7 +164,8 @@ module.exports = React.createClass({
 								type="text" 
 								ref="profession" 
 								defaultValue={this.props.fieldValues.profession}						
-								className="form-control" />
+								className="form-control" 
+								onChange={this.handleInputChange}/>
 						</div>	
 
 						{this.renderError()}

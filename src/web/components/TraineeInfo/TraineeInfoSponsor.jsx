@@ -56,6 +56,15 @@ module.exports = React.createClass({
 		}
 	},
 
+	handleInputChange: function(e) {
+		e.preventDefault();
+
+		this.setState({
+			error: false,
+			errorMsg: ''
+		})
+	},	
+
 	renderError: function() {
 		if (this.state.error) {
 			return (<p className="error">{this.state.errorMsg}</p>);
@@ -84,7 +93,8 @@ module.exports = React.createClass({
 								minLength="2"
 								maxLength="20"
 								defaultValue={this.props.fieldValues.nickname} 
-								className="form-control" />
+								className="form-control" 
+								onChange={this.handleInputChange}/>
 						</div>
 						<div className="form-group">
 							<label className="control-label">个性化签名</label>						
@@ -94,7 +104,8 @@ module.exports = React.createClass({
 								minLength="0"
 								maxLength="50"						
 								defaultValue={this.props.fieldValues.signature}						
-								className="form-control" />
+								className="form-control" 
+								onChange={this.handleInputChange}/>
 						</div>
 						<div className="form-group">							
 							<Input 
@@ -104,7 +115,7 @@ module.exports = React.createClass({
 								maxLength="20"
 								defaultValue={this.props.fieldValues.sponsorName}						
 								className="form-control" 
-							/>
+								onChange={this.handleInputChange} />
 						</div>
 						<div className="form-group">							
 							<Input 
@@ -114,7 +125,7 @@ module.exports = React.createClass({
 								maxLength="20"
 								defaultValue={this.props.fieldValues.sponsorMobile}						
 								className="form-control" 
-							/>
+								onChange={this.handleInputChange}/>
 						</div>		
 						
 						{this.renderError()}				

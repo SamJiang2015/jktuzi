@@ -69,6 +69,15 @@ module.exports = React.createClass({
 		}
 	},
 
+	handleInputChange: function(e) {
+		e.preventDefault();
+
+		this.setState({
+			error: false,
+			errorMsg: ''
+		})
+	},	
+
 	renderError: function() {
 		if (this.state.error) {
 			return (<p className="error">{this.state.errorMsg}</p>);
@@ -97,7 +106,8 @@ module.exports = React.createClass({
 								max="250"
 								ref="height" 
 								defaultValue={this.props.fieldValues.height}  												
-								className="form-control" />
+								className="form-control" 
+								onChange={this.handleInputChange}/>
 						</div>
 
 						<div className="form-group">
@@ -109,7 +119,8 @@ module.exports = React.createClass({
 								max="350"
 								ref="weight" 
 								defaultValue={this.props.fieldValues.weight}  												
-								className="form-control" />
+								className="form-control" 
+								onChange={this.handleInputChange}/>
 						</div>
 
 						<div className="form-group">
@@ -121,7 +132,8 @@ module.exports = React.createClass({
 								max="50"
 								ref="bodyfat" 
 								defaultValue={this.props.fieldValues.bodyfat}  												
-								className="form-control" />
+								className="form-control" 
+								onChange={this.handleInputChange}/>
 						</div>
 
 						<div className="form-group">
@@ -131,7 +143,8 @@ module.exports = React.createClass({
 								ref="habbit" 
 								maxLength="100"
 								defaultValue={this.props.fieldValues.habbit}						
-								className="form-control" />
+								className="form-control" 
+								onChange={this.handleInputChange}/>
 						</div>
 
 						{this.renderError()}

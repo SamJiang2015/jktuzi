@@ -14,15 +14,21 @@ module.exports = {
 
     cb = arguments[arguments.length - 1];
 
-    if (localStorage.token) {
-      if (cb) {
-        cb(true)
-      }
+    // ToDo: commented out the check on localStorage.token because it is
+    // problematic to trust local cached token, as 
+    // if the server-side token has been removed, user action will result in
+    // auth error.  To address this, we hit the server for a new login token
+    // each time user provides mobile and pass.
 
-      // notify the main component that the user is authenticated
-      this.onChange(true);
-      return;
-    }
+    // if (localStorage.token) {
+    //   if (cb) {
+    //     cb(true)
+    // //   }
+
+    //   // notify the main component that the user is authenticated
+    //   this.onChange(true);
+    //   return;
+    // }
 
     if (mobile && pass) {
       loginRequest(mobile, pass, function(res) {
@@ -47,7 +53,7 @@ module.exports = {
           this.onChange(false);    
         }
       }.bind(this));
-    }
+    } 
   },
 
   /*

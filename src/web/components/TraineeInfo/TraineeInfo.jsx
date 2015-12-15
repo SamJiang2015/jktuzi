@@ -36,6 +36,7 @@ var TraineeInfoGoal = require('./TraineeInfoGoal');
 var TraineeInfoSponsor = require('./TraineeInfoSponsor');
 var Confirmation = require('./Confirmation');
 var Success = require('./Success');
+var Error = require('./Error');
 
 var Api = require('../../utils/api');
 var Auth = require('../../utils/auth');
@@ -63,8 +64,14 @@ var fieldValues = {
 module.exports = React.createClass({
 	getInitialState: function() {
 		return {
-			step: 1
+			step: 1,
+			error: false,
+			errorCode: null
 		};
+	},
+
+	componentWillReceiveProps: function() {
+		this.getInitialState();
 	},
 
 	saveValues: function(fields) {
@@ -99,14 +106,11 @@ module.exports = React.createClass({
 	       		// show the success page
 				this.nextStep();
 			} else {
-				//todo: handle error case
-				if (json.status === 400) {
-					alert("信息有误。请核对信息后再试。");
-				} else if(json.status === 401) {
-					alert("您的登录已经过期。请重新登录。");
-				} else {
-					alert("很抱歉暂时不能提交信息。请您联系我们客服(电话：58888888)");
-				}
+				// handle the error by displaying the Error page and asking user to 
+				// take actions as needed
+				this.setState({
+					error: true,
+					errorCode: json.status});
 			}
         }.bind(this))
       	.catch(function (e) {
@@ -158,7 +162,14 @@ module.exports = React.createClass({
 							fieldValues={fieldValues} 
 						/>;				
 		}
+ 	},
 
+ 	renderContent: function() {
+ 		if (this.state.error) {
+ 			return <Error errorCode={this.state.errorCode} />;
+ 		} else {
+ 			return this.showStep();
+ 		}
  	},
 
  	render: function() {
@@ -166,7 +177,7 @@ module.exports = React.createClass({
  		return (
  			<div className="traineeInfo">
  				<br/>
- 				{this.showStep()}
+ 				{this.renderContent()}
  			</div>
 		);
  	}

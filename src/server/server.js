@@ -39,17 +39,22 @@ app.get('/*', function(req, res) {
 
 // create the database and populate the reference table(s)
 db.sequelize.sync({
-	force: false
+	force: true
 }).then(function() {
-	return db.role.create({id: Role.Admin.id, description: Role.Admin.description});
+	return db.role.findOrCreate({
+		where: {id: Role.Admin.id}, defaults: {description: Role.Admin.description}});
 }).then(function() {
-	return db.role.create({id: Role.Trainer.id, description: Role.Trainer.description});
+	return db.role.findOrCreate({
+		where: {id: Role.Trainer.id}, defaults: {description: Role.Trainer.description}});
 }).then(function() {
-	return db.role.create({id: Role.Trainee.id, description: Role.Trainee.description});
+	return db.role.findOrCreate({
+		where: {id: Role.Trainee.id}, defaults: {description: Role.Trainee.description}});
 }).then(function() {
-	db.account.create({mobile: '18888888888', name: '总督头', password: 'PiPi1212', roleId: Role.Admin.id});
+	return db.account.findOrCreate({
+		where: {mobile: '18888888888'}, defaults: {name: '总督头', password: 'PiPi8888', roleId: Role.Admin.id}});
 }).then(function() {
-	db.account.create({mobile: '18811112222', name: 'SS', password: 'PiPi2222'});
+	return db.account.findOrCreate({
+		where: {mobile: '18811112222'}, defaults: {name: '新人', password: 'password'}});
 })
 // if all goes well, start the server
 .then(function() {
