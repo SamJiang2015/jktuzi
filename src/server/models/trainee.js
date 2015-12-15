@@ -48,7 +48,7 @@ module.exports = function(sequelize, DataTypes) {
 			},
 			email: {
 				type: DataTypes.STRING,
-				allowNull: true,
+				allowNull: false,
 				validate: {
 					isEmail: true,
 					len: [Limits.Email.minLen, Limits.Email.maxLen]
@@ -80,10 +80,16 @@ module.exports = function(sequelize, DataTypes) {
 			// %
 			bodyfat: {
 				type: DataTypes.FLOAT,
-				allowNull: false,
+				allowNull: true,				
 				validate: {
 					min: Limits.Bodyfat.min,
 					max: Limits.Bodyfat.max
+				}, 
+				set: function(val) {
+					if (val.trim() === '') {
+						val=null;
+					}
+					this.setDataValue('bodyfat', val);
 				}				
 			},
 			profession: {
@@ -91,6 +97,12 @@ module.exports = function(sequelize, DataTypes) {
 				allowNull: true,
 				validate: {
 					len: [Limits.Profession.minLen, Limits.Profession.maxLen]
+				}, 
+				set: function(val) {
+					if (val.trim() === '') {
+						val=null;
+					}
+					this.setDataValue('profession', val);
 				}
 			},	
 			habbit: {
@@ -98,6 +110,12 @@ module.exports = function(sequelize, DataTypes) {
 				allowNull: true,
 				validate: {
 					len: [Limits.Habbit.minLen, Limits.Habbit.maxLen]
+				}, 
+				set: function(val) {
+					if (val.trim() === '') {
+						val=null;
+					}
+					this.setDataValue('habbit', val);
 				}
 			},
 			// 斤
@@ -107,6 +125,12 @@ module.exports = function(sequelize, DataTypes) {
 				validate: {
 					min: Limits.Weight.min,
 					max: Limits.Weight.max
+				}, 
+				set: function(val) {
+					if (val.trim() === '') {
+						val=null;
+					}
+					this.setDataValue('weightGoal', val);
 				}
 			},
 			// %
@@ -116,6 +140,12 @@ module.exports = function(sequelize, DataTypes) {
 				validate: {
 					min: Limits.Bodyfat.min,
 					max: Limits.Bodyfat.max
+				}, 
+				set: function(val) {
+					if (val.trim() === '') {
+						val=null;
+					}
+					this.setDataValue('bodyfatGoal', val);
 				}				
 			},
 			signature: {
@@ -123,11 +153,17 @@ module.exports = function(sequelize, DataTypes) {
 				allowNull: true,
 				validate: {
 					len: [Limits.Signature.minLen, Limits.Signature.maxLen]
+				}, 
+				set: function(val) {
+					if (val.trim() === '') {
+						val=null;
+					}
+					this.setDataValue('signature', val);
 				}
 			},
 			sponsorName: {
 				type: DataTypes.STRING,
-				allowNull: true,
+				allowNull: false,
 				validate: {
 					len: [Limits.Name.minLen, Limits.Name.maxLen]
 				}
