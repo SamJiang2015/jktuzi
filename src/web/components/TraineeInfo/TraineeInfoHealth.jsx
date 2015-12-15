@@ -19,7 +19,16 @@ var Panel=require('react-bootstrap/lib/panel');
 var Input = require('react-bootstrap/lib/input');
 var Button = require('react-bootstrap/lib/button');
 
+var Limits = require('../../utils/constants').Limits;
+
 module.exports = React.createClass({
+
+	getInitialState: function() {
+		return {
+			error: false,
+			errorMsg: ''
+		}
+	},
 
 	saveAndContinue: function(e) {
 		e.preventDefault();
@@ -28,18 +37,44 @@ module.exports = React.createClass({
 			height: this.refs.height.getValue().trim(),
 			weight: this.refs.weight.getValue().trim(),
 			bodyfat: this.refs.bodyfat.getValue().trim(), 
-			weightGoal: this.refs.weightGoal.getValue().trim(), 
-			bodyfatGoal: this.refs.bodyfatGoal.getValue().trim(),
 			habbit: this.refs.habbit.getValue().trim(),			
 		};
 
+		var errorMsg='';
 		//to do - input validation happens here
+		if (isNaN(data.height) || Number(data.height)<Limits.Height.min || Number(data.height)>Limits.Height.max) {
+			errorMsg='请核验您输入的身高（以厘米为单位）';
+		} else if (isNaN(data.weight) || Number(data.weight)<Limits.Weight.min || Number(data.weight)>Limits.Weight.max) {
+			errorMsg='请核验您输入的体重（以斤为单位）';
+		} else if ((data.bodyfat !== '') &&
+			(isNaN(data.bodyfat) || Number(data.bodyfat)<Limits.Bodyfat.min || Number(data.bodyfat)>Limits.Bodyfat.max)) {
+			errorMsg='请核验您输入的体脂率（百分比）';
+		} else if ( (data.habbit != '') && 
+			(data.habbit.length<Limits.Habbit.minLen ||
+			data.habbit.length>Limits.Habbit.maxLen)) {
+			errorMsg = '请核验您输入的运动';
+		}
 
-		// save data
-		this.props.saveValues(data);
+		if (errorMsg!=='') {
+			this.setState({
+				error: true,
+				errorMsg: errorMsg
+			});
+		} else { 
+			// save data
+			this.props.saveValues(data);
 
-		// move on to next step;
-		this.props.nextStep();
+			// move on to next step;
+			this.props.nextStep();
+		}
+	},
+
+	renderError: function() {
+		if (this.state.error) {
+			return (<p className="error">{this.state.errorMsg}</p>);
+		} else {
+			return null;
+		}
 	},
 
 	render: function() {
@@ -49,7 +84,7 @@ module.exports = React.createClass({
 		return (
 			<div className="panel panel-success traineeInfoHealth">
 				<div className="panel-heading">
-					<h5>健康信息<small className="step-info">第{this.props.step}步 (共3步)</small></h5>
+					<h5>健康信息<small className="step-info">第{this.props.step}步 (共4步)</small></h5>
 				</div>
 				<div className="panel-body">
 					<form>
@@ -91,30 +126,6 @@ module.exports = React.createClass({
 
 						<div className="form-group">
 							<Input 
-								type="number" 
-								label="目标体重" 
-								addonAfter="斤"
-								min="50"
-								max="350"
-								ref="weightGoal" 
-								defaultValue={this.props.fieldValues.weightGoal}  												
-								className="form-control" />
-						</div>
-
-						<div className="form-group">
-							<Input 
-								type="number" 
-								label="目标体脂率(百分比)" 
-								addonAfter="%"
-								min="5"
-								max="50"
-								ref="bodyfatGoal" 
-								defaultValue={this.props.fieldValues.bodyfatGoal}  												
-								className="form-control" />
-						</div>
-
-						<div className="form-group">
-							<Input 
 								type="text" 
 								label="列举您喜爱的运动(跑步, 游泳, 等)" 
 								ref="habbit" 
@@ -122,6 +133,8 @@ module.exports = React.createClass({
 								defaultValue={this.props.fieldValues.habbit}						
 								className="form-control" />
 						</div>
+
+						{this.renderError()}
 
 						<div className="form-group">		
 			              	<div className="col-xs-4 col-xs-offset-2">				

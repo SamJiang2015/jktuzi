@@ -15,6 +15,8 @@
 //
 // 
 
+var Limits = require('../constants.js').Limits;
+
 module.exports = function(sequelize, DataTypes) {
 
 	return sequelize.define(
@@ -37,25 +39,11 @@ module.exports = function(sequelize, DataTypes) {
 				type: DataTypes.BOOLEAN,
 				allowNull: false
 			},
-			// sex: {
-			// 	type: DataTypes.VIRTUAL, // this property does not get stored, but remains accessible
-			// 	allowNull: false,
-			// 	validate: {
-			// 		isIn: ['f', 'm'] // password should be at least 6 letters long
-			// 	},
-			// 	set: function(value) {
-			// 		this.setDataValue('sex', value);
-			// 		this.setDataValue('isMale', value==='m');
-			// 	},
-			// 	get: function() {
-			// 		return (this.isMale)?'m':'f';
-			// 	}
-			// },			
 			nickname: {
 				type: DataTypes.STRING,
 				allowNull: false,
 				validate: {
-					len: [1, 20]
+					len: [Limits.Name.minLen, Limits.Name.maxLen]
 				}
 			},
 			email: {
@@ -63,7 +51,7 @@ module.exports = function(sequelize, DataTypes) {
 				allowNull: true,
 				validate: {
 					isEmail: true,
-					len: [4, 50]
+					len: [Limits.Email.minLen, Limits.Email.maxLen]
 				}
 			},
 			birthdate: {
@@ -76,8 +64,8 @@ module.exports = function(sequelize, DataTypes) {
 				type: DataTypes.INTEGER,
 				allowNull: false,
 				validate: {
-					min: 50,
-					max: 300
+					min: Limits.Height.min,
+					max: Limits.Height.max
 				}
 			},
 			// 斤
@@ -85,8 +73,8 @@ module.exports = function(sequelize, DataTypes) {
 				type: DataTypes.FLOAT,
 				allowNull: false,
 				validate: {
-					min: 10,
-					max: 500
+					min: Limits.Weight.min,
+					max: Limits.Weight.max
 				}				
 			},
 			// %
@@ -94,22 +82,22 @@ module.exports = function(sequelize, DataTypes) {
 				type: DataTypes.FLOAT,
 				allowNull: false,
 				validate: {
-					min: 3,
-					max: 50
+					min: Limits.Bodyfat.min,
+					max: Limits.Bodyfat.max
 				}				
 			},
 			profession: {
 				type: DataTypes.STRING,
 				allowNull: true,
 				validate: {
-					len: [1, 20]
+					len: [Limits.Profession.minLen, Limits.Profession.maxLen]
 				}
 			},	
 			habbit: {
 				type: DataTypes.STRING,
 				allowNull: true,
 				validate: {
-					len: [1, 100]
+					len: [Limits.Habbit.minLen, Limits.Habbit.maxLen]
 				}
 			},
 			// 斤
@@ -117,8 +105,8 @@ module.exports = function(sequelize, DataTypes) {
 				type: DataTypes.FLOAT,
 				allowNull: true,
 				validate: {
-					min: 10,
-					max: 500
+					min: Limits.Weight.min,
+					max: Limits.Weight.max
 				}
 			},
 			// %
@@ -126,22 +114,22 @@ module.exports = function(sequelize, DataTypes) {
 				type: DataTypes.FLOAT,
 				allowNull: true,
 				validate: {
-					min: 3,
-					max: 50
+					min: Limits.Bodyfat.min,
+					max: Limits.Bodyfat.max
 				}				
 			},
 			signature: {
 				type: DataTypes.STRING,
 				allowNull: true,
 				validate: {
-					len: [1, 100]
+					len: [Limits.Signature.minLen, Limits.Signature.maxLen]
 				}
 			},
 			sponsorName: {
 				type: DataTypes.STRING,
 				allowNull: true,
 				validate: {
-					len: [2, 100]
+					len: [Limits.Name.minLen, Limits.Name.maxLen]
 				}
 			},
 			sponsorMobile: {
@@ -149,7 +137,7 @@ module.exports = function(sequelize, DataTypes) {
 				allowNull: false,
 				validate: {
 					isNumeric: true, // only allow numbers
-					len: [11, 20] // valid mobile number should have at least 11 digits
+					len: [Limits.Mobile.minLen, Limits.Mobile.maxLen] // valid mobile number should have at least 11 digits
 				}
 			}
 		}

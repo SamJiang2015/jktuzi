@@ -8,7 +8,16 @@ var Panel=require('react-bootstrap/lib/panel');
 var Input = require('react-bootstrap/lib/input');
 var Button = require('react-bootstrap/lib/button');
 
+var Limits = require('../../utils/constants').Limits;
+
 module.exports = React.createClass({
+
+	getInitialState: function() {
+		return {
+			error: false,
+			errorMsg: null
+		}
+	},
 
 	saveAndContinue: function(e) {
 		e.preventDefault();
@@ -20,13 +29,39 @@ module.exports = React.createClass({
 			sponsorMobile: this.refs.sponsorMobile.getValue().trim()
 		};
 
-		//to do - input validation happens here
+		var errorMsg='';
 
-		// save data
-		this.props.saveValues(data);
+		if (data.nickname.length<Limits.Name.minLen || data.nickname.length>Limits.Name.maxLen) {
+			errorMsg = '请核验您输入的昵称';
+		} else if (data.signature.length<Limits.Signature.minLen || data.signature.length>Limits.Signature.maxLen) {
+			errorMsg = '请核验您输入的个性签名';
+		} else if (data.sponsorName.length<Limits.Name.minLen || data.sponsorName.length>Limits.Name.maxLen) {
+			errorMsg = '请核验您输入的介绍人名字';
+		} else if ((data.sponsorMobile !== '') &&
+			(isNaN(data.sponsorMobile) || data.sponsorMobile.length<Limits.Mobile.minLen || data.sponsorMobile.length>Limits.Mobile.maxLen)) {
+			errorMsg='请核验您输入的介绍人手机';
+		}
 
-		// move on to next step;
-		this.props.nextStep();
+		if (errorMsg!=='') {
+			this.setState({
+				error: true,
+				errorMsg: errorMsg
+			})
+		} else {
+			// save data
+			this.props.saveValues(data);
+
+			// move on to next step;
+			this.props.nextStep();
+		}
+	},
+
+	renderError: function() {
+		if (this.state.error) {
+			return (<p className="error">{this.state.errorMsg}</p>);
+		} else {
+			return null;
+		}
 	},
 
 	render: function() {
@@ -36,7 +71,7 @@ module.exports = React.createClass({
 		return (
 			<div className="panel panel-success traineeInfoSponsor">
 				<div className="panel-heading">
-					<h5>其他信息<small className="step-info">第{this.props.step}步 (共3步)</small></h5>
+					<h5>其他信息<small className="step-info">第{this.props.step}步 (共4步)</small></h5>
 				</div>
 				<div className="panel-body">
 					<form>
@@ -80,7 +115,10 @@ module.exports = React.createClass({
 								defaultValue={this.props.fieldValues.sponsorMobile}						
 								className="form-control" 
 							/>
-						</div>						
+						</div>		
+						
+						{this.renderError()}				
+
 						<div className="form-group">		
 			              	<div className="col-xs-4 col-xs-offset-2">				
 								<Button 

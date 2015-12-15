@@ -1,7 +1,7 @@
 var Fetch = require('whatwg-fetch');
 //var rootUrl = 'http://localhost:3000/api/v1/';
-var rootUrl = 'http://10.10.10.108:3000/api/v1/';
-//var rootUrl = 'http://pipifit.herokuapp.com/api/v1/'; 
+//var rootUrl = 'http://10.10.10.112:3000/api/v1/';
+var rootUrl = 'http://pipifit.herokuapp.com/api/v1/'; 
 console.log('rootUrl: ' + rootUrl);
 
 // need this for browsers that do not support fetch (IEs, android)

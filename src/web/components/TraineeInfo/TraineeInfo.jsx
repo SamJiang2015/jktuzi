@@ -32,6 +32,7 @@ var objectAssign = require('object.assign');
 
 var TraineeInfoBasic = require('./TraineeInfoBasic');
 var TraineeInfoHealth = require('./TraineeInfoHealth');
+var TraineeInfoGoal = require('./TraineeInfoGoal');
 var TraineeInfoSponsor = require('./TraineeInfoSponsor');
 var Confirmation = require('./Confirmation');
 var Success = require('./Success');
@@ -99,7 +100,13 @@ module.exports = React.createClass({
 				this.nextStep();
 			} else {
 				//todo: handle error case
-				alert("信息有误。请核对信息后再试。")；
+				if (json.status === 400) {
+					alert("信息有误。请核对信息后再试。");
+				} else if(json.status === 401) {
+					alert("您的登录已经过期。请重新登录。");
+				} else {
+					alert("很抱歉暂时不能提交信息。请您联系我们客服(电话：58888888)");
+				}
 			}
         }.bind(this))
       	.catch(function (e) {
@@ -124,8 +131,15 @@ module.exports = React.createClass({
 							saveValues={this.saveValues}
 							step={this.state.step}							
 						/>;
-
 			case 3: 
+				return <TraineeInfoGoal
+							fieldValues={fieldValues} 
+							nextStep={this.nextStep}
+							previousStep={this.previousStep}
+							saveValues={this.saveValues}
+							step={this.state.step}							
+						/>;
+			case 4: 
 				return <TraineeInfoSponsor
 							fieldValues={fieldValues} 
 							nextStep={this.nextStep}
@@ -133,13 +147,13 @@ module.exports = React.createClass({
 							saveValues={this.saveValues}
 							step={this.state.step}							
 						/>;
-			case 4: 
+			case 5: 
 				return <Confirmation
 							fieldValues={fieldValues} 
 							previousStep={this.previousStep}
 							submitTraineeInfo={this.submitTraineeInfo}
 						/>;
-			case 5: 
+			case 6: 
 				return <Success
 							fieldValues={fieldValues} 
 						/>;				
