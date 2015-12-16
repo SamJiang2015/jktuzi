@@ -34,7 +34,7 @@ module.exports = React.createClass({
 		}
 	},
 
-	setStateHelper(fieldValues) {
+	setStateHelper: function(fieldValues) {
  		if (fieldValues===null || _.isEmpty(fieldValues)) return;
 
  		this.setState({
