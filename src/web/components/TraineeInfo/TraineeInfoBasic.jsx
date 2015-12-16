@@ -3,62 +3,75 @@
 //
 // 			Step 1: basic info:
 //						- sex
-//						- nickname
-//						- signature 
 //						- birthdate
-//						- location (todo)
 //						- email
 //						- profession
 //
 
 var React = require('react');
 
+var AccountActions = require('../../actions/account-actions');
+
+
 var Input = require('react-bootstrap/lib/input');
 var Button = require('react-bootstrap/lib/button');
 
 var Limits = require('../../utils/constants').Limits;
 var Helper = require('../../utils/helper');
+var _=require('underscore');
 
 module.exports = React.createClass({
 
 	getInitialState: function() {
 		return {
 			isMale: null,
+			isFemale: null,
+			birthdate: '',
+			email: null,
+			profession: null,
+
 			error: false,
 			errorMsg: ''
 		}
 	},
 
-	handleSexInput: function(e) {
-		if (e.target.value==='male') {
-			this.setState({
-				isMale: true,
-				error: false,
-				errorMsg: ''
-			});
-		} else {
-			this.setState({
-				isMale: false,
-				error: false,
-				errorMsg: ''
-			});
+ 	setStateHelper(fieldValues) {
+ 		if (fieldValues===null || _.isEmpty(fieldValues)) return;
 
-		}
-	},
+ 		this.setState({
+ 			isMale: fieldValues.isMale,
+ 			isFemale: (fieldValues.isMale===null ? null : !fieldValues.isMale),
+ 			birthdate: (fieldValues.birthdate!==null && fieldValues.birthdate.length>=10)? 
+						fieldValues.birthdate.slice(0,10) : '',
+ 			email: fieldValues.email,
+ 			profession: fieldValues.profession,
+
+ 			error: false,
+ 			errorMsg: ''
+ 		});			
+ 	},
+
+	componentDidMount: function() {
+		this.setStateHelper(this.props.fieldValues);
+	 },
+
+	 componentWillReceiveProps: function(newProps) {
+	 	this.setStateHelper(newProps.fieldValues);
+	 },
 
 	saveAndContinue: function(e) {
 		e.preventDefault();
 
 		var data = {
-			isMale: this.refs.male.checked ? this.refs.male.checked:(this.refs.female.checked ? false : null),
-			birthdate: this.refs.birthdate.getValue().trim(), 
-			email: this.refs.email.getValue().trim(),
-			profession: this.refs.profession.getValue().trim(),			
+			isMale: this.state.isMale,
+			birthdate: this.state.birthdate, 
+			email: this.state.email.trim(),
+			profession: this.state.profession.trim(),			
 		};
 
 		var errorMsg='';
 
-		if (!this.refs.male.checked && !this.refs.female.checked) {
+		if (data.isMale===null && this.state.isFemale===null) {
 			errorMsg = '请输入您的性别';
 		} else if (isNaN(Date.parse(data.birthdate))) {
 			errorMsg = '请核验您输入的生日';
@@ -77,20 +90,63 @@ module.exports = React.createClass({
 				errorMsg: errorMsg
 			})
 		} else {
-			// save data
-			this.props.saveValues(data);
+			// save data - this will change the info in the account store
+			// which will trigger a change in the info saved as state in parent 
+			// component, which is passed into this component as props
+			AccountActions.saveAccountTraineeInfoInMemory(data);
 
 			// move on to next step;
 			this.props.nextStep();
 		}
 	},
+
+
+	handleSexInput: function(e) {
+		if (e.target.value==='male' && e.target.checked) {
+			this.setState({
+				isMale: true,
+				isFemale: false,
+				error: false,
+				errorMsg: ''
+			});
+		} else {
+			this.setState({
+				isMale: false,
+				isFemale: true,
+				error: false,
+				errorMsg: ''
+			});
+
+		}
+	},
 	
-	handleInputChange: function(e) {
+	handleBirthdayChange: function(e) {
 		e.preventDefault();
 
 		this.setState({
 			error: false,
-			errorMsg: ''
+			errorMsg: '',
+			birthdate: e.target.value
+		})
+	},
+
+	handleEmailChange: function(e) {
+		e.preventDefault();
+
+		this.setState({
+			error: false,
+			errorMsg: '',
+			email: e.target.value
+		})
+	},
+
+	handleProfessionChange: function(e) {
+		e.preventDefault();
+
+		this.setState({
+			error: false,
+			errorMsg: '',
+			profession: e.target.value
 		})
 	},
 
@@ -104,8 +160,6 @@ module.exports = React.createClass({
 
 	render: function() {
 
-		// note that we bind defaultValue to this.props.X so that 
-		// when user goes back to the prior step, the already-inputted value is their
 		return (
 			<div className="panel panel-success traineeInfoBasic">
 				<div className="panel-heading">
@@ -118,21 +172,17 @@ module.exports = React.createClass({
 								<label className="radio-inline">
 									<input 
 										type="radio" 
-										ref="male"
-										value="male" 
-										defaultChecked={this.props.fieldValues.isMale?'defaultChecked':null}  
-										checked={this.state.isMale}
-										onClick={this.handleSexInput}/>
+										value="male"  
+										checked={this.state.isMale?'checked':null}
+										onChange={this.handleSexInput}/>
 										男
 								</label>
 								<label className="radio-inline">								
 									<input 
 										type="radio" 
-										ref="female"
 										value="female" 
-										defaultChecked={this.props.fieldValues.isMale!==null && !this.props.fieldValues.isMale?'defaultChecked':null}  						
-										checked={this.state.isMale!==null && !this.state.isMale}
-										onClick={this.handleSexInput} />
+										checked={this.state.isFemale?'checked':null}
+										onChange={this.handleSexInput} />
 										女
 								</label>
 						</div>
@@ -141,31 +191,28 @@ module.exports = React.createClass({
 							<label className="control-label">生日</label>						
 							<Input 
 								type="date" 
-								ref="birthdate"
 								required  // this is a required field 
-								defaultValue={this.props.fieldValues.birthdate===null?'':this.props.fieldValues.birthdate}						
+								value={this.state.birthdate}						
 								className="form-control" 
-								onChange={this.handleInputChange}/>
+								onChange={this.handleBirthdayChange}/>
 						</div>
 
 						<div className="form-group">
 							<label className="control-label">邮箱</label>						
 							<Input 
 								type="email"  
-								ref="email" 
-								defaultValue={this.props.fieldValues.email}						
+								value={this.state.email}						
 								className="form-control" 
-								onChange={this.handleInputChange}/>
+								onChange={this.handleEmailChange}/>
 						</div>
 												
 						<div className="form-group">
 							<label className="control-label">职业</label>												
 							<Input 
 								type="text" 
-								ref="profession" 
-								defaultValue={this.props.fieldValues.profession}						
+								value={this.state.profession}						
 								className="form-control" 
-								onChange={this.handleInputChange}/>
+								onChange={this.handleProfessionChange}/>
 						</div>	
 
 						{this.renderError()}

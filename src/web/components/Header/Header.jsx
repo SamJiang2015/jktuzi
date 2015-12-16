@@ -60,25 +60,36 @@ module.exports = React.createClass({
 	// right part of the navbar -- if the user is logged in, render a few links 
 	renderNavbarItemsLoggedIn: function() {
 		return (
-            <Nav pullRight>
-                <LinkContainer to="/groups"><NavItem eventKey={1}>我的群</NavItem></LinkContainer>
-                <LinkContainer to="/trainees"><NavItem eventKey={2}>我的学员</NavItem></LinkContainer>
-                <LinkContainer to="/stat"><NavItem eventKey={3}>打卡统计</NavItem></LinkContainer>   
-                <NavDropdown eventKey={3} title={this.props.accountName + this.props.roleName} id="navbar-dropdown">
-                	<LinkContainer to="/myInfo">
-                		<MenuItem eventKey={3.1}>修改注册信息</MenuItem>
-            		</LinkContainer>
-                	<LinkContainer to="/preference">
-                		<MenuItem eventKey={3.1}>账户设置</MenuItem>
-            		</LinkContainer>
-                	<MenuItem divider />
-                	<LinkContainer to="/logout">
-                		<MenuItem eventKey={3.1}>退出登录</MenuItem>
-            		</LinkContainer>
-            	</NavDropdown>
-        	</Nav>
-		);
+           <Nav pullRight>
+           		<LinkContainer to="/"><NavItem eventKey={1}>欢迎您，{this.props.accountName + this.props.roleName}</NavItem></LinkContainer>
+                <LinkContainer to="/groups"><NavItem eventKey={2}>我要打卡</NavItem></LinkContainer>
+                <LinkContainer to="/trainees"><NavItem eventKey={3}>我的群组</NavItem></LinkContainer>
+            	<LinkContainer to="/myInfo"><NavItem eventKey={4}>修改个人信息</NavItem></LinkContainer>
+            	<LinkContainer to="/logout"><NavItem eventKey={5}>退出登录</NavItem></LinkContainer>
+        	</Nav>);
+
 	},
+	// renderNavbarItemsLoggedIn: function() {
+	// 	return (
+ //            <Nav pullRight>
+ //                <LinkContainer to="/groups"><NavItem eventKey={1}>我的群</NavItem></LinkContainer>
+ //                <LinkContainer to="/trainees"><NavItem eventKey={2}>我的学员</NavItem></LinkContainer>
+ //                <LinkContainer to="/stat"><NavItem eventKey={3}>打卡统计</NavItem></LinkContainer>   
+ //                <NavDropdown eventKey={3} title={this.props.accountName + this.props.roleName} id="navbar-dropdown">
+ //                	<LinkContainer to="/myInfo">
+ //                		<MenuItem eventKey={3.1}>修改注册信息</MenuItem>
+ //            		</LinkContainer>
+ //                	<LinkContainer to="/preference">
+ //                		<MenuItem eventKey={3.1}>账户设置</MenuItem>
+ //            		</LinkContainer>
+ //                	<MenuItem divider />
+ //                	<LinkContainer to="/logout">
+ //                		<MenuItem eventKey={3.1}>退出登录</MenuItem>
+ //            		</LinkContainer>
+ //            	</NavDropdown>
+ //        	</Nav>
+	// 	);
+	// },
 
 	// right part of the navbar -- if the user is not logged in, render the login form
 	renderNavbarItemsNotLoggedIn: function() {

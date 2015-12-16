@@ -9,24 +9,52 @@ var Input = require('react-bootstrap/lib/input');
 var Button = require('react-bootstrap/lib/button');
 
 var Limits = require('../../utils/constants').Limits;
+var AccountActions = require('../../actions/account-actions');
+var _=require('underscore');
 
 module.exports = React.createClass({
 
 	getInitialState: function() {
 		return {
+			nickname: null,
+			signature: null,
+			sponsorName: null,
+			sponsorMobile: null,
 			error: false,
 			errorMsg: null
 		}
 	},
 
+	setStateHelper(fieldValues) {
+ 		if (fieldValues===null || _.isEmpty(fieldValues)) return;
+
+ 		this.setState({
+ 			nickname: fieldValues.nickname,
+ 			signature: fieldValues.signature,
+ 			sponsorName: fieldValues.sponsorName,
+ 			sponsorMobile: fieldValues.sponsorMobile,
+
+ 			error: false,
+ 			errorMsg: ''
+ 		});			
+ 	},
+
+	componentDidMount: function() {
+		this.setStateHelper(this.props.fieldValues);
+	 },
+
+	 componentWillReceiveProps: function(newProps) {
+	 	this.setStateHelper(newProps.fieldValues);
+	 },
+
 	saveAndContinue: function(e) {
 		e.preventDefault();
 
 		var data = {
-			nickname: this.refs.nickname.getValue().trim(),
-			signature: this.refs.signature.getValue().trim(),
-			sponsorName: this.refs.sponsorName.getValue().trim(),
-			sponsorMobile: this.refs.sponsorMobile.getValue().trim()
+			nickname: this.state.nickname.trim(),
+			signature: this.state.signature.trim(),
+			sponsorName: this.state.sponsorName.trim(),
+			sponsorMobile: this.state.sponsorMobile.trim()
 		};
 
 		var errorMsg='';
@@ -48,18 +76,51 @@ module.exports = React.createClass({
 				errorMsg: errorMsg
 			})
 		} else {
-			// save data
-			this.props.saveValues(data);
+			// save data - this will change the info in the account store
+			// which will trigger a change in the info saved as state in parent 
+			// component, which is passed into this component as props
+			AccountActions.saveAccountTraineeInfoInMemory(data);
 
 			// move on to next step;
 			this.props.nextStep();
 		}
 	},
 
-	handleInputChange: function(e) {
+	handleNicknameChange: function(e) {
 		e.preventDefault();
 
 		this.setState({
+			nickname: e.target.value,
+			error: false,
+			errorMsg: ''
+		})
+	},	
+
+	handleSignatureChange: function(e) {
+		e.preventDefault();
+
+		this.setState({
+			signature: e.target.value,
+			error: false,
+			errorMsg: ''
+		})
+	},	
+
+	handleSponsorNameChange: function(e) {
+		e.preventDefault();
+
+		this.setState({
+			sponsorName: e.target.value,
+			error: false,
+			errorMsg: ''
+		})
+	},	
+
+	handleSponsorMobileChange: function(e) {
+		e.preventDefault();
+
+		this.setState({
+			sponsorMobile: e.target.value,
 			error: false,
 			errorMsg: ''
 		})
@@ -74,9 +135,6 @@ module.exports = React.createClass({
 	},
 
 	render: function() {
-
-		// note that we bind defaultValue to this.props.X so that 
-		// when user goes back to the prior step, the already-inputted value is their
 		return (
 			<div className="panel panel-success traineeInfoSponsor">
 				<div className="panel-heading">
@@ -92,9 +150,9 @@ module.exports = React.createClass({
 								required   // this is a required field
 								minLength="2"
 								maxLength="20"
-								defaultValue={this.props.fieldValues.nickname} 
+								value={this.state.nickname} 
 								className="form-control" 
-								onChange={this.handleInputChange}/>
+								onChange={this.handleNicknameChange}/>
 						</div>
 						<div className="form-group">
 							<label className="control-label">个性化签名</label>						
@@ -103,9 +161,9 @@ module.exports = React.createClass({
 								ref="signature" 
 								minLength="0"
 								maxLength="50"						
-								defaultValue={this.props.fieldValues.signature}						
+								value={this.state.signature}						
 								className="form-control" 
-								onChange={this.handleInputChange}/>
+								onChange={this.handleSignatureChange}/>
 						</div>
 						<div className="form-group">							
 							<Input 
@@ -113,19 +171,19 @@ module.exports = React.createClass({
 								label="您加入PiPi的介绍人(请填写真实姓名)" 
 								ref="sponsorName" 
 								maxLength="20"
-								defaultValue={this.props.fieldValues.sponsorName}						
+								value={this.state.sponsorName}						
 								className="form-control" 
-								onChange={this.handleInputChange} />
+								onChange={this.handleSponsorNameChange} />
 						</div>
 						<div className="form-group">							
 							<Input 
-								type="number" 
+								type="tel" 
 								label="您的介绍人在PiPi注册时使用的手机号码" 
 								ref="sponsorMobile" 
 								maxLength="20"
-								defaultValue={this.props.fieldValues.sponsorMobile}						
+								value={this.state.sponsorMobile}						
 								className="form-control" 
-								onChange={this.handleInputChange}/>
+								onChange={this.handleSponsorMobileChange}/>
 						</div>		
 						
 						{this.renderError()}				

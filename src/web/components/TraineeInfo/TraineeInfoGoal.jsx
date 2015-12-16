@@ -14,22 +14,46 @@ var Input = require('react-bootstrap/lib/input');
 var Button = require('react-bootstrap/lib/button');
 
 var Limits = require('../../utils/constants').Limits;
+var AccountActions = require('../../actions/account-actions');
+var _=require('underscore');
 
 module.exports = React.createClass({
 
 	getInitialState: function() {
 		return {
+			weightGoal: null,
+			bodyfatGoal: null,
 			error: false,
 			errorMsg: ''
 		}
 	},
 
+ 	setStateHelper(fieldValues) {
+ 		if (fieldValues===null || _.isEmpty(fieldValues)) return;
+
+ 		this.setState({
+ 			weightGoal: fieldValues.weightGoal,
+ 			bodyfatGoal: fieldValues.bodyfatGoal,
+
+ 			error: false,
+ 			errorMsg: ''
+ 		});			
+ 	},
+
+	componentDidMount: function() {
+		this.setStateHelper(this.props.fieldValues);
+	 },
+
+	 componentWillReceiveProps: function(newProps) {
+	 	this.setStateHelper(newProps.fieldValues);
+	 },
+
 	saveAndContinue: function(e) {
 		e.preventDefault();
 
 		var data = {
-			weightGoal: this.refs.weightGoal.getValue().trim(), 
-			bodyfatGoal: this.refs.bodyfatGoal.getValue().trim(),
+			weightGoal: this.state.weightGoal, 
+			bodyfatGoal: this.state.bodyfatGoal,
 		};
 
 		var errorMsg='';
@@ -46,18 +70,31 @@ module.exports = React.createClass({
 				errorMsg: errorMsg
 			});
 		} else { 
-			// save data
-			this.props.saveValues(data);
+			// save data - this will change the info in the account store
+			// which will trigger a change in the info saved as state in parent 
+			// component, which is passed into this component as props
+			AccountActions.saveAccountTraineeInfoInMemory(data);
 
 			// move on to next step;
 			this.props.nextStep();
 		}
 	},
 
-	handleInputChange: function(e) {
+	handleWeightGoalChange: function(e) {
 		e.preventDefault();
 
 		this.setState({
+			weightGoal: e.target.value,
+			error: false,
+			errorMsg: ''
+		})
+	},
+
+	handleBodyfatGoalChange: function(e) {
+		e.preventDefault();
+
+		this.setState({
+			bodyfatGoal: e.target.value,
 			error: false,
 			errorMsg: ''
 		})
@@ -72,9 +109,6 @@ module.exports = React.createClass({
 	},	
 
 	render: function() {
-
-		// note that we bind defaultValue to this.props.X so that 
-		// when user goes back to the prior step, the already-inputted value is their
 		return (
 			<div className="panel panel-success traineeInfoGoal">
 				<div className="panel-heading">
@@ -90,10 +124,9 @@ module.exports = React.createClass({
 								addonAfter="斤"
 								min="50"
 								max="350"
-								ref="weightGoal" 
-								defaultValue={this.props.fieldValues.weightGoal}  												
+								value={this.state.weightGoal}  												
 								className="form-control" 
-								onChange={this.handleInputChange}/>
+								onChange={this.handleWeightGoalChange}/>
 						</div>
 
 						<div className="form-group">
@@ -103,10 +136,9 @@ module.exports = React.createClass({
 								addonAfter="%"
 								min="5"
 								max="50"
-								ref="bodyfatGoal" 
-								defaultValue={this.props.fieldValues.bodyfatGoal}  												
+								value={this.state.bodyfatGoal}  												
 								className="form-control" 
-								onChange={this.handleInputChange}/>
+								onChange={this.handleBodyfatGoalChange}/>
 						</div>
 
 						{this.renderError()}						

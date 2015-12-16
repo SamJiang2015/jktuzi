@@ -95,7 +95,7 @@ module.exports = React.createClass({
 		            <form>
 		                <Input type="text" ref="name" placeholder="姓名" hasFeedback feedbackIcon={userGlyphicon} />            
 		                <Input type="tel" ref="mobile" placeholder="手机" hasFeedback feedbackIcon={mobileGlyphicon} />
-		                <Input type="password" ref="pass1" placeholder="设定密码" hasFeedback feedbackIcon={passwordGlyphicon} />
+		                <Input type="password" ref="pass1" placeholder="设定密码(至少6位)" hasFeedback feedbackIcon={passwordGlyphicon} />
 		                <Input type="password" ref="pass2" placeholder="确认密码" hasFeedback feedbackIcon={passwordGlyphicon} />
 		                <Button bsStyle="info" block onClick={this.handleRegister}>现在加入</Button>
 		                <p id="loginLink"><Link to="/login">我要登录</Link></p>

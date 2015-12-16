@@ -48,7 +48,7 @@ module.exports = React.createClass({
 				return <Groups/>;
 			} else {
 				// direct user to enter sign up info
-				return (<TraineeInfo/>);
+				return (<TraineeInfo action="create" message="请完善您的注册信息，以便我们更好的为您服务"/>);
 			}
 		} else {			
 			return <Login/>;

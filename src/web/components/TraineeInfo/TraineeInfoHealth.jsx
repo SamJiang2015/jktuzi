@@ -4,12 +4,10 @@
 //
 // TraineeInfoBasic.jsx
 //
-//			Step 2: health info: 
+//			Step 3: health info: 
 //						- height
 //						- weight
 //						- bodyfat
-//						- weight goal
-//						- bodyfat goal
 // 						- exercise habbit
 //
 
@@ -20,24 +18,52 @@ var Input = require('react-bootstrap/lib/input');
 var Button = require('react-bootstrap/lib/button');
 
 var Limits = require('../../utils/constants').Limits;
+var AccountActions = require('../../actions/account-actions');
+var _=require('underscore');
 
 module.exports = React.createClass({
 
 	getInitialState: function() {
 		return {
+ 			height: null,
+ 			weight: null,
+ 			bodyfat: null,
+ 			habbit: null,
 			error: false,
 			errorMsg: ''
 		}
 	},
 
+	setStateHelper(fieldValues) {
+ 		if (fieldValues===null || _.isEmpty(fieldValues)) return;
+
+ 		this.setState({
+ 			height: fieldValues.height,
+ 			weight: fieldValues.weight,
+ 			bodyfat: fieldValues.bodyfat,
+ 			habbit: fieldValues.habbit,
+
+ 			error: false,
+ 			errorMsg: ''
+ 		});			
+ 	},
+
+	componentDidMount: function() {
+		this.setStateHelper(this.props.fieldValues);
+	 },
+
+	 componentWillReceiveProps: function(newProps) {
+	 	this.setStateHelper(newProps.fieldValues);
+	 },
+
 	saveAndContinue: function(e) {
 		e.preventDefault();
 
 		var data = {
-			height: this.refs.height.getValue().trim(),
-			weight: this.refs.weight.getValue().trim(),
-			bodyfat: this.refs.bodyfat.getValue().trim(), 
-			habbit: this.refs.habbit.getValue().trim(),			
+			height: this.state.height,
+			weight: this.state.weight,
+			bodyfat: this.state.bodyfat, 
+			habbit: this.state.habbit.trim(),			
 		};
 
 		var errorMsg='';
@@ -61,23 +87,56 @@ module.exports = React.createClass({
 				errorMsg: errorMsg
 			});
 		} else { 
-			// save data
-			this.props.saveValues(data);
+			// save data - this will change the info in the account store
+			// which will trigger a change in the info saved as state in parent 
+			// component, which is passed into this component as props
+			AccountActions.saveAccountTraineeInfoInMemory(data);
 
 			// move on to next step;
 			this.props.nextStep();
 		}
 	},
 
-	handleInputChange: function(e) {
+	handleHeightChange: function(e) {
 		e.preventDefault();
 
 		this.setState({
+			height: e.target.value,
 			error: false,
 			errorMsg: ''
 		})
 	},	
 
+	handleWeightChange: function(e) {
+		e.preventDefault();
+
+		this.setState({
+			weight: e.target.value,
+			error: false,
+			errorMsg: ''
+		})
+	},	
+
+	handleBodyfatChange: function(e) {
+		e.preventDefault();
+
+		this.setState({
+			bodyfat: e.target.value,
+			error: false,
+			errorMsg: ''
+		})
+	},	
+
+	handleHabbitChange: function(e) {
+		e.preventDefault();
+
+		this.setState({
+			habbit: e.target.value,
+			error: false,
+			errorMsg: ''
+		})
+	},	
+			
 	renderError: function() {
 		if (this.state.error) {
 			return (<p className="error">{this.state.errorMsg}</p>);
@@ -88,8 +147,6 @@ module.exports = React.createClass({
 
 	render: function() {
 
-		// note that we bind defaultValue to this.props.X so that 
-		// when user goes back to the prior step, the already-inputted value is their
 		return (
 			<div className="panel panel-success traineeInfoHealth">
 				<div className="panel-heading">
@@ -104,10 +161,9 @@ module.exports = React.createClass({
 								addonAfter="厘米"
 								min="50"
 								max="250"
-								ref="height" 
-								defaultValue={this.props.fieldValues.height}  												
+								value={this.state.height}  												
 								className="form-control" 
-								onChange={this.handleInputChange}/>
+								onChange={this.handleHeightChange}/>
 						</div>
 
 						<div className="form-group">
@@ -117,10 +173,9 @@ module.exports = React.createClass({
 								addonAfter="斤"
 								min="50"
 								max="350"
-								ref="weight" 
-								defaultValue={this.props.fieldValues.weight}  												
+								value={this.state.weight}  												
 								className="form-control" 
-								onChange={this.handleInputChange}/>
+								onChange={this.handleWeightChange}/>
 						</div>
 
 						<div className="form-group">
@@ -130,21 +185,19 @@ module.exports = React.createClass({
 								addonAfter="%"
 								min="5"
 								max="50"
-								ref="bodyfat" 
-								defaultValue={this.props.fieldValues.bodyfat}  												
+								value={this.state.bodyfat}  												
 								className="form-control" 
-								onChange={this.handleInputChange}/>
+								onChange={this.handleBodyfatChange}/>
 						</div>
 
 						<div className="form-group">
 							<Input 
 								type="text" 
 								label="列举您喜爱的运动(跑步, 游泳, 等)" 
-								ref="habbit" 
 								maxLength="100"
-								defaultValue={this.props.fieldValues.habbit}						
+								value={this.state.habbit}						
 								className="form-control" 
-								onChange={this.handleInputChange}/>
+								onChange={this.handleHabbitChange}/>
 						</div>
 
 						{this.renderError()}

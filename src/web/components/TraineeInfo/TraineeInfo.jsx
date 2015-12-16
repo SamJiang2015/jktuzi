@@ -28,7 +28,10 @@
 //						
 
 var React = require('react');
-var objectAssign = require('object.assign');
+var Reflux = require('reflux');
+
+var AccountStore = require('../../stores/account-store');
+var AccountActions = require('../../actions/account-actions');
 
 var TraineeInfoBasic = require('./TraineeInfoBasic');
 var TraineeInfoHealth = require('./TraineeInfoHealth');
@@ -41,43 +44,40 @@ var Error = require('./Error');
 var Api = require('../../utils/api');
 var Auth = require('../../utils/auth');
 
-var fieldValues = {
-	// basic info:
-	isMale: null,
-	nickname: null,
-	signature: null, 
-	birthdate: null,
-	email: null,
-	profession: null,
-	// health info:
-	height: null,
-	weight: null,
-	bodyfat: null,
-	weightGoal: null,
-	bodyfatGoal: null,
-	habbit: null,
-	// sponsor:
-	sponsorName: null,
-	sponsorMobile: null
-}
-
 module.exports = React.createClass({
+
+	// listening to account store for changes to the trainee info of this account
+	mixins: [
+    	Reflux.listenTo(AccountStore, 'onChange')
+  	],
+
 	getInitialState: function() {
 		return {
 			step: 1,
 			error: false,
-			errorCode: null
+			errorCode: null,
+			accountTraineeInfo: {}
 		};
 	},
 
-	componentWillReceiveProps: function() {
-		this.getInitialState();
+	componentWillMount: function() {
+		AccountActions.getAccountTraineeInfo(Auth.getToken());
 	},
 
-	saveValues: function(fields) {
-		// store the properties specified in 'fields' in the fieldValues object
-		fieldValues = objectAssign({}, fieldValues, fields);
+	// reset the error status so that if error is caused by login error, a
+	// when user is logged in and comes back to this page, the user will not
+	// see the error again
+	componentWillReceiveProps: function() {
+		this.setState({
+			error:false
+		});
 	},
+
+ 	onChange: function(event, accountTraineeInfo) {
+ 		this.setState({
+ 			accountTraineeInfo: accountTraineeInfo
+ 		})
+ 	},
 
 	nextStep: function() {
 		this.setState({
@@ -92,76 +92,84 @@ module.exports = React.createClass({
 	},
 
 	submitTraineeInfo: function() {
-		//call Api to submit the info, upon success return this.nextStep()
-		// if fails, show error and do not advance
-      	Api.post('accounts/'+ Auth.getAccountId() +'/traineeInfo', fieldValues, true)
-      	.then(function(json){
-        	console.log(json);
-
-        	if (json.success) {
-
-        		// flip the flag cached at server-side;
-        		Auth.setInfoCompleted(true);
-
-	       		// show the success page
-				this.nextStep();
-			} else {
-				// handle the error by displaying the Error page and asking user to 
-				// take actions as needed
-				this.setState({
-					error: true,
-					errorCode: json.status});
-			}
-        }.bind(this))
-      	.catch(function (e) {
-        	console.log('Error when calling submitTraineeInfo: ' + e.toString());
-      	});    
+		if (this.props.action === 'create') {
+			AccountActions.createAccountTraineeInfo(
+				Auth.getToken(),
+				function(statusResult){
+					if (statusResult.success) {
+						this.nextStep();
+					} else {
+						//handle the error by displaying the Error page and asking user to 
+						// take actions as needed
+						this.setState({
+							error: true,
+							errorCode: statusResult.status});					
+					}
+				}.bind(this));
+		} else {
+			AccountActions.updateAccountTraineeInfo(
+				Auth.getToken(),
+				function(statusResult){
+					if (statusResult.success) {
+						this.nextStep();
+					} else {
+						//handle the error by displaying the Error page and asking user to 
+						// take actions as needed
+						this.setState({
+							error: true,
+							errorCode: statusResult.status});					
+					}
+				}.bind(this));			
+		}
 	},
 
 	showStep: function() {
 		switch(this.state.step) {
 			case 1: 
 				return <TraineeInfoBasic 
-							fieldValues={fieldValues} 
+							fieldValues={this.state.accountTraineeInfo} 
 							nextStep={this.nextStep}
-							saveValues={this.saveValues}
 							step={this.state.step}
 						/>;
 			case 2: 
 				return <TraineeInfoHealth 
-							fieldValues={fieldValues} 
+							fieldValues={this.state.accountTraineeInfo} 
 							nextStep={this.nextStep}
 							previousStep={this.previousStep}
-							saveValues={this.saveValues}
 							step={this.state.step}							
 						/>;
 			case 3: 
 				return <TraineeInfoGoal
-							fieldValues={fieldValues} 
+							fieldValues={this.state.accountTraineeInfo} 
 							nextStep={this.nextStep}
 							previousStep={this.previousStep}
-							saveValues={this.saveValues}
 							step={this.state.step}							
 						/>;
 			case 4: 
 				return <TraineeInfoSponsor
-							fieldValues={fieldValues} 
+							fieldValues={this.state.accountTraineeInfo} 
 							nextStep={this.nextStep}
 							previousStep={this.previousStep}							
-							saveValues={this.saveValues}
 							step={this.state.step}							
 						/>;
 			case 5: 
 				return <Confirmation
-							fieldValues={fieldValues} 
+							fieldValues={this.state.accountTraineeInfo} 
 							previousStep={this.previousStep}
 							submitTraineeInfo={this.submitTraineeInfo}
 						/>;
 			case 6: 
-				return <Success
-							fieldValues={fieldValues} 
-						/>;				
+				return <Success />;				
 		}
+ 	},
+
+ 	renderPrompt: function(){
+ 		if (this.state.step<5) {
+ 			return <p>{this.props.message}</p>
+ 		} else {
+ 			return null;
+ 		}
+
  	},
 
  	renderContent: function() {
@@ -174,13 +182,16 @@ module.exports = React.createClass({
 
  	render: function() {
 
+ 		const message=(<p>{this.props.message}</p>);
+
  		return (
  			<div className="traineeInfo">
- 				<br/>
+ 				{this.renderPrompt()}
  				{this.renderContent()}
  			</div>
 		);
- 	}
+ 	},
+
 })
 
 

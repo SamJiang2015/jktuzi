@@ -86,7 +86,7 @@ module.exports = function(sequelize, DataTypes) {
 					max: Limits.Bodyfat.max
 				}, 
 				set: function(val) {
-					if (val.trim() === '') {
+					if (typeof val === 'string' && val.trim() === '') {
 						val=null;
 					}
 					this.setDataValue('bodyfat', val);
@@ -99,7 +99,7 @@ module.exports = function(sequelize, DataTypes) {
 					len: [Limits.Profession.minLen, Limits.Profession.maxLen]
 				}, 
 				set: function(val) {
-					if (val.trim() === '') {
+					if (typeof val === 'string' && val.trim() === '') {
 						val=null;
 					}
 					this.setDataValue('profession', val);
@@ -112,7 +112,7 @@ module.exports = function(sequelize, DataTypes) {
 					len: [Limits.Habbit.minLen, Limits.Habbit.maxLen]
 				}, 
 				set: function(val) {
-					if (val.trim() === '') {
+					if (typeof val === 'string' && val.trim() === '') {
 						val=null;
 					}
 					this.setDataValue('habbit', val);
@@ -127,7 +127,7 @@ module.exports = function(sequelize, DataTypes) {
 					max: Limits.Weight.max
 				}, 
 				set: function(val) {
-					if (val.trim() === '') {
+					if (typeof val === 'string' && val.trim() === '') {
 						val=null;
 					}
 					this.setDataValue('weightGoal', val);
@@ -142,7 +142,7 @@ module.exports = function(sequelize, DataTypes) {
 					max: Limits.Bodyfat.max
 				}, 
 				set: function(val) {
-					if (val.trim() === '') {
+					if (typeof val === 'string' && val.trim() === '') {
 						val=null;
 					}
 					this.setDataValue('bodyfatGoal', val);
@@ -155,7 +155,7 @@ module.exports = function(sequelize, DataTypes) {
 					len: [Limits.Signature.minLen, Limits.Signature.maxLen]
 				}, 
 				set: function(val) {
-					if (val.trim() === '') {
+					if (typeof val === 'string' && val.trim() === '') {
 						val=null;
 					}
 					this.setDataValue('signature', val);

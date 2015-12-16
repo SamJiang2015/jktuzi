@@ -8,12 +8,11 @@ console.log('rootUrl: ' + rootUrl);
 require('es6-promise').polyfill();
 
 module.exports = {
-  get: function(url) {
+  get: function(url, token) {
     return fetch(rootUrl + url, {
       headers: {
-        'Auth': localStorage.token,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'              
+        'Auth': token,
+        'Accept': 'application/json'           
       }
     })
     .then(function(response){
@@ -21,9 +20,7 @@ module.exports = {
     })
   },
 
-  post: function(url, payload, needAuth) {
-    var token = needAuth? localStorage.token : '';
-
+  post: function(url, payload, token) {
     return fetch(rootUrl + url, {
       method: 'post',
       headers: {
@@ -38,13 +35,13 @@ module.exports = {
     })
   },
 
-  put: function(url, payload) {
+  put: function(url, payload, token) {
     return fetch(rootUrl + url, {
       method: 'put',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',        
-        'Auth': localStorage.token
+        'Auth': token
       },
       body: JSON.stringify(payload)
     })
@@ -53,11 +50,11 @@ module.exports = {
     })
   },
 
-  delete: function(url) {
+  delete: function(url, token) {
     return fetch(rootUrl + url, {
       method: 'delete',
       headers: {
-        'Auth': localStorage.token,
+        'Auth': token,
         'Accept': 'application/json',
         'Content-Type': 'application/json'        
       },

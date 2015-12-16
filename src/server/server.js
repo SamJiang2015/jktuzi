@@ -22,7 +22,7 @@ app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json());
 
 app.use(function(req, res, next) {
-	console.log('\n' + new Date(Date.now()).toString() + ' ' + 
+	console.log('\n' + new Date(Date.now()).toString() + ' ' +
 		req.method + ' ' + req.protocol+'://'+req.hostname+req.originalUrl);
 	console.log('Auth header: ' + req.get('Auth'));
 	console.log(req.body);
@@ -54,7 +54,30 @@ db.sequelize.sync({
 		where: {mobile: '18888888888'}, defaults: {name: '总督头', password: 'PiPi8888', roleId: Role.Admin.id}});
 }).then(function() {
 	return db.account.findOrCreate({
-		where: {mobile: '18811112222'}, defaults: {name: '新人', password: 'password'}});
+		where: {mobile: '18877777777'}, defaults: {name: '副总', password: 'password', infoCompleted: 1, roleId: Role.Trainer.id}});
+}).then(function() {
+	return db.account.findOrCreate({
+		where: {mobile: '18866666666'}, defaults: {name: '新人', password: 'password'}});
+})
+.then(function() {
+	return db.trainee.findOrCreate({
+		where: {id: 1}, defaults: {
+			'isMale': 1,
+			'nickname': 'PiPi',
+			'birthdate':'1980-01-01',
+			'email': 'pipi@test.com',
+			'profession': '健美运动员',
+			'height': 180,
+			'weight': 150,
+			'bodyfat': 20,
+			'weightGoal': 140,
+			'bodyfatGoal': 15,
+			'signature': 'No Zuo No Die',
+			'habbit': '跑步，游泳，健身',
+			'sponsorName': '总督头',
+			'sponsorMobile': '18888888888',
+			'sponsorAccountId': 1,
+			'accountId': 2}});
 })
 // if all goes well, start the server
 .then(function() {
@@ -62,7 +85,5 @@ db.sequelize.sync({
 		console.log('Server started on port ' + PORT);
 	});
 }).catch(function(e) {
-	console.log('ERROR: ' + e);
+	console.log(e);
 });
-
-

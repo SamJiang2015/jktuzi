@@ -2,13 +2,19 @@
 
 .traineeInfo {
 
+	.panel {
+		margin-top:10px;
+	}
+
 	.panel-heading {
-		text-align: center
+		text-align: center;
+		font-weight: 900;
 	}
 
 	small {
 		position: relative;
 		left: 50px;
+		text-decoration: italic;
 	}
 	
 	.traineeInfoBasic {
@@ -25,6 +31,11 @@
 		font-weight: bold;
 		text-align: center;
 		font-size: 1.2em;
+	}
+
+	p {
+		margin:5px;
+		color: green;
 	}
 
 }

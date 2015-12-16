@@ -64,7 +64,9 @@ module.exports = {
     cb = arguments[arguments.length - 1];
 
     if (mobile && name && pass) {
-      Api.post('accounts', {mobile: mobile, name: name, password: pass})
+      Api.post('accounts', 
+                {mobile: mobile, name: name, password: pass}, 
+                localStorage.token)
       .then(function(json){
         cb(json.success);
         })
@@ -151,7 +153,10 @@ module.exports = {
 */
 function loginRequest(mobile, pass, cb) {
 
-  Api.post('accounts/login', {mobile: mobile, password: pass})
+  Api.post(
+    'accounts/login', 
+    {mobile: mobile, password: pass},
+    localStorage.token)
   .then(function(json){
     console.log(json);
     
