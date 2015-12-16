@@ -16,6 +16,7 @@ var Groups = require('./components/Group/Groups');
 var About = require('./components/About/About');
 var Intro = require('./components/Intro/Intro');
 var TraineeInfo = require('./components/TraineeInfo/TraineeInfo');
+var Cards = require('./components/Card/Cards');
 
 function requireAuth(nextState, replaceState) {
   if (!auth.loggedIn()) {
@@ -26,13 +27,14 @@ function requireAuth(nextState, replaceState) {
 ReactDOM.render((
 	<Router history={createBrowserHistory()}>
 		<Route path='/' component={Main}>
-			<Route path='groups' component={Groups} onEnter={requireAuth} />
 			<Route path='login' component={Login} />
 			<Route path='about' component={About} />
 			<Route path='intro' component={Intro} />
 			<Route path='logout' component={Logout} />
 			<Route path='register' component={Register} />
 			<Route path='myInfo' component={TraineeInfo} onEnter={requireAuth} />			
+			<Route path='groups' component={Groups} onEnter={requireAuth} />
+			<Route path='cards' component={Cards} onEnter={requireAuth} />
 		</Route>
 	</Router>),
 	document.getElementById('app') 

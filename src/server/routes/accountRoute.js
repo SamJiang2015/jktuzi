@@ -214,6 +214,8 @@ router.put('/:id/traineeInfo',
 				res.status(400).json(
 					util.formatOutput({errorMsg: 'Invaid sponsor mobile'}, 400, false)
 					);
+
+				return;
 			}
 		}
 
@@ -248,11 +250,11 @@ router.put('/:id/traineeInfo',
 					});
 				} else {
 					// trainee not found in DB; cannot update; something is wrong
-					res.status(404).json(
+					return res.status(404).json(
 						util.formatOutput({errorMsg: 'The requested trainee information for update does not exist'}, 404, false));
 				}
 			}).catch(function(error) {
-				res.status(500).json(
+				return res.status(500).json(
 					util.formatOutput({errorMsg: error.toString()}, 500, false));
 			})					
 	});

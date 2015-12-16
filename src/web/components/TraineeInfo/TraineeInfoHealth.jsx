@@ -25,10 +25,10 @@ module.exports = React.createClass({
 
 	getInitialState: function() {
 		return {
- 			height: null,
- 			weight: null,
- 			bodyfat: null,
- 			habbit: null,
+ 			height: '',
+ 			weight: '',
+ 			bodyfat: '',
+ 			habbit: '',
 			error: false,
 			errorMsg: ''
 		}

@@ -30,21 +30,21 @@ module.exports = Reflux.createStore({
       this.accountTraineeInfo = {
           // basic info:
           isMale: null,
-          nickname: null,
-          signature: null, 
-          birthdate: null,
-          email: null,
-          profession: null,
+          nickname: '',
+          signature: '', 
+          birthdate: '',
+          email: '',
+          profession: '',
           // health info:
-          height: null,
-          weight: null,
-          bodyfat: null,
-          weightGoal: null,
-          bodyfatGoal: null,
-          habbit: null,
+          height: '',
+          weight: '',
+          bodyfat: '',
+          weightGoal: '',
+          bodyfatGoal: '',
+          habbit: '',
           // sponsor:
-          sponsorName: null,
-          sponsorMobile: null        
+          sponsorName: '',
+          sponsorMobile: ''        
       };
       this.triggerChange();
     }

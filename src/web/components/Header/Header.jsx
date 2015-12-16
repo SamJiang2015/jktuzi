@@ -62,7 +62,7 @@ module.exports = React.createClass({
 		return (
            <Nav pullRight>
            		<LinkContainer to="/"><NavItem eventKey={1}>欢迎您，{this.props.accountName + this.props.roleName}</NavItem></LinkContainer>
-                <LinkContainer to="/groups"><NavItem eventKey={2}>我要打卡</NavItem></LinkContainer>
+                <LinkContainer to="/cards"><NavItem eventKey={2}>我要打卡</NavItem></LinkContainer>
                 <LinkContainer to="/trainees"><NavItem eventKey={3}>我的群组</NavItem></LinkContainer>
             	<LinkContainer to="/myInfo"><NavItem eventKey={4}>修改个人信息</NavItem></LinkContainer>
             	<LinkContainer to="/logout"><NavItem eventKey={5}>退出登录</NavItem></LinkContainer>

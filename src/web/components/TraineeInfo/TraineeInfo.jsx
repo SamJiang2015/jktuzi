@@ -164,7 +164,7 @@ module.exports = React.createClass({
  	},
 
  	renderPrompt: function(){
- 		if (this.state.step<5) {
+ 		if (this.state.step<2) {
  			return <p>{this.props.message}</p>
  		} else {
  			return null;

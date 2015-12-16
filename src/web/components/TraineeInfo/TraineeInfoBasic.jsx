@@ -9,9 +9,7 @@
 //
 
 var React = require('react');
-
 var AccountActions = require('../../actions/account-actions');
-
 
 var Input = require('react-bootstrap/lib/input');
 var Button = require('react-bootstrap/lib/button');
@@ -27,8 +25,8 @@ module.exports = React.createClass({
 			isMale: null,
 			isFemale: null,
 			birthdate: '',
-			email: null,
-			profession: null,
+			email: '',
+			profession: '',
 
 			error: false,
 			errorMsg: ''

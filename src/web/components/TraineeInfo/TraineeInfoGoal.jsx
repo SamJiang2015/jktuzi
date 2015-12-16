@@ -21,8 +21,8 @@ module.exports = React.createClass({
 
 	getInitialState: function() {
 		return {
-			weightGoal: null,
-			bodyfatGoal: null,
+			weightGoal: '',
+			bodyfatGoal: '',
 			error: false,
 			errorMsg: ''
 		}

@@ -7,6 +7,7 @@ var Footer = require('../Footer/Footer');
 var Login = require('../Login/Login');
 var TraineeInfo = require('../TraineeInfo/TraineeInfo');
 var Groups = require('../Group/Groups');
+var Cards = require('../Card/Cards');
 
 var auth = require('../../utils/auth');
 var RoleName = require('../../utils/constants').RoleName;
@@ -45,7 +46,7 @@ module.exports = React.createClass({
 			// user is logged in
 			if (auth.getInfoCompleted()) {
 				// user has completed sign up process
-				return <Groups/>;
+				return <Cards/>;
 			} else {
 				// direct user to enter sign up info
 				return (<TraineeInfo action="create" message="请完善您的注册信息，以便我们更好的为您服务"/>);

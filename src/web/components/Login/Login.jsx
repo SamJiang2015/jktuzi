@@ -59,9 +59,28 @@ module.exports = React.createClass({
 		          bsStyle="default">
 		          {title}
 		            <form>
-		                <Input type="tel" ref="phone" placeholder="手机" hasFeedback feedbackIcon={mobileGlyphicon} />
-		                <Input type="password" ref="pass" placeholder="密码" hasFeedback feedbackIcon={passwordGlyphicon} />
-		                <Button bsStyle="info" block onClick={this.handleLogin}>登录</Button>
+		                <Input 
+		                	type="tel" 
+		                	ref="phone" 
+		                	placeholder="手机"
+		                	defaultValue="18877777777"
+		                	hasFeedback 
+		                	feedbackIcon={mobileGlyphicon} 
+		                />
+		                <Input 
+		                	type="password" 
+		                	ref="pass" 
+		                	placeholder="密码" 
+		                	defaultValue="password"
+		                	hasFeedback 
+		                	feedbackIcon={passwordGlyphicon} 
+		                />
+		                <Button 
+		                	bsStyle="info" 
+		                	block 
+		                	onClick={this.handleLogin}>
+		                	登录
+		                </Button>
 		                <p id="registrationLink"><Link to="/register">我要注册</Link></p>
 		                {this.state.error && errorMsg}
 		            </form>
