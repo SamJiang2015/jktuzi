@@ -144,7 +144,7 @@ module.exports = {
   // will be set once a login is successfully called
   accountName: '',
   accountId: null,
-  role: Constants.RoleValue.Trainee,
+  role: null,
   infoCompleted: false
 }
 

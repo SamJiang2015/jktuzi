@@ -11,6 +11,9 @@
 var React = require('react');
 var Input = require('react-bootstrap/lib/input');
 var Button = require('react-bootstrap/lib/button');
+var ButtonToolbar = require('react-bootstrap/lib/Buttontoolbar');
+var SportCardItemModal = require('./SportCardItemModal');
+var SportsTypes = require('../../utils/constants').SportsTypes;
 
 module.exports = React.createClass({
 
@@ -20,6 +23,8 @@ module.exports = React.createClass({
 			description: '',
 			duration: '',
 			distance: '',
+			cardEditable: false,
+			showModal: false,
 			error: false,
 			errorMsg: ''
 		};
@@ -32,6 +37,8 @@ module.exports = React.createClass({
 			description: this.props.description,
 			duration: this.props.duration,
 			distance: this.props.distance,
+			cardEditable: this.props.cardEditable,
+			showModal: this.props.showModal,
 			error: false,
 			errorMsg: ''
 		});
@@ -43,93 +50,86 @@ module.exports = React.createClass({
 			description: newProps.description,
 			duration: newProps.duration,
 			distance: newProps.distance,
+			cardEditable: newProps.cardEditable,
+			showModal: newProps.showModal,
 			error: false,
 			errorMsg: ''
 		});
 	},	
 
-	handleTypeChange: function(e) {
-		e.preventDefault();
+	handleEdit: function() {
 		this.setState({
-			type: e.target.value,
-			error: false,
-			errorMsg: ''
-		});
+			showModal: true,
+			error: false
+		})
 	},
 
-	handleDescriptionChange: function(e) {
-		e.preventDefault();
-		this.setState({
-			description: e.target.value,
-			error: false,
-			errorMsg: ''
-		});
+	handleDelete: function() {
+		this.props.handleDelete(this.props.id);
 	},
 
-	handleDistanceChange: function(e) {
-		e.preventDefault();
-		this.setState({
-			distance: e.target.value,
-			error: false,
-			errorMsg: ''
-		});
+	handleModalSave: function(item) {
+		// this callback will be called by the modal with item being set 
+		// to the new (or updated) item info.  we then call the parent 
+		// callback to pass the info further upstream, which will then
+		// trigger re-render flowing down from SportCard to SportCardItems
+		this.props.handleAddOrUpdate(item);
 	},
 
-	handleDurationChange: function(e) {
-		e.preventDefault();
-		this.setState({
-			duration: e.target.value,
-			error: false,
-			errorMsg: ''
-		});
+	renderModal: function() {
+		if (this.state.showModal) {
+			return (
+				<SportCardItemModal
+					{...this.props}
+					handleSave={this.handleModalSave}
+					showModal={this.state.showModal}
+					/>
+			);
+		}
+	},
+
+	renderButton: function() {
+		if (this.state.cardEditable) {
+			return (
+				<td>
+					<ButtonToolbar>
+						<Button 
+							onClick={this.handleEdit} 
+							bsStyle="warning"
+							bsSize="xsmall">
+							<span className="glyphicon glyphicon-edit"/>
+						</Button>
+						<Button 
+							onClick={this.handleDelete} 
+							bsStyle="danger"
+							bsSize="xsmall">
+							<span className="glyphicon glyphicon-minus"/>
+						</Button>
+					</ButtonToolbar>							
+				</td>
+				);
+		}
+		else {
+			return null;
+		}
 	},
 
 	render: function() {
+
+		// todo -- note the way we read display of SportsTypes depends on the fact
+		// that type values are sequential ints: 1,2,3, .... 
 		return (
-			<li className='sportCardItem'>
-				<form>
-					<div className="form-group">
-						<Input 
-							type="text" 
-							label="运动方式" 
-							value={this.state.type}  												
-							className="form-control" 
-							onChange={this.handleTypeChange}/>
-					</div>
-
-					<div className="form-group">
-						<Input 
-							type="text" 
-							label="描述"
-							maxLen="100" 
-							value={this.state.description}  												
-							className="form-control" 
-							onChange={this.handleDurationChange}/>
-					</div>
-
-					<div className="form-group">
-						<Input 
-							type="number" 
-							label="时间" 
-							addonAfter="分钟"
-							value={this.state.duration}  												
-							className="form-control" 
-							onChange={this.handleDurationChange}/>
-					</div>
-					<div className="form-group">
-						<Input 
-							type="number" 
-							label="距离" 
-							addonAfter="公里"
-							value={this.state.distance}  												
-							className="form-control" 
-							onChange={this.handleDistanceChange}/>
-					</div>
-				</form>						
-			</li>
-
-			);
+			<tr className='sportCardItem'>
+				<td>{SportsTypes.getDisplay(this.state.type)}</td>
+				<td>{this.state.description}</td>
+				<td>{this.state.duration}</td>
+				<td>{this.state.distance}</td>
+				{this.renderButton()}
+				{this.renderModal()}
+			</tr>
+		);
 	}
+
 })
 
 

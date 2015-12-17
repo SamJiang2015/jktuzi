@@ -7,6 +7,8 @@
 var React = require('react');
 var Input = require('react-bootstrap/lib/input');
 var Button = require('react-bootstrap/lib/button');
+var Auth = require('../../utils/auth');
+var Constants = require('../../utils/constants');
 
 module.exports = React.createClass({
 
@@ -15,6 +17,10 @@ module.exports = React.createClass({
 			breakfast: false,
 			lunch: false,
 			dinner: false,
+
+			editable: false,
+			error: false,
+			errorMsg: ''
 		}
 	},
 
@@ -22,33 +28,54 @@ module.exports = React.createClass({
 		this.setState({
 			breakfast: this.props.breakfast,
 			lunch: this.props.lunch,
-			dinner: this.props.dinner
+			dinner: this.props.dinner,
+			editable: false,
+			error: false,
+			errorMsg: ''
 		})
 	},
 
-	handleChange: function(e) {
-		e.preventDefault();
-		var breakfast=this.state.breakfast;
-		var lunch=this.state.lunch;
-		var dinner=this.state.dinner;
-
-		switch (e.target.value) {
-			case 'breakfast':
-				breakfast = e.target.checked;
-				break;
-			case 'lunch':
-				lunch = e.target.checked;
-				break;
-			case 'dinner':
-				dinner = e.target.checked;
-				break;
+	handleBreakfastChange: function(e) {
+		if (this.state.editable) {
+			this.setState({
+				breakfast: e.target.checked,
+			});
 		}
+	},
 
-		this.setState({
-			breakfast: breakfast,
-			lunch: lunch,
-			dinner: dinner
-		});
+	handleLunchChange: function(e) {
+		if (this.state.editable) {
+			this.setState({
+				lunch: e.target.checked,
+			});
+		}
+	},
+
+	handleDinnerChange: function(e) {
+		if (this.state.editable) {
+			this.setState({
+				dinner: e.target.checked,
+			});
+		}
+	},
+
+	handleEditableChange: function(e) {
+		e.preventDefault();
+
+		// tainees cannot edit foodcard info
+		if (Auth.getRole()!==Constants.RoleValue.Trainer &&
+			Auth.getRole()!==Constants.RoleValue.Admin) {
+			this.setState({
+				error: true,
+				errorMsg: '为了更好的帮助您实现减脂目标，三餐打卡由您的教练完成哦'
+			})
+		} else {
+			if (!this.state.editable)
+			this.setState({
+				editable: true,
+				error: false
+			})
+		}
 	},
 
 	handleSubmit: function(e) {
@@ -56,52 +83,107 @@ module.exports = React.createClass({
 
 		//todo: call action to update data through store
 		this.props.submitInfo();
+
+		// after submit the field should become non-editable
+		this.setState({
+			editable: false
+		});
+
+	},
+
+	renderError: function() {
+		if (this.state.error) {
+			return (<p className="error">{this.state.errorMsg}</p>);
+		} else {
+			return null;
+		}
+	},	
+
+	renderButton: function() {
+		if (this.state.editable) {
+			return (
+				<div className="row">		
+		            <div className="col-xs-4 col-xs-offset-4">					
+						<Button 	
+							onClick={this.handleSubmit} 
+							bsStyle="success"
+							bsSize="small"
+							block>
+							提交
+						</Button>
+					</div>
+				</div>
+			)			
+		}
+		else {
+			return (
+				<div className="row">		
+		            <div className="col-xs-4 col-xs-offset-4">					
+						<Button 
+							onClick={this.handleEditableChange} 
+							bsStyle="default"
+							bsSize="small"
+							block>
+							打卡
+						</Button>
+					</div>
+				</div>);
+		}
 	},
 
 	render: function() {
+
 		return (
-			<div className="panel panel-default healthCard">
+			<div className="panel panel-success foodCard">
 				<div className="panel-heading">
 					<h5>三餐打卡</h5>
 				</div>
 				<div className="panel-body">
-					<form>
-						<div className="form-group">
-							<Input 
+					<table>
+						<tbody>
+							<tr>
+								<td>
+						<label className="checkbox-inline">
+							<input 
 								type="checkbox" 
-								label="早餐" 
+								value="breakfast"
 								checked={this.state.breakfast?'checked':null}
-								className="form-control" 
-								onChange={this.handleChange}/>
-						</div>
-						<div className="form-group">
-							<Input 
+								disabled={this.state.editable?false:"disabled"}
+								onClick={this.handleBreakfastChange}
+							/>
+							早餐
+						</label>
+							</td>
+							<td>
+						<label className="checkbox-inline">
+							<input 
 								type="checkbox" 
-								label="午餐" 
+								value="lunch"
 								checked={this.state.lunch?'checked':null}
-								className="form-control" 
-								onChange={this.handleChange}/>
-						</div>
-						<div className="form-group">
-							<Input 
+								disabled={this.state.editable?false:"disabled"}						
+								onClick={this.handleLunchChange}
+							/>
+							午餐
+						</label>
+						</td>
+						<td>
+						<label className="checkbox-inline">
+							<input 
 								type="checkbox" 
-								label="晚餐" 
+								value="dinner"
 								checked={this.state.dinner?'checked':null}
-								className="form-control" 
-								onChange={this.handleChange}/>
-						</div>
-						<div className="form-group">							
-								<Button 
-									onClick={this.handleSubmit} 
-									bsStyle="default"
-									bsSize="small"
-									block>
-									提交
-								</Button>
-						</div>
-					</form>
+								disabled={this.state.editable?false:"disabled"}					
+								onClick={this.handleDinnerChange}
+							/>
+							晚餐
+						</label>
+						</td>
+						</tr>
+						</tbody></table>	
 				</div>
-			</div>			
+				{this.renderError()}						
+				{this.renderButton()}
+			</div>
 			);
 	}
 })

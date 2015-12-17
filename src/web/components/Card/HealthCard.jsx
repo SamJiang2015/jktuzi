@@ -12,6 +12,8 @@ module.exports = React.createClass({
 		return {
 			weight: '',
 			bodyfat: '',
+
+			editable: false,
 			error: false,
 			errorMsg: ''
 		}
@@ -21,6 +23,8 @@ module.exports = React.createClass({
 		this.setState({
 			weight: this.props.weight,
 			bodyfat: this.props.bodyfat,
+
+			editable: false,
 			error: false,
 			errorMsg: ''
 		})
@@ -28,29 +32,150 @@ module.exports = React.createClass({
 
 	handleWeightChange: function(e) {
 		e.preventDefault();
-		this.setState({
-			weight: e.target.value,
-			error: false,
-			errorMsg: ''
-		});
+		if (this.state.editable) {
+			this.setState({
+				weight: e.target.value,
+				error: false,
+				errorMsg: ''
+			});
+		}
 	},
 
 
 	handleBodyfatChange: function(e) {
 		e.preventDefault();
-		this.setState({
-			bodyfat: e.target.value,
-			error: false,
-			errorMsg: ''
-		});
+
+		if (this.state.editable) {
+			this.setState({
+				bodyfat: e.target.value,
+				error: false,
+				errorMsg: ''
+			});
+		}
 	},	
+
+
+	handleEditableChange: function(e) {
+		e.preventDefault();
+		if (!this.state.editable)
+			this.setState({
+				editable: true,
+				error: false
+		})
+	},
 
 	handleSubmit: function(e) {
 		e.preventDefault();
 
 		//todo: call action to update data through store
 		this.props.submitInfo();
+
+		// after submit the field should become non-editable
+		this.setState({
+			editable: false
+		});
 	},
+
+	renderError: function() {
+		if (this.state.error) {
+			return (<p className="error">{this.state.errorMsg}</p>);
+		} else {
+			return null;
+		}
+	},	
+
+	renderContent: function() {
+		if (this.state.editable) {
+			return this.renderEditableContent();
+		} else {
+			return this.renderStaticContent();
+		}
+	},
+
+	renderEditableContent: function(){
+
+		return (
+			<div className="panel-body">
+			<form>
+				<div className="form-group">
+					<Input 
+						type="number" 
+						label="体重" 
+						addonAfter="斤"
+						min="50"
+						max="350"
+						value={this.state.weight}  												
+						className="form-control" 
+						disabled={this.state.editable?false:"disabled"}								
+						onChange={this.handleWeightChange}/>
+				</div>
+
+				<div className="form-group">
+					<Input 
+						type="number" 
+						label="体脂率(百分比)" 
+						addonAfter="%"
+						min="5"
+						max="50"
+						value={this.state.bodyfat}  												
+						disabled={this.state.editable?false:"disabled"}
+						className="form-control" 
+						onChange={this.handleBodyfatChange}/>
+				</div>
+
+				{this.renderError()}	
+				
+				<div className="form-group">					
+					<div className="col-xs-4 col-xs-offset-4">
+						<Button 						
+							onClick={this.handleSubmit} 
+							bsStyle="info"
+							bsSize="small"
+							block>
+							提交
+						</Button>
+					</div>
+				</div>					
+			</form>
+			</div>
+			);
+	},
+
+	renderStaticContent: function(){
+
+		return (
+			<div className="panel-body">
+				<table>
+					<tbody>
+						<tr>
+							<td>
+								体重:  
+								{this.state.weight===''?'  无信息':('  '+ this.state.weight+'斤')}
+							</td>
+							<td>
+								体脂率: 
+								{this.state.bodyfat===''?'  无信息':('  ' +this.state.bodyfat+'%')}
+							</td>
+						</tr>
+					</tbody>
+				</table>	
+				
+				{this.renderError()}	
+				
+				<div className="row">		
+		            <div className="col-xs-4 col-xs-offset-4">					
+						<Button 
+							onClick={this.handleEditableChange} 
+							bsStyle="default"
+							bsSize="small"
+							block>
+							打卡
+						</Button>
+					</div>
+				</div>
+			</div>
+			);
+	},	
 
 	render: function() {
 		return (
@@ -58,43 +183,7 @@ module.exports = React.createClass({
 				<div className="panel-heading">
 					<h5>健康情况打卡</h5>
 				</div>
-				<div className="panel-body">
-					<form>
-						<div className="form-group">
-							<Input 
-								type="number" 
-								label="体重" 
-								addonAfter="斤"
-								min="50"
-								max="350"
-								value={this.state.weight}  												
-								className="form-control" 
-								onChange={this.handleWeightChange}/>
-						</div>
-
-						<div className="form-group">
-							<Input 
-								type="number" 
-								label="体脂率(百分比)" 
-								addonAfter="%"
-								min="5"
-								max="50"
-								value={this.state.bodyfat}  												
-								className="form-control" 
-								onChange={this.handleBodyfatChange}/>
-						</div>
-
-						<div className="form-group">		
-								<Button 
-									onClick={this.handleSubmit} 
-									bsStyle="info"
-									bsSize="small"
-									block>
-									提交
-								</Button>
-						</div>
-					</form>
-				</div>
+				{this.renderContent()}
 			</div>			
 			);
 	}

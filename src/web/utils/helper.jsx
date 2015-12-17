@@ -2,6 +2,7 @@
 // helper.jsx
 //
 
+//var Constants = require('./constants');
 
 module.exports = {
 
@@ -16,4 +17,5 @@ module.exports = {
 	    }
 	    return true;
 	}
+
 }
