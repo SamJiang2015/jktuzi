@@ -4,20 +4,78 @@
 
 module.exports = Object.freeze({
 
-	Role: {
+	RoleType: {
 		Admin: {
 			id: 1,
-			description: 'Admin'
+			description: '管理员'
 		},
 		Trainer: {
 			id: 2,
-			description: 'Trainer'
+			description: '教练'
 		},
 		Trainee: {
 			id: 3,
-			description: 'Trainee'
+			description: '学员'
 		}
 	},
+
+	MealType: {
+		Breakfast: {
+			id: 1,
+			description: '早饭'
+		},
+		Lunch: {
+			id: 2,
+			description: '中饭'
+		},
+		Dinner: {
+			id: 3,
+			description: '晚饭'
+		}				
+	},
+
+	WorkoutType: {
+		Jog: {
+				id: 1, 
+				description: '跑步'	
+			},
+		Swim: {
+				id: 2, 
+				description: '游泳'	
+			},
+		Bike: {
+				id: 3, 
+				description: '自行车'	
+			},
+		Elliptical: {
+				id: 4, 
+				description: '椭圆机'	
+			},
+		Yoga: {
+				id: 5, 
+				description: '瑜伽'	
+			},
+		Seven: {
+				id: 6, 
+				description: 'Seven'	
+			},
+		Soccer: {
+				id: 7, 
+				description: '足球'	
+			},
+		Basketball: {
+				id: 8, 
+				description: '篮球'	
+			},
+		Badminton: {
+				id: 9, 
+				description: '羽毛球'	
+			},
+		Others: {
+				id: 10, 
+				description: '其他'	
+			}
+	},	
 
 	Limits: {
 		Height: {
@@ -63,6 +121,11 @@ module.exports = Object.freeze({
 		Email: {
 			minLen: 4,
 			maxLen: 50
+		},
+
+		// 打卡时选择的年份不可以早过这个
+		YearCardInfo: {
+			min: 2015
 		}
 	}
 });

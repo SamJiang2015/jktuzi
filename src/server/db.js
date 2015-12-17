@@ -5,7 +5,7 @@
 //
 
 var Sequelize = require('sequelize');
-var Role = require('./constants.js').Role;
+var RoleType = require('./constants.js').RoleType;
 
 var env = process.env.NODE_ENV || 'development'; // Heroku sets this env varisable to 'production'
 
@@ -30,9 +30,13 @@ var db = {};
 
 db.account = sequelize.import(__dirname + '/models/account.js');
 db.token = sequelize.import(__dirname + '/models/token.js');
-db.role = sequelize.import(__dirname + '/models/role.js');
-// db.trainer = sequelize.import(__dirname + '/models/trainer.js');
+db.roleType = sequelize.import(__dirname + '/models/roleType.js');
+db.mealType = sequelize.import(__dirname + '/models/mealType.js');
+db.mealItem = sequelize.import(__dirname + '/models/mealItem.js');
+
 db.trainee = sequelize.import(__dirname + '/models/trainee.js');
+
+// db.trainer = sequelize.import(__dirname + '/models/trainer.js');
 // db.group   = sequelize.import(__dirname + '/models/group.js');
 
 db.sequelize = sequelize;
@@ -41,11 +45,11 @@ db.sequelize = sequelize;
 ** setting up association
 **/
 
-// each account has a roleId column
-db.account.belongsTo(db.role, {
+// each account has a roleTypeId column
+db.account.belongsTo(db.roleType, {
 	foreignKey: {
 		allowNull: false,
-		defaultValue: Role.Trainee.id
+		defaultValue: RoleType.Trainee.id
 	}
 });
 
@@ -67,6 +71,22 @@ db.trainee.belongsTo(db.account, {
 		allowNull: true
 	}
 });
+
+// each mealItem has a mealType
+db.mealItem.belongsTo(db.account, {
+	foreignKey: {
+		name: 'accountId',
+		allowNull: true
+	}
+});
+
+// each mealItem has a mealtype
+db.mealItem.belongsTo(db.mealType, {
+	foreignKey: {
+		allowNull: false
+	}
+});
+
 
 // db.todo.belongsTo(db.user);
 // db.user.hasMany(db.todo);

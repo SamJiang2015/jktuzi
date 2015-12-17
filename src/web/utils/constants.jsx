@@ -16,6 +16,21 @@ Constants = Object.freeze({
 		3: '学员'
 	},
 
+	MealType: {
+		Breakfast: {
+			id: 1,
+			description: '早饭'
+		},
+		Lunch: {
+			id: 2,
+			description: '中饭'
+		},
+		Dinner: {
+			id: 3,
+			description: '晚饭'
+		}				
+	},
+
 	SportsTypes: {
 		items: [
 			{

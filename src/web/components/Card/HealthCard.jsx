@@ -129,7 +129,7 @@ module.exports = React.createClass({
 					<div className="col-xs-4 col-xs-offset-4">
 						<Button 						
 							onClick={this.handleSubmit} 
-							bsStyle="info"
+							bsStyle="success"
 							bsSize="small"
 							block>
 							提交
@@ -150,11 +150,11 @@ module.exports = React.createClass({
 						<tr>
 							<td>
 								体重:  
-								{this.state.weight===''?'  无信息':('  '+ this.state.weight+'斤')}
+								{(this.state.weight&&this.state.weight!=='') ? ('  '+ this.state.weight+'斤') : '  无信息'}
 							</td>
 							<td>
 								体脂率: 
-								{this.state.bodyfat===''?'  无信息':('  ' +this.state.bodyfat+'%')}
+								{(this.state.bodyfat&&this.state.weight!=='') ? ('  ' +this.state.bodyfat+'%') : '  无信息'}
 							</td>
 						</tr>
 					</tbody>

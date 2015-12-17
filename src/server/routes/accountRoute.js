@@ -12,6 +12,9 @@ var db = require('../db.js');
 var middleware = require('../middleware.js')(db);
 var util = require('../util.js');
 var Limits = require('../constants.js').Limits;
+var RoleType = require('../constants.js').RoleType;
+var MealType = require('../constants.js').MealType;
+var Utils = require('../util.js');
 
 // POST /accounts -- add an account
 router.post('/',
@@ -302,7 +305,152 @@ router.delete('/login',
 		});
 	});
 
+// GET /accounts/:id/mealCards/:date -- retrieve an account's mealcard info for a specific date
+router.get('/:id/mealCards/:date',
+	middleware.requireAuthentication,	
+	function(req, res) {
+
+		var accountId = parseInt(req.params.id, 10);
+		var date = req.params.date;
+
+		console.log(typeof date);
+		console.log(date);
+		
+		// check if it is the trainee retrieving his own info
+		if (accountId !== req.account.get('id')) {
+
+			// if not the trainee himself, we will only allow trainers and admins to 
+			// retrieve a trainee's meal card info
+			var role = req.account.get('roleTypeId');
+
+			if (role !== RoleType.Admin.id && role !== RoleType.Trainer.id) {
+				res.status(401).json(
+					util.formatOutput('', 401, false));
+				return;
+			}
+		}
+
+		// check if the date is in the correct format 'yyyy-mm-dd'
+		if (!Utils.isValidDate(date)) {
+			res.status(400).json(
+				util.formatOutput({errMsg: 'Date is not in the format of yyyy-mm-dd'}, 400, true));
+			return;
+		};
+
+		// retrieve the info from db
+		db.mealItem.findAll({
+			where: {
+				accountId: accountId,
+				date: date
+			}
+		}).then(function(mealItems) {
+			if (mealItems) {
+				res.json(util.formatOutput(mealItems, 200, true));
+			} else {
+				// return empty object as data if not found 
+				// not really an error case -- the user just hasn't punched card for that date
+				res.json(
+					util.formatOutput({}, 200, false));
+			}
+		}).catch(function(error) {
+				res.status(500).json(
+					util.formatOutput({errorMsg: error.toString()}, 500, false));			
+		})
+});
+
+// POST /accounts/:id/mealCards/:date 
+//       -- update or write an account's mealcard info for a specific date
+router.post('/:id/mealCards/:date',
+	middleware.requireAuthentication,	
+	function(req, res) {
+
+		var requestId = parseInt(req.params.id, 10);
+		var accountId = req.account.get('id');
+		var accountRole = req.account.get('roleTypeId');
+		var date = req.params.date;		
+		
+		// only trainers and admins can update a meal card
+		if (accountRole !== RoleType.Admin.id && accountRole !== RoleType.Trainer.id) {
+			res.status(401).json(
+					util.formatOutput('', 401, false));
+			return;
+		}
+
+		// TODO -- should limit to those trainers who manages this trainee
+		// TODO -- if requestId belongs to a trainer, who can touch it?
+		// TODO -- limit the date range -- you can't go back a month to mess with 
+		//         other people's meal card data.  probably limit to 7 days 
+
+		// check if the date is in the correct format 'yyyy-mm-dd'
+		if (!Utils.isValidDate(date)) {
+			res.status(400).json(
+				util.formatOutput({errMsg: 'Date is not in the format of yyyy-mm-dd'}, 400, true));
+			return;
+		};
+
+		// parse req.body which should contain an array of {mealTypeId, recorded} objects
+		var mealItems = req.body;
+		for (var i=0; i<mealItems.length; i++) {
+			mealItems[i] = _.pick(mealItems[i], 'mealTypeId', 'recorded');
+			mealItems[i].date = date;
+			mealItems[i].accountId = requestId;
+		}
+
+		// open a transaction
+			// delete all <date,requestId> combo in the mealItem table
+			// bulk create to write the array of mealitems into the mealItem table
+
+		// TODO: investigate why rollback does not work: try to update with invalid
+		// mealtypeids will trigger a foreign key constraint error, but existing record still destroyed
+
+		var where = {accountId: requestId, date: date}; 
+
+		db.sequelize.transaction(function(t) {
+
+			// delete whatever that is in the db for this account id and date
+			return db.mealItem.destroy(
+						{where: where},
+						{transaction: t}
+				).then(function() {
+					// now we create the new ones
+						return db.mealItem.bulkCreate(
+						mealItems, 
+						{transaction: t});
+					});
+		}).then(function() {
+			// retrieve the current ones in db to send back to called
+			return db.mealItem.findAll({
+				where: where
+		})}).then(function(mealItems) {
+			res.json(util.formatOutput(mealItems, 200, true))
+		}).catch(function(error) {
+		 		console.log(error);
+		 		res.status(400).json(util.formatOutput(error, 400, false));
+		})
+
+	});
+
+// 
+//  KEEP THESE AS LAST REGISTERED ROUTES
 router.get('/*',
+	function(req, res) {
+		res.status(400).json(util.formatOutput({error: 'API call not supoorted'}, 400, false));
+	}
+);
+
+router.post('/*',
+	function(req, res) {
+		res.status(400).json(util.formatOutput({error: 'API call not supoorted'}, 400, false));
+	}
+);
+
+router.put('/*',
+	function(req, res) {
+		res.status(400).json(util.formatOutput({error: 'API call not supoorted'}, 400, false));
+	}
+);
+
+router.delete('/*',
 	function(req, res) {
 		res.status(400).json(util.formatOutput({error: 'API call not supoorted'}, 400, false));
 	}

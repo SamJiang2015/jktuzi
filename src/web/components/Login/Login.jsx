@@ -70,8 +70,9 @@ module.exports = React.createClass({
 		                <Input 
 		                	type="password" 
 		                	ref="pass" 
-		                	placeholder="密码" 
 		                	defaultValue="password"
+		                	placeholder="密码" 
+		                	
 		                	hasFeedback 
 		                	feedbackIcon={passwordGlyphicon} 
 		                />

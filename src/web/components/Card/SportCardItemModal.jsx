@@ -177,8 +177,8 @@ module.exports = React.createClass({
 				</Modal.Body>
 				<Modal.Footer>
 					<ButtonToolbar>
-						<Button bsStyle="success" bsSize="small" onClick={this.save}>保存</Button>
-						<Button bsStyle="warning"  bsSize="small" onClick={this.close}>取消</Button>
+						<Button bsStyle="success" onClick={this.save}>保存</Button>
+						<Button bsStyle="warning" onClick={this.close}>取消</Button>
 					</ButtonToolbar>	
 				</Modal.Footer>
 			</Modal>);

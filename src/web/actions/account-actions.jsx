@@ -10,7 +10,4 @@ module.exports = Reflux.createActions([
 	'saveAccountTraineeInfoInMemory',
 	'createAccountTraineeInfo',
 	'updateAccountTraineeInfo'
-  // 'getTopics',
-  // 'getImages',
-  // 'getImage'
 ]);

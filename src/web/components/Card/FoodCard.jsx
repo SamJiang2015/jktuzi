@@ -9,6 +9,7 @@ var Input = require('react-bootstrap/lib/input');
 var Button = require('react-bootstrap/lib/button');
 var Auth = require('../../utils/auth');
 var Constants = require('../../utils/constants');
+var Errors = require('../Common/Errors');
 
 module.exports = React.createClass({
 
@@ -24,15 +25,23 @@ module.exports = React.createClass({
 		}
 	},
 
-	componentDidMount: function() {
+	setStateHelper: function(props) {
 		this.setState({
-			breakfast: this.props.breakfast,
-			lunch: this.props.lunch,
-			dinner: this.props.dinner,
-			editable: false,
-			error: false,
-			errorMsg: ''
-		})
+			breakfast: props.breakfast,
+			lunch: props.lunch,
+			dinner: props.dinner,
+			editable: props.submitFoodCardError,  // this way the user gets a visual prompt that submit failed
+			error: props.submitFoodCardError,
+			errorMsg: Errors.getMsg(props.submitFoodCardErrorCode)
+		});
+	},
+
+	componentDidMount: function() {
+		this.setStateHelper(this.props);
+	},
+
+	componentWillReceiveProps: function(newProps) {
+		this.setStateHelper(newProps);
 	},
 
 	handleBreakfastChange: function(e) {
@@ -81,8 +90,13 @@ module.exports = React.createClass({
 	handleSubmit: function(e) {
 		e.preventDefault();
 
-		//todo: call action to update data through store
-		this.props.submitInfo();
+		var data = {
+			breakfast: this.state.breakfast,
+			lunch: this.state.lunch,
+			dinner: this.state.dinner
+		};
+
+		this.props.submitInfo(data);
 
 		// after submit the field should become non-editable
 		this.setState({
@@ -134,7 +148,7 @@ module.exports = React.createClass({
 	render: function() {
 
 		return (
-			<div className="panel panel-success foodCard">
+			<div className="panel panel-info foodCard">
 				<div className="panel-heading">
 					<h5>三餐打卡</h5>
 				</div>

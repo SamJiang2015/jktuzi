@@ -65,7 +65,7 @@ module.exports = React.createClass({
 			errorMsg = '请核验您输入的个性签名';
 		} else if (data.sponsorName.length<Limits.Name.minLen || data.sponsorName.length>Limits.Name.maxLen) {
 			errorMsg = '请核验您输入的介绍人名字';
-		} else if (//(data.sponsorMobile !== '') &&
+		} else if (//(data.sponsorMobile !== '') &&  --ToDo: should sponsorMobile be required?
 			(isNaN(data.sponsorMobile) || data.sponsorMobile.length<Limits.Mobile.minLen || data.sponsorMobile.length>Limits.Mobile.maxLen)) {
 			errorMsg='请核验您输入的介绍人手机';
 		}

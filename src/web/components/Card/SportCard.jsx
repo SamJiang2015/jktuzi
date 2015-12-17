@@ -101,7 +101,8 @@ var SportCard = React.createClass({
 			id: SportCard.newItemId--, // we use a static negative counter as ID place holders
 									   // to avoid conflict with existing ids. the real ID will be set
 										// once we hit the server
-			type: '',
+			type: 1,  // set to the first one otherwise if user does not change the select item
+					  // type won't get set
 			description: '',
 			distance: '',
 			duration: '',
@@ -173,7 +174,7 @@ var SportCard = React.createClass({
 		            <div className="col-xs-4 col-xs-offset-4">					
 						<Button 	
 							onClick={this.handleSubmit} 
-							bsStyle="primary"
+							bsStyle="success"
 							bsSize="small"
 							block>
 							提交
@@ -205,7 +206,7 @@ var SportCard = React.createClass({
 
 	render: function() {
 		return (
-			<div className="panel panel-primary sportCard">
+			<div className="panel panel-info sportCard">
 				<div className="panel-heading">
 					<h5>运动打卡</h5>
 				</div>

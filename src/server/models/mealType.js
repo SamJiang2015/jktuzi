@@ -1,10 +1,10 @@
+// 
+// mealType.js
 //
-// role.js
-//
-//	 	-- reference table to store information on each role:
-//				- 'admin'
-//				- 'trainer'
-//				- 'trainee'
+//	 	-- reference table to store information on each meal type:
+//				- 'breakfast'
+//				- 'lunch'
+//				- 'dinner'
 //
 
 
@@ -14,7 +14,7 @@ module.exports = function(sequelize, DataTypes) {
 		//
 		// model/table name
 		//
-		'role',  
+		'mealType',  
 		//
 		// model attributes/table columns (other than virtual ones)
 		//

@@ -166,7 +166,7 @@ function loginRequest(mobile, pass, cb) {
         accountId: json.data.id,
         token: json.data.token,
         name: json.data.name,
-        role: json.data.roleId,
+        role: json.data.roleTypeId,
         infoCompleted: json.data.infoCompleted
       })
     } else {
