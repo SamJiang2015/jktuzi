@@ -12,11 +12,13 @@ var ButtonToolbar = require('react-bootstrap/lib/Buttontoolbar');
 var DynamicSelect = require('../Common/DynamicSelect');
 var SportsTypes = require('../../utils/constants').SportsTypes;
 
+var Limits = require('../../utils/constants').Limits;
+
 module.exports = React.createClass({
 
 	getInitialState: function(){
 		return {
-			type: null,
+			workoutTypeId: null,
 			description: '',
 			duration: '',
 			distance: '',
@@ -26,34 +28,30 @@ module.exports = React.createClass({
 		};
 	},
 
-	componentDidMount: function() {
+	setStateHelper: function(props) {
 		this.setState({
-			type: this.props.type,
-			description: this.props.description,
-			duration: this.props.duration,
-			distance: this.props.distance,
-			showModal: this.props.showModal,
+			workoutTypeId: props.workoutTypeId,
+			description: props.description,
+			duration: props.duration,
+			distance: props.distance,
+			showModal: props.showModal,
 			error: false,
 			errorMsg: ''
 		});
 	},
 
+	componentDidMount: function() {
+		this.setStateHelper(this.props);	
+	},
+
 	componentWillReceiveProps: function(newProps) {
-		this.setState({
-			type: newProps.type,
-			description: newProps.description,
-			duration: newProps.duration,
-			distance: newProps.distance,
-			showModal: newProps.showModal,
-			error: false,
-			errorMsg: ''
-		});
+		this.setStateHelper(newProps);
 	},	
 
 	handleTypeChange: function(val) {
 
 		this.setState({
-			type: val,
+			workoutTypeId: val,
 			error: false,
 			errorMsg: ''
 		});
@@ -88,7 +86,8 @@ module.exports = React.createClass({
 
 	close: function() {		
 		this.setState({
-			showModal: false
+			showModal: false,
+			error: false
 		})
 
 		if (this.props.isNew) {
@@ -100,7 +99,8 @@ module.exports = React.createClass({
 
 	open: function() {
 		this.setState({
-			showModal: true
+			showModal: true,
+			error: false
 		})
 	},	
 
@@ -109,17 +109,49 @@ module.exports = React.createClass({
 		var item = {
 			id: this.props.id,
 			// isNew: this.props.isNew -- can't set this; otherwise the modal will stay open
-			type: this.state.type,
+			workoutTypeId: this.state.workoutTypeId,
 			description: this.state.description,
 			duration: this.state.duration,
 			distance: this.state.distance
 		};
 
-		//todo: validate input here
+		// validate input
+		var errorMsg='';
+		//input validation happens here
+		if ( (item.description && item.description!=='') && 
+			(item.description.length<Limits.Workout.Description.minLen ||
+			item.description.length>Limits.Workout.Description.maxLen)) {
+			errorMsg = '请核验您输入的描述';
+		} else if ((item.duration && (item.duration !== '')) &&
+			(isNaN(item.duration) || 
+				Number(item.duration)<Limits.Workout.Duration.min ||
+				Number(item.duration)>Limits.Workout.Duration.max)) {
+			errorMsg='请核验您输入的分钟数';
+		} else if ( (item.distance && (item.distance !== '')) &&
+			(isNaN(item.distance) || 
+				Number(item.distance)<Limits.Workout.Distance.min ||
+				Number(item.distance)>Limits.Workout.Distance.max)) {
+			errorMsg='请核验您输入的公里数';
+		}
 
-		this.props.handleSave(item);
-
+		if (errorMsg!=='') {
+			this.setState({
+				showModal: true,
+				error: true,
+				errorMsg: errorMsg
+			});
+		} else {		
+			this.props.handleSave(item);
+		}
 	},
+
+	renderError: function() {
+		if (this.state.error) {
+			return (<p className="error">{this.state.errorMsg}</p>);
+		} else {
+			return null;
+		}
+	},	
 
 	renderModalBody: function() {
 		return (
@@ -128,7 +160,7 @@ module.exports = React.createClass({
 						<DynamicSelect 
 							selectItems={SportsTypes.items}
 							label="运动方式" 
-							value={this.state.type}  												
+							value={this.state.workoutTypeId}  												
 							className="form-control" 
 							handleChange={this.handleTypeChange}/>
 					</div>
@@ -174,6 +206,7 @@ module.exports = React.createClass({
 				bsSize="sm">
 				<Modal.Body>
 					{this.renderModalBody()}
+					{this.renderError()}
 				</Modal.Body>
 				<Modal.Footer>
 					<ButtonToolbar>

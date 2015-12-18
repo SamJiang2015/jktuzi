@@ -333,7 +333,7 @@ router.get('/:id/mealCards/:date',
 		// check if the date is in the correct format 'yyyy-mm-dd'
 		if (!Utils.isValidDate(date)) {
 			res.status(400).json(
-				util.formatOutput({errMsg: 'Date is not in the format of yyyy-mm-dd'}, 400, true));
+				util.formatOutput({errMsg: 'Date is not in the format of yyyy-mm-dd'}, 400, false));
 			return;
 		};
 
@@ -350,7 +350,7 @@ router.get('/:id/mealCards/:date',
 				// return empty object as data if not found 
 				// not really an error case -- the user just hasn't punched card for that date
 				res.json(
-					util.formatOutput({}, 200, false));
+					util.formatOutput({}, 200, true));
 			}
 		}).catch(function(error) {
 				res.status(500).json(
@@ -384,12 +384,17 @@ router.post('/:id/mealCards/:date',
 		// check if the date is in the correct format 'yyyy-mm-dd'
 		if (!Utils.isValidDate(date)) {
 			res.status(400).json(
-				util.formatOutput({errMsg: 'Date is not in the format of yyyy-mm-dd'}, 400, true));
+				util.formatOutput({errMsg: 'Date is not in the format of yyyy-mm-dd'}, 400, false));
 			return;
 		};
 
 		// parse req.body which should contain an array of {mealTypeId, recorded} objects
 		var mealItems = req.body;
+		if (mealItems.length > Limits.Meal.ItemCount.max) {
+			res.status(400).json(
+				util.formatOutput({errMsg: 'Number of items exceed the max count'}, 400, false));
+			return;
+		};				
 		for (var i=0; i<mealItems.length; i++) {
 			mealItems[i] = _.pick(mealItems[i], 'mealTypeId', 'recorded');
 			mealItems[i].date = date;
@@ -458,7 +463,7 @@ router.get('/:id/healthCards/:date',
 		// check if the date is in the correct format 'yyyy-mm-dd'
 		if (!Utils.isValidDate(date)) {
 			res.status(400).json(
-				util.formatOutput({errMsg: 'Date is not in the format of yyyy-mm-dd'}, 400, true));
+				util.formatOutput({errMsg: 'Date is not in the format of yyyy-mm-dd'}, 400, false));
 			return;
 		};
 
@@ -475,7 +480,7 @@ router.get('/:id/healthCards/:date',
 				// return empty object as data if not found 
 				// not really an error case -- the user just hasn't punched card for that date
 				res.json(
-					util.formatOutput({}, 200, false));
+					util.formatOutput({}, 200, true));
 			}
 		}).catch(function(error) {
 				res.status(500).json(
@@ -509,7 +514,7 @@ router.post('/:id/healthCards/:date',
 		// check if the date is in the correct format 'yyyy-mm-dd'
 		if (!Utils.isValidDate(date)) {
 			res.status(400).json(
-				util.formatOutput({errMsg: 'Date is not in the format of yyyy-mm-dd'}, 400, true));
+				util.formatOutput({errMsg: 'Date is not in the format of yyyy-mm-dd'}, 400, false));
 			return;
 		};
 
@@ -546,7 +551,140 @@ router.post('/:id/healthCards/:date',
 
 	});
 
-// 
+
+/*********************************************************************************************************************
+/* // GET /accounts/:id/workoutCards/:date 
+/* 				-- retrieve an account's workoutcard info for a specific date
+*********************************************************************************************************************/
+router.get('/:id/workoutCards/:date',
+	middleware.requireAuthentication,	
+	function(req, res) {
+
+		var accountId = parseInt(req.params.id, 10);
+		var requestId = parseInt(req.params.id, 10);
+		var date = req.params.date;
+
+		console.log(typeof date);
+		console.log(date);
+		
+		// check if it is the trainee retrieving his own info
+		if (accountId !== requestId) {
+
+			// if not the trainee himself, we will only allow trainers and admins to 
+			// retrieve a trainee's meal card info
+			var role = req.account.get('roleTypeId');
+
+			if (role !== RoleType.Admin.id && role !== RoleType.Trainer.id) {
+				res.status(401).json(
+					util.formatOutput('', 401, false));
+				return;
+			}
+		}
+
+		// check if the date is in the correct format 'yyyy-mm-dd'
+		if (!Utils.isValidDate(date)) {
+			res.status(400).json(
+				util.formatOutput({errMsg: 'Date is not in the format of yyyy-mm-dd'}, 400, false));
+			return;
+		};
+
+		// retrieve the info from db
+		db.workoutItem.findAll({
+			where: {
+				accountId: accountId,
+				date: date
+			}
+		}).then(function(workoutItems) {
+			if (!workoutItems) {
+				workoutItems={};
+			}
+			res.json(util.formatOutput(workoutItems, 200, true));
+
+		}).catch(function(error) {
+				res.status(500).json(
+					util.formatOutput({errorMsg: error.toString()}, 500, false));			
+		})
+});
+
+/*********************************************************************************************************************
+/* POST /accounts/:id/sportCards/:date 
+/*       -- update or write an account's sport card info for a specific date
+*********************************************************************************************************************/
+router.post('/:id/workoutCards/:date',
+	middleware.requireAuthentication,	
+	function(req, res) {
+
+		var requestId = parseInt(req.params.id, 10);
+		var accountId = req.account.get('id');
+		var accountRole = req.account.get('roleTypeId');
+		var date = req.params.date;		
+		
+		// TODO: permission checking.  For now only allow one to update own info
+		if (accountId !== requestId) {
+			res.status(401).json(
+					util.formatOutput('', 401, false));
+			return;
+		}
+
+		// TODO -- should limit to those trainers who manages this trainee
+		// TODO -- if requestId belongs to a trainer, who can touch it?
+		// TODO -- limit the date range -- you can't go back a month to mess with 
+		//         other people's workout card data.  probably limit to 7 days 
+
+		// check if the date is in the correct format 'yyyy-mm-dd'
+		if (!Utils.isValidDate(date)) {
+			res.status(400).json(
+				util.formatOutput({errMsg: 'Date is not in the format of yyyy-mm-dd'}, 400, false));
+			return;
+		};
+
+		// parse req.body which should contain an array of {workoutTypeId, description, duration, distance} objects
+		var workoutItems = req.body;
+		if (workoutItems.length > Limits.Workout.ItemCount.max) {
+			res.status(400).json(
+				util.formatOutput({errMsg: 'Number of items exceed the max count'}, 400, false));
+			return;
+		};		
+		for (var i=0; i<workoutItems.length; i++) {
+			workoutItems[i] = _.pick(workoutItems[i], 'workoutTypeId', 'description', 'duration', 'distance');
+			workoutItems[i].date = date;
+			workoutItems[i].accountId = requestId;
+		}
+
+		// open a transaction
+			// delete all <date,requestId> combo in the workoutItem table
+			// bulk create to write the array of workoutitems into the workoutItem table
+
+		// TODO: investigate why rollback does not work: try to update with invalid
+		// mealtypeids will trigger a foreign key constraint error, but existing record still destroyed
+
+		var where = {accountId: requestId, date: date}; 
+
+		db.sequelize.transaction(function(t) {
+
+			// delete whatever that is in the db for this account id and date
+			return db.workoutItem.destroy(
+						{where: where},
+						{transaction: t}
+				).then(function() {
+					// now we create the new ones
+						return db.workoutItem.bulkCreate(
+						workoutItems, 
+						{transaction: t});
+					});
+		}).then(function() {
+			// retrieve the current ones in db to send back to called
+			return db.workoutItem.findAll({
+				where: where
+		})}).then(function(workoutItems) {
+			res.json(util.formatOutput(workoutItems, 200, true))
+		}).catch(function(error) {
+		 		console.log(error);
+		 		res.status(400).json(util.formatOutput(error, 400, false));
+		})
+
+	});
+
 //  KEEP THESE AS LAST REGISTERED ROUTES
 router.get('/*',
 	function(req, res) {

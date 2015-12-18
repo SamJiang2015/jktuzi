@@ -1,10 +1,7 @@
+// 
+// workoutType.js
 //
-// role.js
-//
-//	 	-- reference table to store information on each role:
-//				- 'admin'
-//				- 'trainer'
-//				- 'trainee'
+//	 	-- reference table to store information on each workout type:
 //
 
 
@@ -14,7 +11,7 @@ module.exports = function(sequelize, DataTypes) {
 		//
 		// model/table name
 		//
-		'roleType',  
+		'workoutType',  
 		//
 		// model attributes/table columns (other than virtual ones)
 		//

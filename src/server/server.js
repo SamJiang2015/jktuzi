@@ -44,9 +44,10 @@ app.get('/*', function(req, res) {
 
 // create the database and populate the reference table(s)
 db.sequelize.sync({
-	force: true
+	force: false
+})
 /////////////////////////////// Role Types /////////////////////////////////
-}).then(function() {
+.then(function() {
 	return db.roleType.findOrCreate({
 		where: {id: RoleType.Admin.id}, defaults: {description: RoleType.Admin.description}});
 }).then(function() {
@@ -55,8 +56,9 @@ db.sequelize.sync({
 }).then(function() {
 	return db.roleType.findOrCreate({
 		where: {id: RoleType.Trainee.id}, defaults: {description: RoleType.Trainee.description}});
-}).then(function() {
+})
 /////////////////////////////// Meal Types /////////////////////////////////	
+.then(function() {
 	return db.mealType.findOrCreate({
 		where: {id: MealType.Breakfast.id}, defaults: {description: MealType.Breakfast.description}});
 }).then(function() {
@@ -65,8 +67,41 @@ db.sequelize.sync({
 }).then(function() {
 	return db.mealType.findOrCreate({
 		where: {id: MealType.Dinner.id}, defaults: {description: MealType.Dinner.description}});
-/////////////////////////////// Test Accounts ////////////////////////////////////
+})
+/////////////////////////////// Workout Types /////////////////////////////////	
+.then(function() {
+	return db.workoutType.findOrCreate({
+		where: {id: WorkoutType.Jog.id}, defaults: {description: WorkoutType.Jog.description}});
 }).then(function() {
+	return db.workoutType.findOrCreate({
+		where: {id: WorkoutType.Swim.id}, defaults: {description: WorkoutType.Swim.description}});
+}).then(function() {
+	return db.workoutType.findOrCreate({
+		where: {id: WorkoutType.Bike.id}, defaults: {description: WorkoutType.Bike.description}});
+}).then(function() {
+	return db.workoutType.findOrCreate({
+		where: {id: WorkoutType.Elliptical.id}, defaults: {description: WorkoutType.Elliptical.description}});
+}).then(function() {
+	return db.workoutType.findOrCreate({
+		where: {id: WorkoutType.Yoga.id}, defaults: {description: WorkoutType.Yoga.description}});
+}).then(function() {
+	return db.workoutType.findOrCreate({
+		where: {id: WorkoutType.Seven.id}, defaults: {description: WorkoutType.Seven.description}});
+}).then(function() {
+	return db.workoutType.findOrCreate({
+		where: {id: WorkoutType.Soccer.id}, defaults: {description: WorkoutType.Soccer.description}});
+}).then(function() {
+	return db.workoutType.findOrCreate({
+		where: {id: WorkoutType.Basketball.id}, defaults: {description: WorkoutType.Basketball.description}});
+}).then(function() {
+	return db.workoutType.findOrCreate({
+		where: {id: WorkoutType.Badminton.id}, defaults: {description: WorkoutType.Badminton.description}});
+}).then(function() {
+	return db.workoutType.findOrCreate({
+		where: {id: WorkoutType.Others.id}, defaults: {description: WorkoutType.Others.description}});
+})
+/////////////////////////////// Test Accounts ////////////////////////////////////
+.then(function() {
 	return db.account.findOrCreate({
 		where: {mobile: '18888888888'}, defaults: {name: '总督头', password: 'PiPi8888', roleTypeId: RoleType.Admin.id}});
 }).then(function() {
@@ -77,26 +112,26 @@ db.sequelize.sync({
 		where: {mobile: '18866666666'}, defaults: {name: '新人', password: 'password'}});
 })
 /////////////////////////////// Test Account Trainee Info ////////////////////////////////////
-.then(function() {
-	return db.trainee.findOrCreate({
-		where: {id: 1}, defaults: {
-			'isMale': 1,
-			'nickname': 'PiPi',
-			'birthdate':'1980-01-01',
-			'email': 'pipi@test.com',
-			'profession': '健美运动员',
-			'height': 180,
-			'weight': 150,
-			'bodyfat': 20,
-			'weightGoal': 140,
-			'bodyfatGoal': 15,
-			'signature': 'No Zuo No Die',
-			'habbit': '跑步，游泳，健身',
-			'sponsorName': '总督头',
-			'sponsorMobile': '18888888888',
-			'sponsorAccountId': 1,
-			'accountId': 2}});
-})
+// .then(function() {
+// 	return db.trainee.findOrCreate({
+// 		where: {id: 1}, defaults: {
+// 			'isMale': 1,
+// 			'nickname': 'PiPi',
+// 			'birthdate':'1980-01-01',
+// 			'email': 'pipi@test.com',
+// 			'profession': '健美运动员',
+// 			'height': 180,
+// 			'weight': 150,
+// 			'bodyfat': 20,
+// 			'weightGoal': 140,
+// 			'bodyfatGoal': 15,
+// 			'signature': 'No Zuo No Die',
+// 			'habbit': '跑步，游泳，健身',
+// 			'sponsorName': '总督头',
+// 			'sponsorMobile': '18888888888',
+// 			'sponsorAccountId': 1,
+// 			'accountId': 2}});
+// })
 //////////////////////////// Test Login Tokenhash //////////////////////////
 .then(function() {
 	return db.token.findOrCreate({

@@ -19,7 +19,7 @@ module.exports = React.createClass({
 
 	getInitialState: function(){
 		return {
-			type: null,
+			workoutTypeId: null,
 			description: '',
 			duration: '',
 			distance: '',
@@ -31,30 +31,25 @@ module.exports = React.createClass({
 
 	},
 
-	componentDidMount: function() {
+	setStateHelper: function(props) {
 		this.setState({
-			type: this.props.type,
-			description: this.props.description,
-			duration: this.props.duration,
-			distance: this.props.distance,
-			cardEditable: this.props.cardEditable,
-			showModal: this.props.showModal,
+			workoutTypeId: props.workoutTypeId,
+			description: props.description,
+			duration: props.duration,
+			distance: props.distance,
+			cardEditable: props.cardEditable,
+			showModal: props.showModal,
 			error: false,
 			errorMsg: ''
 		});
 	},
 
+	componentDidMount: function() {
+		this.setStateHelper(this.props);	
+	},
+
 	componentWillReceiveProps: function(newProps) {
-		this.setState({
-			type: newProps.type,
-			description: newProps.description,
-			duration: newProps.duration,
-			distance: newProps.distance,
-			cardEditable: newProps.cardEditable,
-			showModal: newProps.showModal,
-			error: false,
-			errorMsg: ''
-		});
+		this.setStateHelper(newProps);
 	},	
 
 	handleEdit: function() {
@@ -120,12 +115,12 @@ module.exports = React.createClass({
 		// that type values are sequential ints: 1,2,3, .... 
 		return (
 			<tr className='sportCardItem'>
-				<td>{SportsTypes.getDisplay(this.state.type)}</td>
+				<td>{SportsTypes.getDisplay(this.state.workoutTypeId)}</td>
 				<td>{this.state.description}</td>
 				<td>{this.state.duration}</td>
 				<td>{this.state.distance}</td>
 				{this.renderButton()}
-				{this.renderModal()}
+				<td>{this.renderModal()}</td>
 			</tr>
 		);
 	}

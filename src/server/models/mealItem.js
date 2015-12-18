@@ -11,6 +11,7 @@
 //		-- recorded (whether the specific meal for that date has been recorded, 是否已经打卡)
 //
 
+var Utils = require('../util.js');
 module.exports = function(sequelize, DataTypes) {
 
 	return sequelize.define(

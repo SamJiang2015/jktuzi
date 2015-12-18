@@ -77,6 +77,18 @@ module.exports = React.createClass({
 		})
 	},
 
+	handleCancel: function(e) {
+		e.preventDefault();
+
+		this.setState({
+			weight: this.props.weight,
+			bodyfat: this.props.bodyfat,
+			editable: false,
+			error: false,
+			errorMsg: ''
+		});
+	},
+
 	handleSubmit: function(e) {
 		e.preventDefault();
 
@@ -100,7 +112,6 @@ module.exports = React.createClass({
 				errorMsg: errorMsg
 			});
 		} else {		
-			//todo: call action to update data through store
 			this.props.submitInfo(data);
 
 			// after submit the field should become non-editable
@@ -160,7 +171,16 @@ module.exports = React.createClass({
 				{this.renderError()}	
 				
 				<div className="form-group">					
-					<div className="col-xs-4 col-xs-offset-4">
+					<div className="col-xs-2 col-xs-offset-4">
+						<Button 						
+							onClick={this.handleCancel} 
+							bsStyle="warning"
+							bsSize="small"
+							block>
+							取消
+						</Button>
+					</div>
+					<div className="col-xs-2">
 						<Button 						
 							onClick={this.handleSubmit} 
 							bsStyle="success"

@@ -11,33 +11,58 @@ var SportCardItem = require('./SportCardItem');
 var Input = require('react-bootstrap/lib/input');
 var Button = require('react-bootstrap/lib/button');
 var ButtonToolbar = require('react-bootstrap/lib/buttontoolbar');
-
+var Limits = require('../../utils/constants').Limits;
 
 var SportCard = React.createClass({
 
 	statics: {
-		newItemId: -1
+		newItemId: 0
 	},
 
 	getInitialState: function() {
 		return {
 			items: [],
-			editable: false
-
+			editable: false,
+			error: false,
+			errorMsg: ''
 		}
+	},
+
+	copySportCardItems: function(items) {
+
+		var copy = [];
+
+		for (var i=0; i<items.length; i++){
+			item=items[i];
+			copy[i] = {
+				id: item.id,
+				workoutTypeId: item.workoutTypeId,
+				description: item.description,
+				duration: item.duration,
+				distance: item.distance
+			};
+		}
+		return copy;
 	},
 
 	componentDidMount: function() {
 		this.setState({
-			items: this.props.items,
-			editable: false
+			//deep copy the array so that we can easily rollback by resetting state.items to props.items
+			//items: JSON.parse(JSON.stringify(this.props.items)), 
+			items: this.copySportCardItems(this.props.items),
+			editable: false,
+			error: false,
+			errorMsg: ''
 		})
 	},
 
 	componentWillReceiveProps: function(newProps) {
 		this.setState({
-			items: newProps.items,
-			editable: false
+			//items: JSON.parse(JSON.stringify(newProps.items)), 
+			items: this.copySportCardItems(newProps.items),
+			editable: false,
+			error: false,
+			errorMsg: ''
 		})
 	},
 
@@ -55,7 +80,9 @@ var SportCard = React.createClass({
 
 		// reset the state to trigger a rerender
 		this.setState({
-			items: items
+			items: items,
+			error: false,
+			errorMsg: ''			
 		});
 	},
 
@@ -75,7 +102,9 @@ var SportCard = React.createClass({
 
 		// reset the state to trigger a rerender
 		this.setState({
-			items: items
+			items: items,
+			error: false,
+			errorMsg: ''
 		});
 	},
 
@@ -84,24 +113,37 @@ var SportCard = React.createClass({
 		if (!this.state.editable)
 			this.setState({
 				editable: true,
-				error: false
+				error: false,
+				errorMsg: ''
 		})
 	},
 
 	handleAdd: function(e) {
 		e.preventDefault();
 
+		if (this.state.items.length >= Limits.Workout.ItemCount.max) {
+			this.setState({
+				error: true,
+				errorMsg: '抱歉，您已超过一天可以记录运动项目的上限了'
+			});
+
+			return;
+		}
+
 		// we first create a new SportCardItem and update the list stored in memory,
 		// this will trigger a re-render s.t. the logic inside <SportCardItem> will take care 
 		// of the job of rendering a form.  When SportCardItem is done, the user will click a confirm 
 		// button and call the handleItemAdd here in parent.  That function will then hit the server
 		// to add the item.  
+
 		var items = this.state.items;
+		var newId = SportCard.newItemId--;
+
 		var newItem = {
-			id: SportCard.newItemId--, // we use a static negative counter as ID place holders
+			id: newId, // we use a static negative counter as ID place holders
 									   // to avoid conflict with existing ids. the real ID will be set
 										// once we hit the server
-			type: 1,  // set to the first one otherwise if user does not change the select item
+			workoutTypeId: 1,  // set to the first one otherwise if user does not change the select item
 					  // type won't get set
 			description: '',
 			distance: '',
@@ -114,19 +156,34 @@ var SportCard = React.createClass({
 
 		// set the items in memory to trigger a re-render
 		this.setState({
-			items: items
+			items: items,
+			error: false,
+			errorMsg: ''			
 		});		
+	},
+
+	handleCancel: function(e) {
+		e.preventDefault();
+
+		this.setState({
+			items: this.copySportCardItems(this.props.items),
+			editable: false,
+			error: false,
+			errorMsg: ''
+		});
 	},
 
 	handleSubmit: function(e) {
 		e.preventDefault();
 
 		//todo: call action to update data through store
-		this.props.submitInfo();
+		this.props.submitInfo(this.state.items);
 
 		// after submit the field should become non-editable
 		this.setState({
-			editable: false
+			editable: false,
+			error: false,
+			errorMsg: ''			
 		});
 	},
 
@@ -135,7 +192,7 @@ var SportCard = React.createClass({
 			return (<SportCardItem 
 						key={item.id}
 						id={item.id}
-						type={item.type}
+						workoutTypeId={item.workoutTypeId}
 						description={item.description}
 						duration={item.duration}
 						distance={item.distance}
@@ -149,18 +206,26 @@ var SportCard = React.createClass({
 		}.bind(this))
 	},
 
+	renderError: function() {
+		if (this.state.error) {
+			return (<p className="error">{this.state.errorMsg}</p>);
+		} else {
+			return null;
+		}
+	},	
+
 	renderAddButton: function() {
 		return (
 			<tr>
 			<td></td><td></td><td></td><td></td>
 			<td>
 	            <ButtonToolbar>			
-				<Button 
-					onClick={this.handleAdd} 
-					bsStyle="success"
-					bsSize="xsmall">
-					<span className="glyphicon glyphicon-plus"></span>
-				</Button>				
+					<Button 
+						onClick={this.handleAdd} 
+						bsStyle="success"
+						bsSize="xsmall">
+						<span className="glyphicon glyphicon-plus"></span>
+					</Button>				
 	            </ButtonToolbar>			
 			</td>
 			</tr>)
@@ -171,7 +236,16 @@ var SportCard = React.createClass({
 		if (this.state.editable) {
 			return (
 				<div className="row">		
-		            <div className="col-xs-4 col-xs-offset-4">					
+		            <div className="col-xs-2 col-xs-offset-4">					
+						<Button 	
+							onClick={this.handleCancel} 
+							bsStyle="warning"
+							bsSize="small"
+							block>
+							取消
+						</Button>
+					</div>				
+		            <div className="col-xs-2">					
 						<Button 	
 							onClick={this.handleSubmit} 
 							bsStyle="success"
@@ -222,7 +296,8 @@ var SportCard = React.createClass({
 							{this.renderItems()}
 							{this.state.editable ? this.renderAddButton() : null}						
 						</tbody>
-					</table>	
+					</table>
+					{this.renderError()}	
 					{this.renderButton()}
 
 				</div>

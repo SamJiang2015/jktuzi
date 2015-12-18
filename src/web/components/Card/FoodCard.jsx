@@ -7,6 +7,7 @@
 var React = require('react');
 var Input = require('react-bootstrap/lib/input');
 var Button = require('react-bootstrap/lib/button');
+var ButtonGroup = require('react-bootstrap/lib/buttongroup');
 var Auth = require('../../utils/auth');
 var Constants = require('../../utils/constants');
 var Errors = require('../Common/Errors');
@@ -87,6 +88,19 @@ module.exports = React.createClass({
 		}
 	},
 
+	handleCancel: function(e) {
+		e.preventDefault();
+
+		this.setState({
+			breakfast: this.props.breakfast,
+			lunch: this.props.lunch,
+			dinner: this.props.dinner,
+			editable: false,
+			error: false,
+			errorMsg: false
+		});
+	},
+
 	handleSubmit: function(e) {
 		e.preventDefault();
 
@@ -117,14 +131,23 @@ module.exports = React.createClass({
 		if (this.state.editable) {
 			return (
 				<div className="row">		
-		            <div className="col-xs-4 col-xs-offset-4">					
+		            <div className="col-xs-2 col-xs-offset-4">			
+						<Button 	
+							onClick={this.handleCancel} 
+							bsStyle="warning"
+							bsSize="small"
+							block>
+							取消
+						</Button>
+					</div>		
+		            <div className="col-xs-2">								
 						<Button 	
 							onClick={this.handleSubmit} 
 							bsStyle="success"
 							bsSize="small"
 							block>
 							提交
-						</Button>
+						</Button>							
 					</div>
 				</div>
 			)			

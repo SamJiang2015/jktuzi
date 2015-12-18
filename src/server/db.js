@@ -32,8 +32,10 @@ db.account = sequelize.import(__dirname + '/models/account.js');
 db.token = sequelize.import(__dirname + '/models/token.js');
 db.roleType = sequelize.import(__dirname + '/models/roleType.js');
 db.mealType = sequelize.import(__dirname + '/models/mealType.js');
+db.workoutType = sequelize.import(__dirname + '/models/workoutType.js');
 db.mealItem = sequelize.import(__dirname + '/models/mealItem.js');
 db.healthItem = sequelize.import(__dirname + '/models/healthItem.js');
+db.workoutItem = sequelize.import(__dirname + '/models/workoutItem.js');
 
 db.trainee = sequelize.import(__dirname + '/models/trainee.js');
 
@@ -93,6 +95,21 @@ db.healthItem.belongsTo(db.account, {
 	foreignKey: {
 		name: 'accountId',
 		allowNull: true
+	}
+});
+
+// each workoutItem has an accountId
+db.workoutItem.belongsTo(db.account, {
+	foreignKey: {
+		name: 'accountId',
+		allowNull: true
+	}
+});
+
+// each workoutItem has a mealtype
+db.workoutItem.belongsTo(db.workoutType, {
+	foreignKey: {
+		allowNull: false
 	}
 });
 

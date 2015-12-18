@@ -78,6 +78,30 @@ module.exports = Object.freeze({
 	},	
 
 	Limits: {
+		Meal: {
+			ItemCount: {
+				max: 20
+			}
+		},
+
+		Workout: {
+			Description: {
+				minLen: 2,
+				maxLen: 100
+			},
+			Duration: {
+				min: 1,
+				max: 1440 //24 hours * 60
+			},
+			Distance: {
+				min: 0,
+				max: 1000 // km
+			},
+			ItemCount: {
+				max: 20
+			}
+		},
+
 		Height: {
 			min:  50,
 			max:  300

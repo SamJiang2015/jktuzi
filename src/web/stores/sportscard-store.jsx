@@ -1,4 +1,0 @@
-//
-// sportscard-store.jsx
-//
-

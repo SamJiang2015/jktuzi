@@ -12,8 +12,11 @@ var Auth = require('../../utils/auth');
 
 var FoodCardStore = require('../../stores/foodcard-store');
 var HealthCardStore = require('../../stores/healthcard-store');
+var SportCardStore = require('../../stores/sportcard-store');
+
 var FoodCardActions = require('../../actions/foodcard-actions');
 var HealthCardActions = require('../../actions/healthcard-actions');
+var SportCardActions = require('../../actions/sportcard-actions');
 
 var FoodCard = require('./FoodCard');
 var HealthCard = require('./HealthCard');
@@ -24,45 +27,23 @@ module.exports = React.createClass({
 	// listening to account store for changes to the trainee info of this account
 	mixins: [
     	Reflux.listenTo(FoodCardStore, 'onFoodCardChange'),
-    	Reflux.listenTo(HealthCardStore, 'onHealthCardChange')
+    	Reflux.listenTo(HealthCardStore, 'onHealthCardChange'),
+    	Reflux.listenTo(SportCardStore, 'onSportCardChange')
   	],
 
 	getInitialState: function() {
 		return {
 			foodCard: {breakfast: false, lunch: false, dinner: false},
 			healthCard: {weight: null, height: null},
-			sportCard: {items:[]},
+			sportCard: [],
 			date: new Date().toISOString().slice(0,10), // start off with today's date
 
 			submitFoodCardError: false,
 			submitFoodCardErrorCode: null,
 			submitHealthCardError: false,
 			submitHealthCardErrorCode: null,
-				// items: [
-			// 	{
-			// 		id: 1,
-			// 		type: 1,
-			// 		description: '长跑',
-			// 		duration: '120',
-			// 		distance: '20'
-			// 	},
-			// 	{
-			// 		id: 2,
-			// 		type: 5,
-			// 		description: '',
-			// 		duration: '7',
-			// 		distance: ''
-			// 	},
-			// 	{
-			// 		id: 3,
-			// 		type: 2,
-			// 		description: '普拉提',
-			// 		duration: '35',
-			// 		distance: ''
-			// 	},
-
-			// 	]
-			// },
+			submitSportCardError: false,
+			submitSportCardErrorCode: null,			
 		}
 	},
 
@@ -78,9 +59,16 @@ module.exports = React.createClass({
   		})
   	},
 
+  	onSportCardChange: function(event, sportCard) {
+  		this.setState({
+  			sportCard: sportCard
+  		})
+  	},
+
 	componentWillMount: function() {
 		FoodCardActions.getFoodCard(Auth.getAccountId(), this.state.date, Auth.getToken());
 		HealthCardActions.getHealthCard(Auth.getAccountId(), this.state.date, Auth.getToken());
+		SportCardActions.getSportCard(Auth.getAccountId(), this.state.date, Auth.getToken());
 	},
 
 	handleDateChange: function(e) {
@@ -93,8 +81,9 @@ module.exports = React.createClass({
 		});
 
 		// fetch the data based on the new dates
-		FoodCardActions.getFoodCard(Auth.getAccountId(), e.target.value, Auth.getToken());
-		HealthCardActions.getHealthCard(Auth.getAccountId(), e.target.value, Auth.getToken());
+		FoodCardActions.getFoodCard(Auth.getAccountId(), e.target.value, Auth.getToken())
+		HealthCardActions.getHealthCard(Auth.getAccountId(), e.target.value, Auth.getToken());		
+		SportCardActions.getSportCard(Auth.getAccountId(), e.target.value, Auth.getToken());		
 	},
 
 	submitFoodCard: function(userData) {
@@ -131,8 +120,21 @@ module.exports = React.createClass({
 			}.bind(this));
 	},	
 
-	submitSportCard: function() {
-
+	submitSportCard: function(userData) {
+		SportCardActions.updateSportCard(
+			Auth.getAccountId(),
+			this.state.date,
+			userData,
+			Auth.getToken(),
+			function(statusResult){
+				if (!statusResult.success) {
+					//handle the error by displaying the Error page and asking user to 
+					// take actions as needed
+					this.setState({
+						submitSportCardError: true,
+						submitSportCardErrorCode: statusResult.status});
+				}
+			}.bind(this));
 	},
 
 	render: function() {
@@ -167,7 +169,7 @@ module.exports = React.createClass({
 					submitErrodCode={this.submitHealthCardErrorCode}					
 				/>				
 				<SportCard 
-					items={this.state.sportCard.items}
+					items={this.state.sportCard}
 					submitInfo={this.submitSportCard}
 				/>				
 			</div>
