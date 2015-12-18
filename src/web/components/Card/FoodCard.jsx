@@ -30,9 +30,9 @@ module.exports = React.createClass({
 			breakfast: props.breakfast,
 			lunch: props.lunch,
 			dinner: props.dinner,
-			editable: props.submitFoodCardError,  // this way the user gets a visual prompt that submit failed
-			error: props.submitFoodCardError,
-			errorMsg: Errors.getMsg(props.submitFoodCardErrorCode)
+			editable: props.submitError,  // this way the user gets a visual prompt that submit failed
+			error: props.submitError,
+			errorMsg: Errors.getMsg(props.submitErrorCode)
 		});
 	},
 

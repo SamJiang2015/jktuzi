@@ -33,6 +33,7 @@ db.token = sequelize.import(__dirname + '/models/token.js');
 db.roleType = sequelize.import(__dirname + '/models/roleType.js');
 db.mealType = sequelize.import(__dirname + '/models/mealType.js');
 db.mealItem = sequelize.import(__dirname + '/models/mealItem.js');
+db.healthItem = sequelize.import(__dirname + '/models/healthItem.js');
 
 db.trainee = sequelize.import(__dirname + '/models/trainee.js');
 
@@ -72,7 +73,7 @@ db.trainee.belongsTo(db.account, {
 	}
 });
 
-// each mealItem has a mealType
+// each mealItem has an accountId
 db.mealItem.belongsTo(db.account, {
 	foreignKey: {
 		name: 'accountId',
@@ -84,6 +85,14 @@ db.mealItem.belongsTo(db.account, {
 db.mealItem.belongsTo(db.mealType, {
 	foreignKey: {
 		allowNull: false
+	}
+});
+
+// each healthItem has an accountId
+db.healthItem.belongsTo(db.account, {
+	foreignKey: {
+		name: 'accountId',
+		allowNull: true
 	}
 });
 

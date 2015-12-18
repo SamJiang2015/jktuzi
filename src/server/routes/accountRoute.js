@@ -430,6 +430,122 @@ router.post('/:id/mealCards/:date',
 
 	});
 
+// GET /accounts/:id/healthCards/:date -- retrieve an account's health card info for a specific date
+router.get('/:id/healthCards/:date',
+	middleware.requireAuthentication,	
+	function(req, res) {
+
+		var accountId = parseInt(req.params.id, 10);
+		var date = req.params.date;
+
+		console.log(typeof date);
+		console.log(date);
+		
+		// check if it is the trainee retrieving his own info
+		if (accountId !== req.account.get('id')) {
+
+			// if not the trainee himself, we will only allow trainers and admins to 
+			// retrieve a trainee's health card info
+			var role = req.account.get('roleTypeId');
+
+			if (role !== RoleType.Admin.id && role !== RoleType.Trainer.id) {
+				res.status(401).json(
+					util.formatOutput('', 401, false));
+				return;
+			}
+		}
+
+		// check if the date is in the correct format 'yyyy-mm-dd'
+		if (!Utils.isValidDate(date)) {
+			res.status(400).json(
+				util.formatOutput({errMsg: 'Date is not in the format of yyyy-mm-dd'}, 400, true));
+			return;
+		};
+
+		// retrieve the info from db
+		db.healthItem.findOne({
+			where: {
+				accountId: accountId,
+				date: date
+			}
+		}).then(function(healthItem) {
+			if (healthItem) {
+				res.json(util.formatOutput(healthItem, 200, true));
+			} else {
+				// return empty object as data if not found 
+				// not really an error case -- the user just hasn't punched card for that date
+				res.json(
+					util.formatOutput({}, 200, false));
+			}
+		}).catch(function(error) {
+				res.status(500).json(
+					util.formatOutput({errorMsg: error.toString()}, 500, false));			
+		})
+});
+
+// POST /accounts/:id/healthCards/:date 
+//       -- update or write an account's healthcard info for a specific date
+router.post('/:id/healthCards/:date',
+	middleware.requireAuthentication,	
+	function(req, res) {
+
+		var requestId = parseInt(req.params.id, 10);
+		var accountId = req.account.get('id');
+		var accountRole = req.account.get('roleTypeId');
+		var date = req.params.date;		
+		
+		// TODO: permission checking.  For now only allow one to update own info
+		if (accountId !== requestId) {
+			res.status(401).json(
+					util.formatOutput('', 401, false));
+			return;
+		}
+
+		// TODO -- should limit to those trainers who manages this trainee
+		// TODO -- if requestId belongs to a trainer, who can touch it?
+		// TODO -- limit the date range -- you can't go back a month to mess with 
+		//         other people's health card data.  probably limit to 7 days 
+
+		// check if the date is in the correct format 'yyyy-mm-dd'
+		if (!Utils.isValidDate(date)) {
+			res.status(400).json(
+				util.formatOutput({errMsg: 'Date is not in the format of yyyy-mm-dd'}, 400, true));
+			return;
+		};
+
+		var newHealthItem = _.pick(req.body, 'weight', 'bodyfat');
+		newHealthItem.date = date;
+		newHealthItem.accountId = requestId;  // note we made sure requestId == accountId up above
+
+		// we use accountId/date combo to find the record
+		var where = {accountId: requestId, date: date}; 
+
+		// we delete existing record (if any) and then insert this new one
+		db.sequelize.transaction(function(t) {
+
+			// delete whatever that is in the db for this account id and date
+			return db.healthItem.destroy(
+						{where: where},
+						{transaction: t}
+				).then(function() {
+					// now we create the new one
+						return db.healthItem.create(
+						newHealthItem, 
+						{transaction: t});
+					});
+		}).then(function() {
+			// retrieve the current ones in db to send back to called
+			return db.healthItem.findOne({
+				where: where
+		})}).then(function(healthItem) {
+			res.json(util.formatOutput(healthItem, 200, true))
+		}).catch(function(error) {
+		 		console.log(error);
+		 		res.status(400).json(util.formatOutput(error, 400, false));
+		})
+
+	});
+
 // 
 //  KEEP THESE AS LAST REGISTERED ROUTES
 router.get('/*',

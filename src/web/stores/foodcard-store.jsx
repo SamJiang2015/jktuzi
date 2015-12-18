@@ -3,7 +3,6 @@
 //
 
 var Reflux = require('reflux');
-var objectAssign = require('object.assign');
 
 var FoodCardActions = require('../actions/foodcard-actions');
 var Api = require('../utils/api');

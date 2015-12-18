@@ -6,6 +6,10 @@ var React = require('react');
 var Input = require('react-bootstrap/lib/input');
 var Button = require('react-bootstrap/lib/button');
 
+var Limits = require('../../utils/constants').Limits;
+var Errors = require('../Common/Errors');
+
+
 module.exports = React.createClass({
 
 	getInitialState: function() {
@@ -19,15 +23,24 @@ module.exports = React.createClass({
 		}
 	},
 
-	componentDidMount: function() {
+	setStateHelper: function(props) {
 		this.setState({
-			weight: this.props.weight,
-			bodyfat: this.props.bodyfat,
+			weight: props.weight,
+			bodyfat: props.bodyfat,
 
-			editable: false,
-			error: false,
-			errorMsg: ''
-		})
+			// this way the user gets a visual prompt that submit failed
+			editable: props.submitError ? props.submitError : false,  
+			error: props.submitError ? props.submitError : false,  
+			errorMsg: Errors.getMsg(props.submitErrorCode)
+		});
+	},
+
+	componentDidMount: function() {
+		this.setStateHelper(this.props);
+	},
+
+	componentWillReceiveProps: function(newProps) {
+		this.setStateHelper(newProps);
 	},
 
 	handleWeightChange: function(e) {
@@ -67,13 +80,34 @@ module.exports = React.createClass({
 	handleSubmit: function(e) {
 		e.preventDefault();
 
-		//todo: call action to update data through store
-		this.props.submitInfo();
+		var data = {
+			weight: this.state.weight,
+			bodyfat: this.state.bodyfat
+		};		
 
-		// after submit the field should become non-editable
-		this.setState({
-			editable: false
-		});
+		var errorMsg='';
+		//input validation happens here
+		if (isNaN(data.weight) || Number(data.weight)<Limits.Weight.min || Number(data.weight)>Limits.Weight.max) {
+			errorMsg='请核验您输入的体重（以斤为单位）';
+		} else if ((data.bodyfat !== '') &&
+			(isNaN(data.bodyfat) || Number(data.bodyfat)<Limits.Bodyfat.min || Number(data.bodyfat)>Limits.Bodyfat.max)) {
+			errorMsg='请核验您输入的体脂率（百分比）';
+		}
+
+		if (errorMsg!=='') {
+			this.setState({
+				error: true,
+				errorMsg: errorMsg
+			});
+		} else {		
+			//todo: call action to update data through store
+			this.props.submitInfo(data);
+
+			// after submit the field should become non-editable
+			this.setState({
+				editable: false
+			});
+		}
 	},
 
 	renderError: function() {

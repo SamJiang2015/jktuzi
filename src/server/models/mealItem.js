@@ -34,7 +34,7 @@ module.exports = function(sequelize, DataTypes) {
 				validate: {
 					isValidDate: function(value) {
 						if (!Utils.isValidDate(value)) {
-							throw new Error('Date is now in the \'yyyy-mm-dd\' format');
+							throw new Error('Date is not in the \'yyyy-mm-dd\' format');
 						}
 					}
 				}

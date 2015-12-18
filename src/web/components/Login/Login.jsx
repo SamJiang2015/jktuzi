@@ -63,14 +63,12 @@ module.exports = React.createClass({
 		                	type="tel" 
 		                	ref="phone" 
 		                	placeholder="手机"
-		                	defaultValue="18877777777"
 		                	hasFeedback 
 		                	feedbackIcon={mobileGlyphicon} 
 		                />
 		                <Input 
 		                	type="password" 
 		                	ref="pass" 
-		                	defaultValue="password"
 		                	placeholder="密码" 
 		                	
 		                	hasFeedback 
