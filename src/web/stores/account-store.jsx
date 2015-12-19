@@ -35,6 +35,7 @@ module.exports = Reflux.createStore({
           birthdate: '',
           email: '',
           profession: '',
+          location: '',
           // health info:
           height: '',
           weight: '',
@@ -117,6 +118,7 @@ module.exports = Reflux.createStore({
           birthdate: null,
           email: null,
           profession: null,
+          location: null,
           // health info:
           height: null,
           weight: null,

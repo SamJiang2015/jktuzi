@@ -80,7 +80,7 @@ Constants = Object.freeze({
 			}
 
 			if (typeof value === 'string') value=Number(value);
-			
+
 			var items = Constants.SportsTypes.items;
 			for (var i=0; i<items.length; i++) {
 				if (items[i].value === Number(value)) {
@@ -119,6 +119,11 @@ Constants = Object.freeze({
 		Weight: {
 			min: 10,
 			max: 500
+		},
+		
+		Location: {
+			minLen: 2,
+			maxLen: 20
 		},
 
 		Bodyfat: {

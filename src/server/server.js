@@ -106,7 +106,7 @@ db.sequelize.sync({
 		where: {mobile: '18888888888'}, defaults: {name: '总督头', password: 'PiPi8888', roleTypeId: RoleType.Admin.id}});
 }).then(function() {
 	return db.account.findOrCreate({
-		where: {mobile: '18877777777'}, defaults: {name: '副总', password: 'password', infoCompleted: 1, roleTypeId: RoleType.Trainer.id}});
+		where: {mobile: '18877777777'}, defaults: {name: '副总', password: 'password', infoCompleted: 0, roleTypeId: RoleType.Trainer.id}});
 }).then(function() {
 	return db.account.findOrCreate({
 		where: {mobile: '18866666666'}, defaults: {name: '新人', password: 'password'}});

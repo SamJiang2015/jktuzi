@@ -9,6 +9,7 @@ var Glyphicon = require('react-bootstrap/lib/glyphicon');
 var Button = require('react-bootstrap/lib/button');
 
 var auth = require('../../utils/auth');
+var Error = require('../Common/Errors');
 
 module.exports = React.createClass({
 
@@ -16,7 +17,8 @@ module.exports = React.createClass({
 
 	getInitialState: function() {
 		return {
-			error: false
+			error: false,
+			errorMsg: '登录信息不正确'
 		}
 	},
 
@@ -26,12 +28,10 @@ module.exports = React.createClass({
 		const phone = this.refs.phone.getValue();
 		const pass = this.refs.pass.getValue();
 
-		auth.login(phone, pass, function(loggedIn) {
+		auth.login(phone, pass, function(loggedIn, status) {
 		    if (!loggedIn) {
-		    	return this.setState({ error: true });
+		    	return this.setState({ error: true, errorMsg: Error.getMsg(status)});
 		    }
-
-
 		    // const location = this.props.location;
 
 		    // if (location.state && location.state.nextPathname) {
@@ -50,7 +50,7 @@ module.exports = React.createClass({
 			);
 		const mobileGlyphicon=<Glyphicon glyph="phone"/>;
 		const passwordGlyphicon=<Glyphicon glyph="lock"/>;
-		var errorMsg = <p className="error">登录信息不正确</p>;	
+		var errorMsg = <p className="error">{this.state.errorMsg}</p>;	
 		
 		return (
 			<div className="login">
@@ -63,7 +63,6 @@ module.exports = React.createClass({
 		                	type="tel" 
 		                	ref="phone" 
 		                	placeholder="手机"
-		                	defaultValue="18877777777"
 		                	hasFeedback 
 		                	feedbackIcon={mobileGlyphicon} 
 		                />
@@ -71,7 +70,6 @@ module.exports = React.createClass({
 		                	type="password" 
 		                	ref="pass" 
 		                	placeholder="密码" 
-		                	defaultValue="password"
 		                	hasFeedback 
 		                	feedbackIcon={passwordGlyphicon} 
 		                />

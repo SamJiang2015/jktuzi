@@ -118,6 +118,13 @@ module.exports = function(sequelize, DataTypes) {
 					this.setDataValue('habbit', val);
 				}
 			},
+			location: {
+				type: DataTypes.STRING,
+				allowNull: false,
+				validate: {
+					len: [Limits.Location.minLen, Limits.Location.maxLen]
+				}
+			},
 			// 斤
 			weightGoal: {
 				type: DataTypes.FLOAT,

@@ -6,6 +6,7 @@
 //						- birthdate
 //						- email
 //						- profession
+//						- location
 //
 
 var React = require('react');
@@ -27,6 +28,7 @@ module.exports = React.createClass({
 			birthdate: '',
 			email: '',
 			profession: '',
+			location: '',
 
 			error: false,
 			errorMsg: ''
@@ -43,6 +45,7 @@ module.exports = React.createClass({
 						fieldValues.birthdate.slice(0,10) : '',
  			email: fieldValues.email,
  			profession: fieldValues.profession,
+ 			location: fieldValues.location,
 
  			error: false,
  			errorMsg: ''
@@ -63,8 +66,9 @@ module.exports = React.createClass({
 		var data = {
 			isMale: this.state.isMale,
 			birthdate: this.state.birthdate, 
-			email: this.state.email.trim(),
-			profession: this.state.profession.trim(),			
+			email: this.state.email ? this.state.email.trim() : '',
+			profession: this.state.profession ? this.state.profession.trim() : '',	
+			location: this.state.location? this.state.location.trim() : ''			
 		};
 
 		var errorMsg='';
@@ -80,6 +84,9 @@ module.exports = React.createClass({
 		} else if (data.profession.length<Limits.Profession.minLen ||
 			data.profession.length>Limits.Profession.maxLen) {
 			errorMsg = '请核验您输入的职业';
+		} else if (data.location.length<Limits.Location.minLen ||
+			data.location.length>Limits.Location.maxLen) {
+			errorMsg = '请核验您输入的城市';
 		}
 
 		if (errorMsg!=='') {
@@ -148,6 +155,16 @@ module.exports = React.createClass({
 		})
 	},
 
+	handleLocationChange: function(e) {
+		e.preventDefault();
+
+		this.setState({
+			error: false,
+			errorMsg: '',
+			location: e.target.value
+		})
+	},
+
 	renderError: function() {
 		if (this.state.error) {
 			return (<p className="error">{this.state.errorMsg}</p>);
@@ -212,6 +229,15 @@ module.exports = React.createClass({
 								className="form-control" 
 								onChange={this.handleProfessionChange}/>
 						</div>	
+
+						<div className="form-group">
+							<label className="control-label">所在城市</label>												
+							<Input 
+								type="text" 
+								value={this.state.location}						
+								className="form-control" 
+								onChange={this.handleLocationChange}/>
+						</div>							
 
 						{this.renderError()}
 

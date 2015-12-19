@@ -104,7 +104,7 @@ module.exports = function(sequelize, DataTypes) {
 					return new Promise(function(resolve, reject) {
 
 						if (typeof body.mobile !== 'string' || typeof body.password !== 'string') {
-							return reject();
+							return reject(401);
 						};
 
 						// retrieve the account with the passed-in mobile and do password check here
@@ -115,14 +115,15 @@ module.exports = function(sequelize, DataTypes) {
 						}).then(function(account) {
 							if (!account || !bcrypt.compareSync(body.password, account.get('password_hash'))) {
 								// account does not exist or password is wrong
-								return reject();
+								return reject(401);
 							}
 
 							// now account is authenticated
 							return resolve(account);
 
 						}, function(e) {
-							return reject();
+							console.log('Account.Authenticate.findOne() error: '+ e.toString());
+							return reject(500);
 						});
 					});
 				},
@@ -139,12 +140,11 @@ module.exports = function(sequelize, DataTypes) {
 								if(account) {
 									resolve(account);
 								} else {
-									reject();
+									reject(401);
 								}
-							}, function() {
-								reject();
 							});
 						} catch(e) {
+							console.log('Account.findByToken error: ' + e.toString())
 							reject();
 						}
 					});

@@ -65,7 +65,13 @@ module.exports = function(sequelize, DataTypes) {
 				validate: {
 					min: Limits.Workout.Duration.min,
 					max: Limits.Workout.Duration.max
-				}				
+				},
+				set: function(val) {
+					if (typeof val === 'string' && val.trim() === '') {
+						val=null;
+					}
+					this.setDataValue('duration', val);
+				}								
 			},
 			// 公里
 			distance: {
@@ -75,6 +81,12 @@ module.exports = function(sequelize, DataTypes) {
 					min: Limits.Workout.Distance.min,
 					max: Limits.Workout.Distance.max
 				},
+				set: function(val) {
+					if (typeof val === 'string' && val.trim() === '') {
+						val=null;
+					}
+					this.setDataValue('distance', val);
+				}				
 			} 
 		}
 	);

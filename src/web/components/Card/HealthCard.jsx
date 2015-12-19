@@ -170,8 +170,8 @@ module.exports = React.createClass({
 
 				{this.renderError()}	
 				
-				<div className="form-group">					
-					<div className="col-xs-2 col-xs-offset-4">
+				<div className="form-group row">					
+					<div className="col-xs-3 col-xs-offset-3">
 						<Button 						
 							onClick={this.handleCancel} 
 							bsStyle="warning"
@@ -180,7 +180,7 @@ module.exports = React.createClass({
 							取消
 						</Button>
 					</div>
-					<div className="col-xs-2">
+					<div className="col-xs-3">
 						<Button 						
 							onClick={this.handleSubmit} 
 							bsStyle="success"

@@ -236,7 +236,7 @@ var SportCard = React.createClass({
 		if (this.state.editable) {
 			return (
 				<div className="row">		
-		            <div className="col-xs-2 col-xs-offset-4">					
+		            <div className="col-xs-3 col-xs-offset-3">					
 						<Button 	
 							onClick={this.handleCancel} 
 							bsStyle="warning"
@@ -245,7 +245,7 @@ var SportCard = React.createClass({
 							取消
 						</Button>
 					</div>				
-		            <div className="col-xs-2">					
+		            <div className="col-xs-3">					
 						<Button 	
 							onClick={this.handleSubmit} 
 							bsStyle="success"

@@ -49,7 +49,7 @@ module.exports = {
           if (cb) cb(true)
           this.onChange(true);
         } else {
-          if (cb) cb(false)
+          if (cb) cb(false, res.status);
           this.onChange(false);    
         }
       }.bind(this));
@@ -88,7 +88,7 @@ module.exports = {
       // we don't care what the function returns; it is okay even 
       // if the token was not deleted properly since we already
       // removed it from client side.    
-      Api.delete('accounts/login')
+      Api.delete('accounts/login', localStorage.token)
           .then(function(json) {
             //do nothing
           });
@@ -155,14 +155,14 @@ function loginRequest(mobile, pass, cb) {
 
   Api.post(
     'accounts/login', 
-    {mobile: mobile, password: pass},
-    localStorage.token)
+    {mobile: mobile, password: pass})
   .then(function(json){
     console.log(json);
     
     if (json.success) {
       cb({
         authenticated: true,
+        status: json.status,
         accountId: json.data.id,
         token: json.data.token,
         name: json.data.name,
@@ -170,7 +170,7 @@ function loginRequest(mobile, pass, cb) {
         infoCompleted: json.data.infoCompleted
       })
     } else {
-      cb({authenticated: false});
+      cb({authenticated: false, status: json.status});
     }
   });
 

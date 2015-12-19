@@ -47,7 +47,8 @@ router.post('/:id/traineeInfo',
 
 		// check if the infoCompleted flag has not been set (if it is set - the client
 		// should call put to update instead of post)
-		if (req.account.get('infoCompleted')) {
+		if (req.account.get('infoCompleted')===true ||
+			req.account.get('infoCompleted')==='t') {  // this check is for postgres, which stores boolean as 't'/'f'
 			res.status(400).json(
 				util.formatOutput({errorMsg: 'Wrong API call is used to update an account\'s trainee information'}, 400, false)
 				);
@@ -61,6 +62,7 @@ router.post('/:id/traineeInfo',
 			'birthdate', 
 			'email', 
 			'profession', 
+			'location',
 			'height', 
 			'weight', 
 			'bodyfat', 
@@ -196,6 +198,7 @@ router.put('/:id/traineeInfo',
 			'birthdate', 
 			'email', 
 			'profession', 
+			'location',
 			'height', 
 			'weight', 
 			'bodyfat', 
@@ -279,8 +282,8 @@ router.post('/login',
 				return db.token.create({
 					token: token
 				});
-			}, function() {
-				res.status(401).json(util.formatOutput(e||'', 401, false));
+			}, function(status) {
+				res.status(status).json(util.formatOutput(e||'', status, false));
 			})
 			.then(function(tokenInstance) {
 				accountInstance = accountInstance.toPublicJSON();
@@ -288,7 +291,8 @@ router.post('/login',
 				res.json(util.formatOutput(accountInstance, 200, true));
 			})
 			.catch(function(e) {
-				res.status(401).json(util.formatOutput(e||'', 401, false));
+				console.log(e);
+				res.status(500).json(util.formatOutput(e||'', 500, false));
 			});
 	});
 
@@ -312,9 +316,6 @@ router.get('/:id/mealCards/:date',
 
 		var accountId = parseInt(req.params.id, 10);
 		var date = req.params.date;
-
-		console.log(typeof date);
-		console.log(date);
 		
 		// check if it is the trainee retrieving his own info
 		if (accountId !== req.account.get('id')) {

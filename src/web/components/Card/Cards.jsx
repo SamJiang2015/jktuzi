@@ -158,19 +158,21 @@ module.exports = React.createClass({
 					lunch={this.state.foodCard.lunch}
 					dinner={this.state.foodCard.dinner}
 					submitInfo={this.submitFoodCard}
-					submitError={this.submitFoodCardError}
-					submitErrodCode={this.submitFoodCardErrorCode}
+					submitError={this.state.submitFoodCardError}
+					submitErrorCode={this.state.submitFoodCardErrorCode}
 				/>
 				<HealthCard 
 					weight={this.state.healthCard.weight}
 					bodyfat={this.state.healthCard.bodyfat}
 					submitInfo={this.submitHealthCard}
-					submitError={this.submitHealthCardError}
-					submitErrodCode={this.submitHealthCardErrorCode}					
+					submitError={this.state.submitHealthCardError}
+					submitErrorCode={this.state.submitHealthCardErrorCode}					
 				/>				
 				<SportCard 
 					items={this.state.sportCard}
 					submitInfo={this.submitSportCard}
+					submitError={this.state.submitSportCardError}
+					submitErrorCode={this.state.submitSportCardErrorCode}										
 				/>				
 			</div>
 

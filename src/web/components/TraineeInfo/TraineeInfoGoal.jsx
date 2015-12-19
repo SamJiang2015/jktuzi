@@ -59,7 +59,7 @@ module.exports = React.createClass({
 		var errorMsg='';
 		if (isNaN(data.weightGoal) || Number(data.weightGoal)<Limits.Weight.min || Number(data.weightGoal)>Limits.Weight.max) {
 			errorMsg='请核验您输入的目标体重（以斤为单位）';
-		} else if ((data.bodyfatGoal !== '') &&
+		} else if ((data.bodyfatGoal && data.bodyfatGoal !== '') &&
 			(isNaN(data.bodyfatGoal) || Number(data.bodyfatGoal)<Limits.Bodyfat.min || Number(data.bodyfatGoal)>Limits.Bodyfat.max)) {
 			errorMsg='请核验您输入的目标体脂率（百分比）';
 		} 

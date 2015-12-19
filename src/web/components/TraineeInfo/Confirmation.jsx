@@ -33,6 +33,10 @@ module.exports = React.createClass({
 								<td>{this.props.fieldValues.profession}</td>
 							</tr>
 							<tr> 
+								<td>所在城市</td> 
+								<td>{this.props.fieldValues.location}</td>
+							</tr>							
+							<tr> 
 								<td>身高</td> 
 								<td>{this.props.fieldValues.height!==''? (this.props.fieldValues.height+'厘米'):''}</td>
 							</tr>

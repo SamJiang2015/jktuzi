@@ -51,10 +51,10 @@ module.exports = React.createClass({
 		e.preventDefault();
 
 		var data = {
-			nickname: this.state.nickname.trim(),
-			signature: this.state.signature.trim(),
-			sponsorName: this.state.sponsorName.trim(),
-			sponsorMobile: this.state.sponsorMobile.trim()
+			nickname: this.state.nickname? this.state.nickname.trim(): '',
+			signature: this.state.signature ? this.state.signature.trim(): '',
+			sponsorName: this.state.sponsorName ? this.state.sponsorName.trim(): '',
+			sponsorMobile: this.state.sponsorMobile ? this.state.sponsorMobile.trim(): ''
 		};
 
 		var errorMsg='';

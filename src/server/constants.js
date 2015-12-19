@@ -122,6 +122,11 @@ module.exports = Object.freeze({
 			maxLen: 20
 		},
 
+		Location: {
+			minLen: 2,
+			maxLen: 20
+		},
+
 		Habbit: {
 			minLen: 1,
 			maxLen: 100

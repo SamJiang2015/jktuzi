@@ -63,7 +63,7 @@ module.exports = React.createClass({
 			height: this.state.height,
 			weight: this.state.weight,
 			bodyfat: this.state.bodyfat, 
-			habbit: this.state.habbit.trim(),			
+			habbit: this.state.habbit? this.state.habbit.trim():''			
 		};
 
 		var errorMsg='';
@@ -72,7 +72,7 @@ module.exports = React.createClass({
 			errorMsg='请核验您输入的身高（以厘米为单位）';
 		} else if (isNaN(data.weight) || Number(data.weight)<Limits.Weight.min || Number(data.weight)>Limits.Weight.max) {
 			errorMsg='请核验您输入的体重（以斤为单位）';
-		} else if ((data.bodyfat !== '') &&
+		} else if ((data.bodyfat && data.bodyfat !== '') &&
 			(isNaN(data.bodyfat) || Number(data.bodyfat)<Limits.Bodyfat.min || Number(data.bodyfat)>Limits.Bodyfat.max)) {
 			errorMsg='请核验您输入的体脂率（百分比）';
 		} else if ( (data.habbit != '') && 
