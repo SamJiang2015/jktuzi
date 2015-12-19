@@ -153,6 +153,9 @@ module.exports = Object.freeze({
 		GroupMember: {
 			Payment: {
 				min: 0
+			},
+			ItemCount: {
+				max: 100 // TODO: is this a good limit?
 			}
 		},
 

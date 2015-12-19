@@ -136,6 +136,27 @@ db.group.belongsTo(db.groupType, {
 	}
 });
 
+/***********************************************
+** groupMember table --  groupId, accountId
+**         groupMemberTypeId (use 'memberTypeId')
+************************************************/
+db.group.belongsToMany(db.account, 
+	{through: db.groupMember,
+	 foreignKey: 'groupId'
+	});
+
+db.account.belongsToMany(db.group, 
+	{through: db.groupMember,
+	 foreignKey: 'accountId'
+	});
+
+db.groupMember.belongsTo(db.groupMemberType, {
+	foreignKey: {
+		name: 'memberTypeId',
+		allowNull: false
+	}
+});
 
 
 module.exports = db;
+
