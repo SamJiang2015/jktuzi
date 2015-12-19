@@ -37,18 +37,28 @@ db.mealItem = sequelize.import(__dirname + '/models/mealItem.js');
 db.healthItem = sequelize.import(__dirname + '/models/healthItem.js');
 db.workoutItem = sequelize.import(__dirname + '/models/workoutItem.js');
 
-db.trainee = sequelize.import(__dirname + '/models/trainee.js');
+db.group = sequelize.import(__dirname + '/models/group.js');
+db.groupType = sequelize.import(__dirname + '/models/groupType.js');
+db.groupMember = sequelize.import(__dirname + '/models/groupMember.js');
+db.groupMemberType = sequelize.import(__dirname + '/models/groupMemberType.js');
+
+db.trainee = sequelize.import(__dirname + '/models/group.js');
 
 // db.trainer = sequelize.import(__dirname + '/models/trainer.js');
 // db.group   = sequelize.import(__dirname + '/models/group.js');
 
 db.sequelize = sequelize;
 
-/*
-** setting up association
-**/
+/*******************************************************************
+**
+** setting up associations
+**
+********************************************************************/
 
-// each account has a roleTypeId column
+/********************************************
+** account table -- roleTypeId
+********************************************/
+
 db.account.belongsTo(db.roleType, {
 	foreignKey: {
 		allowNull: false,
@@ -56,8 +66,9 @@ db.account.belongsTo(db.roleType, {
 	}
 });
 
-// each trainee has an account column, which can be null
-// in the current phase (since trainers will manually enter trainee info)
+/***********************************************
+** trainee table -- accountId, sponsorAccountId
+************************************************/
 db.trainee.belongsTo(db.account, {
 	as: 'traineeAccount',
 	foreignKey: {
@@ -66,7 +77,6 @@ db.trainee.belongsTo(db.account, {
 	}
 });
 
-// each trainee also has a sponsor, track that with the sponsor's account id
 db.trainee.belongsTo(db.account, {
 	as: 'traineeSponsorAccount',
 	foreignKey: {
@@ -75,7 +85,9 @@ db.trainee.belongsTo(db.account, {
 	}
 });
 
-// each mealItem has an accountId
+/***********************************************
+** mealItem table -- accountId, mealTypeId, 
+************************************************/
 db.mealItem.belongsTo(db.account, {
 	foreignKey: {
 		name: 'accountId',
@@ -83,14 +95,15 @@ db.mealItem.belongsTo(db.account, {
 	}
 });
 
-// each mealItem has a mealtype
 db.mealItem.belongsTo(db.mealType, {
 	foreignKey: {
 		allowNull: false
 	}
 });
 
-// each healthItem has an accountId
+/***********************************************
+** healthItem table -- accountId
+************************************************/
 db.healthItem.belongsTo(db.account, {
 	foreignKey: {
 		name: 'accountId',
@@ -98,7 +111,9 @@ db.healthItem.belongsTo(db.account, {
 	}
 });
 
-// each workoutItem has an accountId
+/***********************************************
+** workoutItem table -- accountId, workoutTypeId, 
+************************************************/
 db.workoutItem.belongsTo(db.account, {
 	foreignKey: {
 		name: 'accountId',
@@ -106,15 +121,21 @@ db.workoutItem.belongsTo(db.account, {
 	}
 });
 
-// each workoutItem has a mealtype
 db.workoutItem.belongsTo(db.workoutType, {
 	foreignKey: {
 		allowNull: false
 	}
 });
 
+/***********************************************
+** group table --  groupTypeId, 
+************************************************/
+db.group.belongsTo(db.groupType, {
+	foreignKey: {
+		allowNull: false
+	}
+});
 
-// db.todo.belongsTo(db.user);
-// db.user.hasMany(db.todo);
+
 
 module.exports = db;

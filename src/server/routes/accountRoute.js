@@ -31,6 +31,50 @@ router.post('/',
 			});
 	});
 
+// log in an account -- POST /accounts/login 
+router.post('/login',
+	function(req, res) {
+		var body = _.pick(req.body, 'mobile', 'password');
+		var accountInstance; // to save the account returned 
+							 // from the authenticate call so that it can be used 
+							 // in chained then();
+
+		// call the authenticate class method on the "account" model
+		db.account.authenticate(body)
+			.then(function(account) {
+				var token = account.generateToken('authentication');
+				accountInstance = account;
+
+				return db.token.create({
+					token: token
+				});
+			}, function(status) {
+				res.status(status).json(util.formatOutput(e||'', status, false));
+			})
+			.then(function(tokenInstance) {
+				accountInstance = accountInstance.toPublicJSON();
+				accountInstance.token=tokenInstance.get('token');
+				res.json(util.formatOutput(accountInstance, 200, true));
+			})
+			.catch(function(e) {
+				console.log(e);
+				res.status(500).json(util.formatOutput(e||'', 500, false));
+			});
+	});
+
+// DELETE /users/login: Logging out user by removing token
+router.delete('/login',
+	middleware.requireAuthentication,
+	function(req, res) {
+
+		//delete the token instance
+		req.token.destroy().then(function(){
+			res.status(200).json(util.formatOutput({}, 200, true));
+		}, function() {
+			res.status(500).json(util.formatOutput({error: 'internal server error'}, 500, false));
+		});
+	});
+
 // POST /accounts/:id/traineeInfo -- add trainee info to an account 
 //  require that the account ID must match what is in the login token
 router.post('/:id/traineeInfo',
@@ -263,50 +307,6 @@ router.put('/:id/traineeInfo',
 				return res.status(500).json(
 					util.formatOutput({errorMsg: error.toString()}, 500, false));
 			})					
-	});
-
-// log in an account -- POST /accounts/login 
-router.post('/login',
-	function(req, res) {
-		var body = _.pick(req.body, 'mobile', 'password');
-		var accountInstance; // to save the account returned 
-							 // from the authenticate call so that it can be used 
-							 // in chained then();
-
-		// call the authenticate class method on the "account" model
-		db.account.authenticate(body)
-			.then(function(account) {
-				var token = account.generateToken('authentication');
-				accountInstance = account;
-
-				return db.token.create({
-					token: token
-				});
-			}, function(status) {
-				res.status(status).json(util.formatOutput(e||'', status, false));
-			})
-			.then(function(tokenInstance) {
-				accountInstance = accountInstance.toPublicJSON();
-				accountInstance.token=tokenInstance.get('token');
-				res.json(util.formatOutput(accountInstance, 200, true));
-			})
-			.catch(function(e) {
-				console.log(e);
-				res.status(500).json(util.formatOutput(e||'', 500, false));
-			});
-	});
-
-// DELETE /users/login: Logging out user by removing token
-router.delete('/login',
-	middleware.requireAuthentication,
-	function(req, res) {
-
-		//delete the token instance
-		req.token.destroy().then(function(){
-			res.status(200).json(util.formatOutput({}, 200, true));
-		}, function() {
-			res.status(500).json(util.formatOutput({error: 'internal server error'}, 500, false));
-		});
 	});
 
 // GET /accounts/:id/mealCards/:date -- retrieve an account's mealcard info for a specific date

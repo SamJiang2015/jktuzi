@@ -122,7 +122,7 @@ module.exports = function(sequelize, DataTypes) {
 							return resolve(account);
 
 						}, function(e) {
-							console.log('Account.Authenticate.findOne() error: '+ e.toString());
+							console.log('Account.Authenticate.findOne() error: '+ e);
 							return reject(500);
 						});
 					});
@@ -144,8 +144,8 @@ module.exports = function(sequelize, DataTypes) {
 								}
 							});
 						} catch(e) {
-							console.log('Account.findByToken error: ' + e.toString())
-							reject();
+							console.log('Account.findByToken error: ' + e);
+							reject(500);
 						}
 					});
 				}

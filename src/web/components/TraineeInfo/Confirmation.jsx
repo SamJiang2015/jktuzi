@@ -3,6 +3,7 @@
 var React = require('react');
 var Table = require('react-bootstrap/lib/table');
 var Button = require('react-bootstrap/lib/button');
+//var Button = require('react-progress-button');
 
 module.exports = React.createClass({
 

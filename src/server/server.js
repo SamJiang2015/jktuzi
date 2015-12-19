@@ -12,10 +12,12 @@ var bodyParser = require('body-parser');
 var RoleType = require('./constants.js').RoleType;
 var MealType = require('./constants.js').MealType;
 var WorkoutType = require('./constants.js').WorkoutType;
+var GroupType = require('./constants.js').GroupType;
+var GroupMemberType = require('./constants.js').GroupMemberType;
 
 // Route handlers
 var accountRoutes = require('./routes/accountRoute.js');
-var traineeRoutes = require('./routes/traineeRoute.js');
+var groupRoutes = require('./routes/groupRoute.js');
 
 var app = express();
 var PORT = process.env.PORT || 3000;
@@ -36,6 +38,7 @@ app.use(function(req, res, next) {
 });
 
 app.use('/api/v1/accounts', accountRoutes);
+app.use('/api/v1/groups', groupRoutes);
 
 // any unhandled requests will get back index.html
 app.get('/*', function(req, res) {
@@ -44,7 +47,7 @@ app.get('/*', function(req, res) {
 
 // create the database and populate the reference table(s)
 db.sequelize.sync({
-	force: false
+	force: true
 })
 /////////////////////////////// Role Types /////////////////////////////////
 .then(function() {
@@ -100,6 +103,31 @@ db.sequelize.sync({
 	return db.workoutType.findOrCreate({
 		where: {id: WorkoutType.Others.id}, defaults: {description: WorkoutType.Others.description}});
 })
+/////////////////////////////// Group Types /////////////////////////////////	
+.then(function() {
+	return db.groupType.findOrCreate({
+		where: {id: GroupType.FatLoss.id}, defaults: {description: GroupType.FatLoss.description}});
+}).then(function() {
+	return db.groupType.findOrCreate({
+		where: {id: GroupType.MuscleBuilding.id}, defaults: {description: GroupType.MuscleBuilding.description}});
+}).then(function() {
+	return db.groupType.findOrCreate({
+		where: {id: GroupType.Waist.id}, defaults: {description: GroupType.Waist.description}});
+}).then(function() {
+	return db.groupType.findOrCreate({
+		where: {id: GroupType.Chat.id}, defaults: {description: GroupType.Chat.description}});
+})
+/////////////////////////////// Group Member Types /////////////////////////////////	
+.then(function() {
+	return db.groupMemberType.findOrCreate({
+		where: {id: GroupMemberType.HeadCoach.id}, defaults: {description: GroupMemberType.HeadCoach.description}});
+}).then(function() {
+	return db.groupMemberType.findOrCreate({
+		where: {id: GroupMemberType.AssistantCoach.id}, defaults: {description: GroupMemberType.AssistantCoach.description}});
+}).then(function() {
+	return db.groupMemberType.findOrCreate({
+		where: {id: GroupMemberType.Student.id}, defaults: {description: GroupMemberType.Student.description}});
+})
 /////////////////////////////// Test Accounts ////////////////////////////////////
 .then(function() {
 	return db.account.findOrCreate({
@@ -133,13 +161,13 @@ db.sequelize.sync({
 // 			'accountId': 2}});
 // })
 //////////////////////////// Test Login Tokenhash //////////////////////////
-.then(function() {
-	return db.token.findOrCreate({
-		where: {id: 1}, defaults: {
-			'token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbiI6IlUyRnNkR1ZrWDE5VlJtSFpUS1lua0EycG96ZXNzOHRrMkFKSFdiSGg1MEdKd202cm16WHRoeFMxcUNkdENaMlRrb2VHNllXTHhYeXlCSzcwUnBzYWpRPT0iLCJpYXQiOjE0NTAzODkzMDd9.XUPeI2WXPBeQzfA3LWtkrBwnV9Gz1wWj1hQXGn5YU-Y'
-		}
-	})
-})
+// .then(function() {
+// 	return db.token.findOrCreate({
+// 		where: {id: 1}, defaults: {
+// 			'token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbiI6IlUyRnNkR1ZrWDE5VlJtSFpUS1lua0EycG96ZXNzOHRrMkFKSFdiSGg1MEdKd202cm16WHRoeFMxcUNkdENaMlRrb2VHNllXTHhYeXlCSzcwUnBzYWpRPT0iLCJpYXQiOjE0NTAzODkzMDd9.XUPeI2WXPBeQzfA3LWtkrBwnV9Gz1wWj1hQXGn5YU-Y'
+// 		}
+// 	})
+// })
 // if all goes well, start the server
 .then(function() {
 	app.listen(PORT, function() {

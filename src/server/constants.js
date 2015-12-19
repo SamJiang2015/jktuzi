@@ -77,7 +77,44 @@ module.exports = Object.freeze({
 			}
 	},	
 
+	GroupType: {
+
+		FatLoss: {
+			id: 1,
+			description: '减脂'
+		},
+		MuscleBuilding: {
+			id: 2,
+			description: '增肌'
+		},
+		Waist: {
+			id: 3,
+			description: '瘦腰'
+		},
+		Chat: {
+			id: 4,
+			description: '聊天'
+		}
+	},
+
+	GroupMemberType: {
+
+		HeadCoach: {
+			id: 1,
+			description: '主教'
+		},
+		AssistantCoach: {
+			id: 2,
+			description: '助教'
+		},
+		Student: {
+			id: 3,
+			description: '学员'
+		}
+	},
+
 	Limits: {
+
 		Meal: {
 			ItemCount: {
 				max: 20
@@ -99,6 +136,23 @@ module.exports = Object.freeze({
 			},
 			ItemCount: {
 				max: 20
+			}
+		},
+
+		Group: {
+			Name: {
+				minLen: 1,
+				maxLen: 100
+			},			
+			Nickname: {
+				minLen: 1,
+				maxLen: 100
+			}
+		},
+
+		GroupMember: {
+			Payment: {
+				min: 0
 			}
 		},
 
