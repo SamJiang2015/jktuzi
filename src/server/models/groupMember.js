@@ -31,10 +31,12 @@ module.exports = function(sequelize, DataTypes) {
 			groupId: {
 				type: DataTypes.INTEGER,
 				allowNull: false,
+				unique: 'groupMemberIndex'
 			},
 			accountId: {
 				type: DataTypes.INTEGER,
 				allowNull: false,
+				unique: 'groupMemberIndex'
 			},
 			//元
 			paymentAmount: {

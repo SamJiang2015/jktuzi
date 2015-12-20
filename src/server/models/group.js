@@ -35,6 +35,7 @@ module.exports = function(sequelize, DataTypes) {
 			
 			name: {
 				type: DataTypes.STRING,
+				unique: true,    // group names must be unique
 				allowNull: false,
 				validate: {
 					len: [Limits.Group.Name.minLen, Limits.Group.Name.maxLen]

@@ -31,12 +31,17 @@ module.exports = {
 		if (typeof m !== 'object' && m !== null && m.size!==3){return false;}
 					
 		var now = new Date();
-		var thisYear = now.getFullYear(); //YEAR now
+		//var thisYear = now.getFullYear(); //YEAR now
 		var minYear = Limits.YearCardInfo.min; //MIN YEAR
 		
 		// todo: check the date (y+m+d) is not in the future
 		// YEAR CHECK
-		if( (m[1].length < 4) || m[1] < minYear || m[1] > thisYear){return false;}
+		if( (m[1].length < 4)  
+			|| m[1] < minYear  
+	//		||	m[1] < thisYear
+			) {
+			return false;
+		}
 
 		// MONTH CHECK			
 		if( (m[2].length < 2) || m[2] < 1 || m[2] > 12){return false;}

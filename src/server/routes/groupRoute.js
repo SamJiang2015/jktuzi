@@ -13,6 +13,7 @@ var middleware = require('../middleware.js')(db);
 var util = require('../util.js');
 var Limits = require('../constants.js').Limits;
 var Utils = require('../util.js');
+var RoleType = require('../constants.js').RoleType;
 
 /***********************************************
 /* POST groups/
@@ -21,7 +22,7 @@ var Utils = require('../util.js');
 /*		-- body: 
 /*    			{
 /*					"name":"第15期减脂群",
-/*					"groupTypeId":"1"
+/*					"groupTypeId":"1",
 /*					"nickname":"天王盖地虎",    
 /*					"startdate":"2015-12-25",
 /*					"enddate":"2016-01-18"
@@ -79,20 +80,16 @@ router.get('/',
 		db.group.findAll()
 			.then(function(groups) {
 				if (groups) {
-					// go through the list of groups and retrieve memberships
-					groups.foreach(function(group) {
-						db.groupMember.findAll({
-							where: 
-						})
-					})
-
 					res.json(util.formatOutput(groups, 200, true));
 				} else {
 					// return empty array
-					res.json(util.formatOutput({[]}, 200, true));
-				}, 
+					res.json(util.formatOutput([], 200, true));
+				}}, 
 			function(e) {
-				res.status(400).json(util.formatOutput(e, 400, false));				
+				// assuming these are interal server errors since there is no
+				// user input to validate
+				console.log(e);
+				res.status(500).json(util.formatOutput(e, 500, false));				
 			})
 			.catch(function(e) {
 				// todo: exceptions maybe thrown by validation error (400s) or other reasons (500s)
@@ -117,11 +114,13 @@ router.get('/:id',
 	function(req, res) {
 
 		var groupId = parseInt(req.params.id, 10);
+		var accountId = req.account.get('id'); // the account that is making this request
+		var role = req.account.get('roleTypeId'); // the role of the account making this request
 
 		// normally we would check permissions before hitting the db,
 		// but here since permission is based on group membership 
 		// we will check for permissions after we have the membership info
-		var where = {groupId: groupId};
+		var where = {id: groupId};
 
 		// find the group first
 		db.group.findOne({
@@ -131,13 +130,56 @@ router.get('/:id',
 						// retrieve memberships and attach to 
 						// group info
 						group.getAccounts()
-							.then(function(members) {
-								group.members = members;
-								// can't just send the result, must 
-								// check permisssions
+							.then(function(members) {								
+								// now we check for permissions: (1) admins are okay (2) non-admins must be a member
+								// of the group they are trying to access
+								var isPermitted = false;
+
+								if (role === RoleType.Admin.id) {
+									// admins are okay
+									isPermitted = true; 
+								} else { 
+									// for trainers and trainees, can only view a group that they belong to
+									if (members) {
+										for (var i=0; i<members.lentgh; i++) {
+											if (members[i].id === accountId) {
+												console.log(members[i].id);
+												// the account is part of this group
+												isPermitted = true;
+											}
+											// filter the result to be sent out to client
+											resultMembers.push(members[i].toJSON());
+
+											// resultMembers[i] = _.pick(members[i].toPublicJSON(), 
+											// 	'id',
+											// 	'mobile',
+											// 	'name',
+											// 	'roleTypeId',
+											// 	'groupMember.groupId',
+											// 	'groupMember.paymentAmount',
+											// 	'groupMember.memberTypeId',
+											// 	'groupMember.createdAt',
+											// 	'groupMember.updatedAt');
+										}
+									}
+								}
+
+								// now we send back the information based on the result of permission checking
+								if (isPermitted) {
+									group=group.toJSON();
+									group.members=members;
+									res.json(util.formatOutput(group, 200, true));
+								} else {
+									res.status(401).json(
+										util.formatOutput({errorMsg: 'You are not authorized to view this group'}, 401, false));
+									return;
+								}									
 							});
 					} else {
-						// no group found; return empty object
+						// no group found; return 404
+						res.status(404).json(
+							util.formatOutput({errorMsg: 'No group was found. ID: ' + groupId}, 404, false));
+						return;
 					}
 				}, 
 			function(e) {
@@ -148,43 +190,7 @@ router.get('/:id',
 				// todo: exceptions maybe thrown by validation error (400s) or other reasons (500s)
 				console.log(e);
 				res.status(500).json(util.formatOutput(e, 500, false));
-			});
-
-		// now we check for permissions: (1) admins are okay (2) non-admins must be a member
-		// of the group they are trying to access
-		var accountId = req.account.get('id'); // the account that is making this request
-		var role = req.account.get('roleTypeId'); // the role of the account making this request
-		var isPermitted = false;
-
-		if (role === RoleType.Admin.id) {
-			// admins are okay
-			isPermitted = true; 
-		} else { 
-			// for trainers and trainees, can only view a group that they belong to
-			if (group && group.members) {
-				group.members.foreach(
-					function(member){
-						if (member.accountId.toString() === accountId.toString()) {
-							// the account is part of this group
-							isPermitted = true;
-							break;
-						}
-				});
-			} else {
-				// the account is not admin so cannot view an empty group or even know whether
-				// this group exists
-			}
-		}
-
-		// now we send back the information based on the result of permission checking
-		if (isPermitted) {
-			if (!group) group={};
-			res.json(util.formatOutput(group, 200, true));
-		} else {
-			res.status(401).json(
-				util.formatOutput({errorMsg: 'You are not authorized to view this group'}, 401, false));
-			return;
-		}				
+			});			
 	});
 
 /***********************************************
@@ -222,7 +228,7 @@ router.put('/:id',
 
 		// retrieve the instance so that we can call update on it
 		db.group.findOne({
-			where: {groupId: groupId}
+			where: {id: groupId}
 		}).then(function(group) {
 				if (group) {
 					// update the group information
@@ -270,13 +276,11 @@ router.delete('/:id',
 			return;
 		}	
 
-		var where = {where: {groupId: groupId}};
-
 		// first delete all members of the group
-		db.groupMember.destroy({where: where})
+		db.groupMember.destroy({where: {groupId: groupId}})
 			.then(function() {
 				// then delete the group itself	
-				db.group.destory({where: where})
+				db.group.destory({where: {id: groupId}})
 			}).
 			then(function(rowsDeleted) {
 				if (rowsDeleted === 1) {
@@ -336,7 +340,7 @@ router.post('/:id/members',
 		// validating the request and prepare the data for writing to DB
 		var members = req.body;
 		if (!members || members.length===0) {
-			util.formatOutput({errMsg: 'No members found in the request body'}, 400, false));			
+			util.formatOutput({errMsg: 'No members found in the request body'}, 400, false);			
 			return;
 		}
 		if (members.length > Limits.GroupMember.ItemCount.max) {
@@ -350,7 +354,7 @@ router.post('/:id/members',
 		}
 
 		// first we find the group
-		db.group.findOne({where: {groupId: groupId}})
+		db.group.findOne({where: {id: groupId}})
 			.then(function(group) {
 				if (group) {
 					// then we add the members in the request to this group
@@ -404,7 +408,8 @@ router.delete('/:id/members',
 		// validating the request and prepare the data for writing to DB
 		var memberAccountIds = req.body;
 		if (!memberAccountIds || memberAccountIds.length===0) {
-			util.formatOutput({errMsg: 'No member account IDs found in the request body'}, 400, false));			
+			res.status(400).json(
+				util.formatOutput({errMsg: 'No member account IDs found in the request body'}, 400, false));			
 			return;
 		}
 		// parse the array of IDs and check for error
@@ -413,8 +418,9 @@ router.delete('/:id/members',
 			memberAccountIds[i]=parseInt(memberAccountIds[i]);
 
 			// check for invalid ids passed in
-			if (isNaN(memberAccountIds[i]) {
-				util.formatOutput({errMsg: 'invalid format of member account IDs found in the request body'}, 400, false));			
+			if (isNaN(memberAccountIds[i])) {
+				res.status(400).json(				
+					util.formatOutput({errMsg: 'invalid format of member account IDs found in the request body'}, 400, false));			
 				return;				
 			}
 		}
