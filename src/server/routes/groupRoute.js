@@ -129,8 +129,16 @@ router.get('/:id',
 					if (group) {
 						// retrieve memberships and attach to 
 						// group info
-						group.getAccounts()
-							.then(function(members) {								
+						group.getAccounts({
+							attributes: 
+								['id',
+								'mobile',
+								'name',
+								'roleTypeId',
+								'groupMember.groupId',
+								'groupMember.paymentAmount',
+								'groupMember.memberTypeId']
+						}).then(function(members) {								
 								// now we check for permissions: (1) admins are okay (2) non-admins must be a member
 								// of the group they are trying to access
 								var isPermitted = false;
@@ -143,23 +151,9 @@ router.get('/:id',
 									if (members) {
 										for (var i=0; i<members.lentgh; i++) {
 											if (members[i].id === accountId) {
-												console.log(members[i].id);
 												// the account is part of this group
 												isPermitted = true;
 											}
-											// filter the result to be sent out to client
-											resultMembers.push(members[i].toJSON());
-
-											// resultMembers[i] = _.pick(members[i].toPublicJSON(), 
-											// 	'id',
-											// 	'mobile',
-											// 	'name',
-											// 	'roleTypeId',
-											// 	'groupMember.groupId',
-											// 	'groupMember.paymentAmount',
-											// 	'groupMember.memberTypeId',
-											// 	'groupMember.createdAt',
-											// 	'groupMember.updatedAt');
 										}
 									}
 								}
