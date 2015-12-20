@@ -686,7 +686,45 @@ router.post('/:id/workoutCards/:date',
 
 	});
 
-//  KEEP THESE AS LAST REGISTERED ROUTES
+/***********************************************
+/* GET /accounts/:id/groups
+/*      -- API call to return info of all groups
+/*      -- this account is part of
+/*
+/* 		-- **PERMISSION**: 
+/*				- only groups that the loggedin user
+/*                belongs to
+/*		-- body: none
+***********************************************/
+router.get('/:id/groups',
+	middleware.requireAuthentication,		
+	function(req, res) {
+
+		var requestId = parseInt(req.params.id, 10);
+		var accountId = req.account.get('id'); // the account that is making this request
+
+		// Permission checking
+		if (accountId !== requestId) {
+			res.status(401).json(
+					util.formatOutput('', 401, false));
+			return;
+		}
+
+		// find the groups that this account is part of
+		req.account.getGroups()
+		.then(function(groups) {
+			res.json(util.formatOutput(groups, 200, true));
+		}).catch(function(e) {
+			// todo: exceptions maybe thrown by validation error (400s) or other reasons (500s)
+			console.log(e);
+			res.status(500).json(util.formatOutput(e, 500, false));
+		});			
+	});
+
+/***********************************************
+/*  DEFAULT HANDLERS 
+/*         KEEP THESE AS LAST REGISTERED ROUTES
+/***********************************************/
 router.get('/*',
 	function(req, res) {
 		res.status(400).json(util.formatOutput({error: 'API call not supoorted'}, 400, false));

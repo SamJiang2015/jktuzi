@@ -120,66 +120,60 @@ router.get('/:id',
 		// normally we would check permissions before hitting the db,
 		// but here since permission is based on group membership 
 		// we will check for permissions after we have the membership info
-		var where = {id: groupId};
 
 		// find the group first
-		db.group.findOne({
-			where: where})
+		var resultGroup; 
+		db.group.findOne({where: {id: groupId}})
 			.then(function(group) {
-					if (group) {
-						// retrieve memberships and attach to 
-						// group info
-						group.getAccounts({
-							attributes: 
-								['id',
-								'mobile',
-								'name',
-								'roleTypeId',
-								'groupMember.groupId',
-								'groupMember.paymentAmount',
-								'groupMember.memberTypeId']
-						}).then(function(members) {								
-								// now we check for permissions: (1) admins are okay (2) non-admins must be a member
-								// of the group they are trying to access
-								var isPermitted = false;
-
-								if (role === RoleType.Admin.id) {
-									// admins are okay
-									isPermitted = true; 
-								} else { 
-									// for trainers and trainees, can only view a group that they belong to
-									if (members) {
-										for (var i=0; i<members.lentgh; i++) {
-											if (members[i].id === accountId) {
-												// the account is part of this group
-												isPermitted = true;
-											}
-										}
-									}
-								}
-
-								// now we send back the information based on the result of permission checking
-								if (isPermitted) {
-									group=group.toJSON();
-									group.members=members;
-									res.json(util.formatOutput(group, 200, true));
-								} else {
-									res.status(401).json(
-										util.formatOutput({errorMsg: 'You are not authorized to view this group'}, 401, false));
-									return;
-								}									
-							});
-					} else {
-						// no group found; return 404
-						res.status(404).json(
-							util.formatOutput({errorMsg: 'No group was found. ID: ' + groupId}, 404, false));
-						return;
+				if (group) {
+					// retrieve memberships and attach to 
+					// group info
+					resultGroup = group;
+					return group.getAccounts({
+						attributes: 
+							['id',
+							'mobile',
+							'name',
+							'roleTypeId',
+							'groupMember.groupId',
+							'groupMember.paymentAmount',
+							'groupMember.memberTypeId']
+					});
+				} else {
+					// no group found; return 404
+					res.status(404).json(
+						util.formatOutput({errorMsg: 'No group was found. ID: ' + groupId}, 404, false));
+					return;
+				}})
+			.then(function(members) {								
+				// now we check for permissions: (1) admins are okay (2) non-admins must be a member
+				// of the group they are trying to access
+				var isPermitted = false;				
+				if (role === RoleType.Admin.id) {
+					// admins are okay
+					isPermitted = true; 
+				} else { 		
+					// for trainers and trainees, can only view a group that they belong to
+					if (members) {
+						for (var i=0; i<members.length; i++) {
+							if (members[i].get('id') === accountId) {
+								// the account is part of this group
+								isPermitted = true;
+							}
+						}
 					}
-				}, 
-			function(e) {
-				res.status(400).json(util.formatOutput(e, 400, false));				
-				return;
-			})
+				}
+
+				// now we send back the information based on the result of permission checking
+				if (isPermitted) {
+					resultGroup=resultGroup.toJSON();
+					resultGroup.members=members;
+					res.json(util.formatOutput(resultGroup, 200, true));
+				} else {
+					res.status(401).json(
+						util.formatOutput({errorMsg: 'You are not authorized to view this group'}, 401, false));
+					return;
+				}}) 
 			.catch(function(e) {
 				// todo: exceptions maybe thrown by validation error (400s) or other reasons (500s)
 				console.log(e);
