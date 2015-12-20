@@ -274,9 +274,9 @@ router.delete('/:id',
 		db.groupMember.destroy({where: {groupId: groupId}})
 			.then(function() {
 				// then delete the group itself	
-				db.group.destory({where: {id: groupId}})
-			}).
-			then(function(rowsDeleted) {
+				return db.group.destroy({where: {id: groupId}});})
+			.then(function(rowsDeleted) {
+
 				if (rowsDeleted === 1) {
 					res.status(200).json(
 						util.formatOutput({}, 200, true));						
@@ -284,14 +284,17 @@ router.delete('/:id',
 					if (rowsDeleted !== 0) {
 						//something weird is going on since groupId should be unique
 						console.log('Multiple groups with same groupId delted.  GroupID: ' + groupId);
+					} else {
+						res.status(404).json({
+							'errorMsg': 'no group found with that id'
+						});
+						return;
 					}
-					res.status(404).json({
-						'errorMsg': 'no group found with that id'
-					});
-				}
-			}).catch(function(error) {
-				return res.status(500).json(
-					util.formatOutput({errorMsg: error.toString()}, 500, false));
+				}})
+			.catch(function(error) {
+				console.log(error);
+				res.status(500).json(
+					util.formatOutput({errorMsg: error}, 500, false));
 			})				
 	});
 
@@ -352,44 +355,42 @@ router.post('/:id/members',
 			.then(function(group) {
 				if (group) {
 					// then we add the members in the request to this group
-					group.addAccounts(members)
-						.then(function(accounts) {
-							// then return these accounts back to caller but need to filter out password info first
-							if (accounts) {
-								accounts.foreach(function(account) {
-									account=account.toPublicJSON();
-								});
-
-								res.json(
-									util.formatOutput(accounts, 200, true));
-							}
-						})
+					return db.groupMember.bulkCreate(members);
 				} else {
 					// group not found. something wrong happened on the FE
 					res.status(404).json(
-						util.formatOutput({errorMsg: 'Group not found with id: ' + groupId}, 401, false));
+						util.formatOutput({errorMsg: 'Group not found with id: ' + groupId}, 404, false));
 					return;
 				}
+			}).then(function() {
+				return db.groupMember.findAll({
+					where: {groupId: groupId}
+				});
+			}).then(function(members) {
+				res.json(
+					util.formatOutput(members, 200, true));
 			}).catch(function(error) {
-				return res.status(500).json(
-					util.formatOutput({errorMsg: error}, 500, false));
+				console.log(error);
+				// likely a validation error
+				return res.status(400).json(
+					util.formatOutput({errorMsg: error}, 400, false));
 			})		
 	});
 
-
 /***********************************************
-/* DELETE groups/:id/members
-/*      -- API call to delete members from a group
+/*
+/* DELETE groups/:groupId/members/:accountId
+/*      -- API call to delete a member from a group
 /* 		-- **PERMISSION: ADMIN ONLY**
-/*		-- body: an array of account IDs
-/*    			{[ "1", "5", "6"]}
+/*		-- body: none.
 /*
 ***********************************************/
-router.delete('/:id/members',
+router.delete('/:id/members/:accountId',
 	middleware.requireAuthentication,		
 	function(req, res) {
 
 		var groupId = parseInt(req.params.id, 10);
+		var accountId = parseInt(req.params.accountId, 10);
 
 		// Check permission
 		var role = req.account.get('roleTypeId');
@@ -399,40 +400,88 @@ router.delete('/:id/members',
 			return;
 		}	
 
-		// validating the request and prepare the data for writing to DB
-		var memberAccountIds = req.body;
-		if (!memberAccountIds || memberAccountIds.length===0) {
-			res.status(400).json(
-				util.formatOutput({errMsg: 'No member account IDs found in the request body'}, 400, false));			
-			return;
-		}
-		// parse the array of IDs and check for error
-		for (var i=0; i<memberAccountIds.lenth; i++) 
-		{
-			memberAccountIds[i]=parseInt(memberAccountIds[i]);
-
-			// check for invalid ids passed in
-			if (isNaN(memberAccountIds[i])) {
-				res.status(400).json(				
-					util.formatOutput({errMsg: 'invalid format of member account IDs found in the request body'}, 400, false));			
-				return;				
-			}
-		}
-
-		// now we delete these members from the group
-		var where = {groupId: groupId, accountId: memberAccountIds};
+		var where = {groupId: groupId, accountId: accountId};
 		db.groupMember.destroy({
 			where: where})
 			.then(function(rowsDeleted){
 				// theoretically caller should don't care if some IDs are not in the table already
-				if (rowsDeleted !== memberAccountIds.length) {
-					console.log('some of the accounts requested do not appear in the groupMember table');
+				if (rowsDeleted === 1) {
+					res.status(200).json(
+						util.formatOutput({}, 200, true));
+				} else if (rowsDeleted === 0) {
+					res.status(404).json(
+						util.formatOutput({errorMsg: 'The account requested is not a member of the group'}, 404, true));
+				} else {
+					//should not be here
+					console.log('multiple rows deleted from groupMember table!')
 				}
 			}).catch(function(error) {
 				return res.status(500).json(
 					util.formatOutput({errorMsg: error}, 500, false));
 			});
 	});
+
+// /***********************************************
+// /*  NOTE -- Was thinking about a bulk delete members
+// /*      from a group.  But don't think we need it.
+// /*      might as well delete one by one, or perhaps
+// /*      a set members via post 
+// /*
+// /* DELETE groups/:id/members/
+// /*      -- API call to delete a member from a group
+// /* 		-- **PERMISSION: ADMIN ONLY**
+// /*		-- body: an array of account IDs
+// /*    			{[ "1", "5", "6"]}
+// /*
+// ***********************************************/
+// router.delete('/:groupId/members',
+// 	middleware.requireAuthentication,		
+// 	function(req, res) {
+
+// 		var groupId = parseInt(req.params.id, 10);
+
+// 		// Check permission
+// 		var role = req.account.get('roleTypeId');
+// 		if (role !== RoleType.Admin.id) {
+// 			res.status(401).json(
+// 				util.formatOutput({errorMsg: 'You are not authorized to remove members from this group'}, 401, false));
+// 			return;
+// 		}	
+
+// 		// validating the request and prepare the data for writing to DB
+// 		var memberAccountIds = req.body;
+// 		if (!memberAccountIds || memberAccountIds.length===0) {
+// 			res.status(400).json(
+// 				util.formatOutput({errMsg: 'No member account IDs found in the request body'}, 400, false));			
+// 			return;
+// 		}
+// 		// parse the array of IDs and check for error
+// 		for (var i=0; i<memberAccountIds.lenth; i++) 
+// 		{
+// 			memberAccountIds[i]=parseInt(memberAccountIds[i]);
+
+// 			// check for invalid ids passed in
+// 			if (isNaN(memberAccountIds[i])) {
+// 				res.status(400).json(				
+// 					util.formatOutput({errMsg: 'invalid format of member account IDs found in the request body'}, 400, false));			
+// 				return;				
+// 			}
+// 		}
+
+// 		// now we delete these members from the group
+// 		var where = {groupId: groupId, accountId: memberAccountIds};
+// 		db.groupMember.destroy({
+// 			where: where})
+// 			.then(function(rowsDeleted){
+// 				// theoretically caller should don't care if some IDs are not in the table already
+// 				if (rowsDeleted !== memberAccountIds.length) {
+// 					console.log('some of the accounts requested do not appear in the groupMember table');
+// 				}
+// 			}).catch(function(error) {
+// 				return res.status(500).json(
+// 					util.formatOutput({errorMsg: error}, 500, false));
+// 			});
+// 	});
 
 /***********************************************
 /* Other routes:
