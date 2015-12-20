@@ -30,6 +30,7 @@ var db = {};
 
 db.account = sequelize.import(__dirname + '/models/account.js');
 db.trainee = sequelize.import(__dirname + '/models/trainee.js');
+db.trainer = sequelize.import(__dirname + '/models/trainer.js');
 db.token = sequelize.import(__dirname + '/models/token.js');
 db.roleType = sequelize.import(__dirname + '/models/roleType.js');
 
@@ -76,6 +77,25 @@ db.trainee.belongsTo(db.account, {
 
 db.trainee.belongsTo(db.account, {
 	as: 'traineeSponsorAccount',
+	foreignKey: {
+		name: 'sponsorAccountId',
+		allowNull: true
+	}
+});
+
+/***********************************************
+** trainer table -- accountId, sponsorAccountId
+************************************************/
+db.trainer.belongsTo(db.account, {
+	as: 'trainerAccount',
+	foreignKey: {
+		name: 'accountId',
+		allowNull: true
+	}
+});
+
+db.trainer.belongsTo(db.account, {
+	as: 'trainerSponsorAccount',
 	foreignKey: {
 		name: 'sponsorAccountId',
 		allowNull: true

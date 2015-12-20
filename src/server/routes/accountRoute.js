@@ -49,16 +49,16 @@ router.post('/login',
 					token: token
 				});
 			}, function(status) {
-				res.status(status).json(util.formatOutput(e||'', status, false));
+				res.status(status).json(util.formatOutput('', status, false));
 			})
 			.then(function(tokenInstance) {
 				accountInstance = accountInstance.toPublicJSON();
 				accountInstance.token=tokenInstance.get('token');
 				res.json(util.formatOutput(accountInstance, 200, true));
 			})
-			.catch(function(e) {
-				console.log(e);
-				res.status(500).json(util.formatOutput(e||'', 500, false));
+			.catch(function(error) {
+				console.log(error);
+				res.status(401).json(util.formatOutput(error||'', 401, false));
 			});
 	});
 

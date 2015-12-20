@@ -9,14 +9,18 @@ var createBrowserHistory = require('history/lib/createBrowserHistory');
 
 var Main = require('./components/Main/Main');
 var auth = require('./utils/auth');
-var Register = require('./components/Register/Register');
+
 var Login = require('./components/Login/Login');
 var Logout = require('./components/Logout/Logout');
-var Groups = require('./components/Group/Groups');
 var About = require('./components/About/About');
 var Intro = require('./components/Intro/Intro');
+
+var Register = require('./components/Register/Register');
 var TraineeInfo = require('./components/TraineeInfo/TraineeInfo');
+
 var Cards = require('./components/Card/Cards');
+var Groups = require('./components/Group/Groups');
+
 
 function requireAuth(nextState, replaceState) {
   if (!auth.loggedIn()) {

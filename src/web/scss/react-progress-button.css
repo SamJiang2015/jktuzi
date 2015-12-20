@@ -4,15 +4,15 @@
   width: 100%;
 }
 .pb-container .pb-button {
-  background: transparent;
-  border: 2px solid currentColor;
-  border-radius: 27px;
-  color: currentColor;
+  background: #31B0D5;
+  border: 2px solid #31B0D5;
+  border-radius: 7px;
+  color: white;
+  font-size: 0.7em;
   cursor: pointer;
-  padding: 0.7em 1em;
   text-decoration: none;
   text-align: center;
-  height: 54px;
+  height: 35px;
   width: 100%;
   -webkit-tap-highlight-color: transparent;
   outline: none;
@@ -21,7 +21,7 @@
 .pb-container .pb-button span {
   display: inherit;
   transition: opacity 0.3s 0.1s;
-  font-size: 2em;
+  font-size: 1.5em;
   font-weight: 100;
 }
 .pb-container .pb-button svg {
@@ -39,7 +39,7 @@
   animation: spin 0.9s infinite cubic-bezier(0.085, 0.260, 0.935, 0.710);
 }
 .pb-container .pb-button svg.pb-progress-circle path {
-  stroke: currentColor;
+  stroke: #31B0D5;
   stroke-width: 5;
 }
 .pb-container .pb-button svg.pb-checkmark path,

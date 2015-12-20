@@ -33,9 +33,13 @@ module.exports = function(db) {
 			}).then(function(account) {
 				req.account = account; // store the retrieved account for route handler
 				next();
-			}).catch(function(e) {
-				console.log(e);
-				res.status(401).json(util.formatOutput({errorMsg: e.toString()}, 401, false));
+			}, function(error) {
+				console.log(error);
+				res.status(401).json(util.formatOutput({errorMsg: error}, 401, false));
+				res.end();				
+			}).catch(function(error) {
+				console.log(error);
+				res.status(401).json(util.formatOutput({errorMsg: error}, 401, false));
 				res.end();
 			});
 		}

@@ -116,13 +116,12 @@ module.exports = function(sequelize, DataTypes) {
 							if (!account || !bcrypt.compareSync(body.password, account.get('password_hash'))) {
 								// account does not exist or password is wrong
 								return reject(401);
-							}
-
+							}							
 							// now account is authenticated
 							return resolve(account);
 
-						}, function(e) {
-							console.log('Account.Authenticate.findOne() error: '+ e);
+						}, function(error) {
+							console.log('Account.Authenticate.findOne() error: '+ error);
 							return reject(500);
 						});
 					});

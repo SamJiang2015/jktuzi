@@ -47,7 +47,7 @@ app.get('/*', function(req, res) {
 
 // create the database and populate the reference table(s)
 db.sequelize.sync({
-	force: false
+	force: true
 })
 /////////////////////////////// Role Types /////////////////////////////////
 .then(function() {

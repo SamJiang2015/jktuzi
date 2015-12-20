@@ -5,7 +5,8 @@ var _=require('underscore');
 var Panel = require('react-bootstrap/lib/panel');
 var Input = require('react-bootstrap/lib/input');
 var Glyphicon = require('react-bootstrap/lib/glyphicon');
-var Button = require('react-bootstrap/lib/button');
+//var Button = require('react-bootstrap/lib/button');
+var Button = require('react-progress-button');
 
 var auth = require('../../utils/auth');
 var Login = require('../Login/Login');
@@ -51,7 +52,7 @@ module.exports = React.createClass({
 			this.setState({
 				error: true,
 				errorMsg: errorMsg
-			})
+			});
 		} else {
 			// user inputs are okay; try hitting the DB to create an account
 			auth.register(mobile, name, pass1, function(succeeded) {
@@ -60,7 +61,7 @@ module.exports = React.createClass({
 		    		error: true,
 		    		errorMsg: '注册未成功。请稍候再试。',
 		    		registered: false
-		    	});
+		    	});				
 		    } else {
 		    	return this.setState({
 		    		registered: true
@@ -95,9 +96,12 @@ module.exports = React.createClass({
 		            <form>
 		                <Input type="text" ref="name" placeholder="姓名" hasFeedback feedbackIcon={userGlyphicon} />            
 		                <Input type="tel" ref="mobile" placeholder="手机" hasFeedback feedbackIcon={mobileGlyphicon} />
-		                <Input type="password" ref="pass1" placeholder="设定密码(至少6位)" hasFeedback feedbackIcon={passwordGlyphicon} />
+		                <Input type="password" ref="pass1" placeholder="设定密码 (至少6位)" hasFeedback feedbackIcon={passwordGlyphicon} />
 		                <Input type="password" ref="pass2" placeholder="确认密码" hasFeedback feedbackIcon={passwordGlyphicon} />
-		                <Button bsStyle="info" block onClick={this.handleRegister}>现在加入</Button>
+		                <Button
+		                	bsStyle="info"
+		                	block
+		                	onClick={this.handleRegister}>现在加入</Button>
 		                <p id="loginLink"><Link to="/login">我要登录</Link></p>
 		                {this.renderError()}
 		            </form>

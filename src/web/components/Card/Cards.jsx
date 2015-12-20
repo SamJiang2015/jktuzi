@@ -153,14 +153,6 @@ module.exports = React.createClass({
 					</div>
 				</form>
 				<br/>
-				<FoodCard 
-					breakfast={this.state.foodCard.breakfast}
-					lunch={this.state.foodCard.lunch}
-					dinner={this.state.foodCard.dinner}
-					submitInfo={this.submitFoodCard}
-					submitError={this.state.submitFoodCardError}
-					submitErrorCode={this.state.submitFoodCardErrorCode}
-				/>
 				<HealthCard 
 					weight={this.state.healthCard.weight}
 					bodyfat={this.state.healthCard.bodyfat}
@@ -173,7 +165,15 @@ module.exports = React.createClass({
 					submitInfo={this.submitSportCard}
 					submitError={this.state.submitSportCardError}
 					submitErrorCode={this.state.submitSportCardErrorCode}										
-				/>				
+				/>
+				<FoodCard 
+					breakfast={this.state.foodCard.breakfast}
+					lunch={this.state.foodCard.lunch}
+					dinner={this.state.foodCard.dinner}
+					submitInfo={this.submitFoodCard}
+					submitError={this.state.submitFoodCardError}
+					submitErrorCode={this.state.submitFoodCardErrorCode}
+				/>								
 			</div>
 
 			);

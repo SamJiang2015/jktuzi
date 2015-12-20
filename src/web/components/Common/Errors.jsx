@@ -13,7 +13,7 @@ module.exports = React.createClass({
 				case 204: 
 					return '您的操作已成功';
 				case 400:
-					return '好像您输入的信息有误哦。请核对信息后再试。如果持续有问题，请您联系我们客服(电话: (010)xxxx-xxxx)';
+					return '好像您输入的信息有误哦。请核对信息后再试。';
 				case 401: 
 					return '很抱歉您的登录已经失效。请重新登录。';
 				case 404: 
