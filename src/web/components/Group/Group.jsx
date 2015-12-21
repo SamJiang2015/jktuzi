@@ -6,10 +6,11 @@
 //		- name
 //		- nickname
 // 		- startdate
-//		- enddate
+//		- groupTypeId
 //		- members
 
 var React = require('react');
+var GroupType = require('../../utils/constants').GroupType;
 
 module.exports = React.createClass({
 
@@ -19,7 +20,7 @@ module.exports = React.createClass({
 			name: '',
 			nickname: '',
 			startdate: '',
-			enddate: ''
+			groupTypeId: null
 		};
 	},
 
@@ -27,9 +28,9 @@ module.exports = React.createClass({
 		this.setState({
 			id: props.id,
 			name: props.name,
-			nickname: props.duration,
+			nickname: props.nickname,
 			startdate: props.startdate,
-			enddate: props.enddate,
+			groupTypeId: props.groupTypeId,
 		});
 	},
 
@@ -46,6 +47,19 @@ module.exports = React.createClass({
 	    this.props.toggleShowGroupMembers(id);
 	},
 
+	getGroupTypeDisplay: function(groupTypeId) {
+		switch(groupTypeId) {
+			case GroupType.FatLoss.id:
+				return GroupType.FatLoss.description;
+			case GroupType.MuscleBuilding.id:
+				return GroupType.MuscleBuilding.description;
+			case GroupType.Waist.id:
+				return GroupType.Waist.description;
+			case GroupType.Chat.id:
+				return GroupType.Chat.description;				
+		}
+	},
+
 	render: function() {
 
 		return (
@@ -54,8 +68,8 @@ module.exports = React.createClass({
 				<td>{this.state.name}</td>
 				<td>{this.state.nickname}</td>
 				<td>{this.state.startdate}</td>
-				<td>{this.state.enddate}</td>				
+				<td>{this.getGroupTypeDisplay(this.state.groupTypeId)}</td>				
 			</tr>
 		);
 	}
-}
+})

@@ -4,12 +4,14 @@
 
 var React = require('react');
 var Reflux = require('reflux');
+var Link = require('react-router').Link;
 var _ = require('underscore');
 
 var Auth = require('../../utils/auth');
 var GroupsStore = require('../../stores/groups-store');
 var GroupsActions = require('../../actions/groups-actions');
 
+var Group = require('./Group');
 var GroupMembers = require('./GroupMembers');
 
 module.exports = React.createClass({
@@ -43,15 +45,17 @@ module.exports = React.createClass({
 
 	toggleShowGroupMembers: function(groupId) {
 
-		if (!this.showMembers) {
+		if (!this.state.showMembers || 
+			(groupId && groupId !== this.state.showingGroupId)) {
 			// we were in the no-show state, so toggle to show state
 
 			// first call store to fetch the members data 
 			// note store may already have this info cached			
-			GroupActions.getGroupMembers(
+			GroupsActions.getGroupMembers(
 				Auth.getAccountId(), 
 				groupId,
-				Auth.getToken(), function(success, status) {
+				Auth.getToken(), 
+				function(success, status) {
 					if (success) {
 						this.setState({
 							showMembers: true,
@@ -64,9 +68,7 @@ module.exports = React.createClass({
 							errorMsg: '抱歉暂时无法获取群组信息，请稍候再试。'
 						})
 					}
-
-				});
-
+				}.bind(this));
 		} else {
 			// we were showing the members, so toggle to no show
 			this.setState({
@@ -91,29 +93,22 @@ module.exports = React.createClass({
 	},
 
 	renderMembers: function() {
-		var members = _.findWhere(this.state.groups, {id: this.state.showingGroupId});
-
-		// debug 
-		if (!members) console.log('Fail to find members info!!!');
-
-		if (this.state.showMembers) {
-			return (
-				<GroupMembers 
-					members={members}
-					handleHide={this.toggleShowGroupMembers}
-					/>
-				)
-		}
+		var displayingGroup = _.findWhere(this.state.groups, {id: this.state.showingGroupId});			
+		
+		return (
+			<GroupMembers 
+				members={displayingGroup.members}
+				handleHide={this.toggleShowGroupMembers}
+				/>
+			)
 	},
 
-	render: function() {
-		return (
-			
-			<div className="panel panel-info groups">
-				<div className="panel-heading">
-					<h5>我的群</h5>
-				</div>
+	renderPanelBody: function() {
+
+		if (this.state.groups && this.state.groups.length>0) {
+			return (
 				<div className="panel-body">
+					<p>点击任一群查看成员信息</p>
 					<table className="table table-condensed table-striped table-hover">
 						<thead>
 							<tr>
@@ -124,9 +119,31 @@ module.exports = React.createClass({
 							{this.renderGroup()}					
 						</tbody>
 					</table>
-					{this.renderMembers()}
+					{this.state.showMembers? this.renderMembers():<span/>}
 				</div>
-			</div>			
+			);
+		} else {
+			return (
+				<div className="panel-body">
+					<p>您还没有加入群组。请点击
+						<Link to='requests'>申请入群</Link>
+					</p>	
+				</div>				
+				)
+		}			
+	},
+
+	render: function() {
+
+		return (
+			<div className="groups">
+				<div className="panel panel-primary">
+					<div className="panel-heading">	
+						<h5>我的群</h5>
+					</div>
+					{this.renderPanelBody()}
+				</div>			
+			</div>
 		);
 	}
 })

@@ -121,7 +121,6 @@ module.exports = React.createClass({
 				error: false,
 				errorMsg: ''
 			});
-
 		}
 	},
 	

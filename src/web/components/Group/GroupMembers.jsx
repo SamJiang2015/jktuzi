@@ -35,7 +35,7 @@ module.exports = React.createClass({
 						id={member.id}
 						name={member.name}
 						memberTypeId={member.groupMember.memberTypeId}
-						toggleShowGroupMembers={this.toggleShowGroupMembers}
+						handleHide={this.props.handleHide}
 					/>
 			);
 		}.bind(this))

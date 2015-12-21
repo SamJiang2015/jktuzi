@@ -92,7 +92,7 @@ module.exports = React.createClass({
 	},
 
 	submitTraineeInfo: function() {
-		if (this.props.action === 'create') {
+		if (this.props.action === 'create' || !Auth.getInfoCompleted()) {
 			AccountActions.createAccountTraineeInfo(
 				Auth.getToken(),
 				function(statusResult){

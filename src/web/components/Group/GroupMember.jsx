@@ -19,6 +19,14 @@ module.exports = React.createClass({
 		};
 	},
 
+	setStateHelper: function(props) {
+		this.setState({
+			id: props.id,
+			name: props.name,
+			memberTypeId: props.memberTypeId
+		});
+	},
+
 	componentDidMount: function() {
 		this.setStateHelper(this.props);
 	},
@@ -27,20 +35,27 @@ module.exports = React.createClass({
 		this.setStateHelper(newProps);
 	},
 
+	handleClick: function() {
+		this.props.handleHide();
+	},
+
 	getMemberTypeDisplay: function() {
-		switch(this.memberTypeId) {
+		switch(this.state.memberTypeId) {
 			case GroupMemberType.HeadCoach.id:
 				return GroupMemberType.HeadCoach.description;
 			case GroupMemberType.AssistantCoach.id:
 				return GroupMemberType.AssistantCoach.description;
 			case GroupMemberType.Student.id:
-				return GroupMemberType.HeadCoach.description;			
+				return GroupMemberType.Student.description;			
 		}
 	},
 
 	render: function() {
 		return (
-			<tr className='groupMember'>
+			<tr 
+				className='groupMember'
+				onClick={this.handleClick}
+			>
 				<td>{this.getMemberTypeDisplay()}</td>
 				<td>{this.state.name}</td>
 			</tr>

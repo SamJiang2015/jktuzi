@@ -20,6 +20,8 @@ var TraineeInfo = require('./components/TraineeInfo/TraineeInfo');
 
 var Cards = require('./components/Card/Cards');
 var Groups = require('./components/Group/Groups');
+var Requests = require('./components/Request/Requests');
+var Success = require('./components/Common/Success');
 
 
 function requireAuth(nextState, replaceState) {
@@ -39,6 +41,8 @@ ReactDOM.render((
 			<Route path='myInfo' component={TraineeInfo} onEnter={requireAuth} />			
 			<Route path='groups' component={Groups} onEnter={requireAuth} />
 			<Route path='cards' component={Cards} onEnter={requireAuth} />
+			<Route path='requests' component={Requests} onEnter={requireAuth} />
+			<Route path='success' component={Success} onEnter={requireAuth} />
 		</Route>
 	</Router>),
 	document.getElementById('app') 

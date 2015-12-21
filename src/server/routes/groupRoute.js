@@ -14,6 +14,8 @@ var util = require('../util.js');
 var Limits = require('../constants.js').Limits;
 var Utils = require('../util.js');
 var RoleType = require('../constants.js').RoleType;
+var GroupType = require('../constants.js').GroupType;
+var GroupMemberType = require('../constants.js').GroupMemberType;
 
 /***********************************************
 /* POST groups/
@@ -415,6 +417,106 @@ router.delete('/:id/members/:accountId',
 			});
 	});
 
+
+/***********************************************
+/* TEMPORARY DEMO ONLY; TO BE REMOVED LATER
+/* GET groups/createDemos
+/*      -- API call to create demogroups
+/* 		-- **PERMISSION: everyone**
+/*		-- body: 
+/*    			{
+/*					"fatloss":"true",
+/*					"waist":"true"
+/*    			}
+***********************************************/
+router.post('/createDemos',
+	middleware.requireAuthentication,		
+	function(req, res) {
+
+		var accountId = req.account.get('id'); 
+		var joinFatloss = false;
+		var joinWaist = false;
+		var fatlossGroup=null;
+		var waistGroup=null; 
+
+		var request=req.body;
+		if (request.fatloss) {
+			joinFatloss = true;
+		} 
+		if (request.waist) {
+			joinWaist = true;
+		};
+
+		// find the groups
+		db.group.findAll()
+		.then(function(groups) {
+			if(groups) {
+				for(var i=0; i<groups.length; i++) {
+					if (groups[i].get('groupTypeId') === GroupType.FatLoss.id) {
+						fatlossGroup = groups[i];
+					}
+					if (groups[i].get('groupTypeId') === GroupType.Waist.id) {
+						waistGroup = groups[i];
+					}					
+				}
+			}
+
+			// then based on user request, join this user to the groups
+			if (joinFatloss && !joinWaist) {
+				return req.account.addGroup(fatlossGroup, {memberTypeId: GroupMemberType.Student.id});
+			} else if (!joinFatloss && joinWaist) {
+				return req.account.addGroup(waistGroup, {memberTypeId: GroupMemberType.Student.id});
+			} else if (joinFatloss && joinWaist) {
+				return req.account.addGroup([fatlossGroup,waistGroup], {memberTypeId: GroupMemberType.Student.id});
+			} else {
+				// should not be here 
+				return res.status(400).json(
+					util.formatOutput({errorMsg: 'createDemoGroups called with wrong params'}, 400, false));			
+
+			}})
+
+			// // then based on user request, join this user to the groups
+			// if (joinFatloss && !joinWaist) {
+			// 	return db.groupMember.create({
+			// 		groupId: fatlossGroupId,
+			// 		accountId: accountId,
+			// 		memberTypeId: GroupMemberType.Student});
+			// } else if (!joinFatloss && joinWaist) {
+			// 	return db.groupMember.create({
+			// 		groupId: waistGroupId,
+			// 		accountId: accountId,
+			// 		memberTypeId: GroupMemberType.Student});				
+			// } else if (joinFatloss && joinWaist) {
+			// 	return db.groupMember.bulkCreate([
+			// 	{
+			// 		groupId: fatlossGroupId,
+			// 		accountId: accountId,
+			// 		memberTypeId: GroupMemberType.Student
+			// 	},
+			// 	{
+			// 		groupId: waistGroupId,
+			// 		accountId: accountId,
+			// 		memberTypeId: GroupMemberType.Student
+			// 	}]);				
+			// } else {
+			// 	// should not be here 
+			// 	return res.status(400).json(
+			// 		util.formatOutput({errorMsg: 'createDemoGroups called with wrong params'}, 400, false));			
+
+			// }})
+		.then(function(){
+			// all went well; return the groups info for this user			
+			req.account.getGroups()
+			.then(function(groups) {
+				res.json(util.formatOutput(groups, 200, true));
+			})			
+		})
+		.catch(function(e) {
+			console.log(e);
+				res.status(500).json(util.formatOutput(e, 500, false));
+		});	
+	});
+
 // /***********************************************
 // /*  NOTE -- Was thinking about a bulk delete members
 // /*      from a group.  But don't think we need it.
@@ -485,22 +587,22 @@ router.delete('/:id/members/:accountId',
 ***********************************************/
 router.get('/*',
 	function(req, res) {
-		res.status(400).json(util.formatOutput({error: 'API call not supoorted'}, 400, false));
+		res.status(400).json(util.formatOutput({error: 'API call not supported'}, 400, false));
 	});
 
 router.post('/*',
 	function(req, res) {
-		res.status(400).json(util.formatOutput({error: 'API call not supoorted'}, 400, false));
+		res.status(400).json(util.formatOutput({error: 'API call not supported'}, 400, false));
 	});
 
 router.put('/*',
 	function(req, res) {
-		res.status(400).json(util.formatOutput({error: 'API call not supoorted'}, 400, false));
+		res.status(400).json(util.formatOutput({error: 'API call not supported'}, 400, false));
 	});
 
 router.delete('/*',
 	function(req, res) {
-		res.status(400).json(util.formatOutput({error: 'API call not supoorted'}, 400, false));
+		res.status(400).json(util.formatOutput({error: 'API call not supported'}, 400, false));
 	});
 
 module.exports = router; 

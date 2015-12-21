@@ -139,6 +139,34 @@ db.sequelize.sync({
 	return db.account.findOrCreate({
 		where: {mobile: '18866666666'}, defaults: {name: '新人', password: 'password'}});
 })
+/////////////////////////////// Test Groups and group members ////////////////////////////////////
+.then(function() {
+	return db.group.findOrCreate({
+		where: {name: '第100期减脂群'}, 
+		defaults: {nickname: '牛群', startdate: '2015-12-25', enddate: '2016-01-20', groupTypeId: GroupType.FatLoss.id}});
+}).then(function() {
+	return db.group.findOrCreate({
+		where: {name: '第10期瘦腰群'}, 
+		defaults: {nickname: '霸群', startdate: '2015-12-20', enddate: '2016-01-15', groupTypeId: GroupType.Waist.id}});
+})
+// .then(function() {
+
+// 	var existingGroups;
+// 	var existingAccounts;
+
+// 	db.group.findAll({where: {id: [1,2]}})
+// 	.then(function(groups) {
+// 		existingGroups=groups;
+// 		return db.account.findAll({where: {id:[1,2]}});
+// 	}).then(function(accounts){
+// 		console.log('******************');
+// 		console.log(account[0]);
+// 		existingAccounts=accounts;
+// 		return accounts[0].addGroups(existingGroups, {memberTypeId: GroupMemberType.HeadCoach});
+// 	}).then(function(){
+// 		return existingAccounts[1].addGroups(existingGroups, {memberTypeId: GroupMemberType.AssistantCoach});
+// 	})
+// })
 /////////////////////////////// Test Account Trainee Info ////////////////////////////////////
 // .then(function() {
 // 	return db.trainee.findOrCreate({
@@ -173,6 +201,8 @@ db.sequelize.sync({
 	app.listen(PORT, function() {
 		console.log('Server started on port ' + PORT);
 	});
-}).catch(function(e) {
-	console.log(e);
-});
+})
+// .catch(function(e) {
+// 	console.log(e);
+// 	console.log(e.stack);
+// });
