@@ -4,9 +4,9 @@ var Fetch = require('whatwg-fetch');
 require('es6-promise').polyfill();
 
 //var rootUrl = 'http://pipifit.herokuapp.com/api/v1/'; 
-var rootUrl = 'http://pipifit.carp.mopaasapp.com/api/v1/';
+//var rootUrl = 'http://pipifit.carp.mopaasapp.com/api/v1/';
 
-//  var rootUrl = 'http://localhost:3000/api/v1/'; 
+var rootUrl = 'http://localhost:3000/api/v1/'; 
 
 
 console.log('rootUrl: ' + rootUrl);
