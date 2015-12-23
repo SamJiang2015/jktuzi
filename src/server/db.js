@@ -8,6 +8,11 @@ var Sequelize = require('sequelize');
 var RoleType = require('./constants.js').RoleType;
 
 var env = process.env.NODE_ENV || 'development'; // Heroku sets this env varisable to 'production'
+var db = process.env.POSTGRES_DB;
+var user = process.env.POSTGRES_USER;
+var password = process.env.POSTGRES_PASSWORD;
+var host = process.env.POSTGRES_HOST;
+var port = process.env.POSTGRES_PORT;
 
 var sequelize;
 if (env === 'production') {
@@ -18,6 +23,14 @@ if (env === 'production') {
 			dialect: 'postgres'
 		}
 	);
+} else if (env ==='mopaas') {
+
+    sequelize = new Sequelize(db, user, password, {
+        host: host,
+        port: port,
+        dialect: 'postgres'
+    });
+
 } else {
 	sequelize = new Sequelize(undefined, undefined, undefined, {
 		'dialect': 'sqlite',

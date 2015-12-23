@@ -22,6 +22,9 @@ var cryptojs = require('crypto-js');
 var jwt = require('jsonwebtoken');
 var _ = require('underscore');
 
+require('es6-promise').polyfill();
+
+
 module.exports = function(sequelize, DataTypes) {
 
 	var account = sequelize.define(

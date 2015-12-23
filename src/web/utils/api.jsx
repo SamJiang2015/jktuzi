@@ -1,13 +1,19 @@
 var Fetch = require('whatwg-fetch');
-//var rootUrl = 'http://localhost:3000/api/v1/';
-var rootUrl = 'http://10.10.10.105:3000/api/v1/';
-//var rootUrl = 'http://pipifit.herokuapp.com/api/v1/'; 
-console.log('rootUrl: ' + rootUrl);
 
 // need this for browsers that do not support fetch (IEs, android)
 require('es6-promise').polyfill();
 
+//var rootUrl = 'http://pipifit.herokuapp.com/api/v1/'; 
+var rootUrl = 'http://pipifit.carp.mopaasapp.com/api/v1/';
+
+//  var rootUrl = 'http://localhost:3000/api/v1/'; 
+
+
+console.log('rootUrl: ' + rootUrl);
+
+
 module.exports = {
+
   get: function(url, token) {
     return fetch(rootUrl + url, {
       headers: {

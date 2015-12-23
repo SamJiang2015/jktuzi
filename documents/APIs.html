@@ -1,0 +1,933 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0" />
+    <title>PiPiFit API</title>
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/sidemenu.css">
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+
+        	<!------------------------------------ Side Bar----------------------------------- -->
+            <div class="col-md-1 sidebar">
+		        <ul class="nav nav-sidebar">
+		            <li><a href="#summary">总览</a></li>
+		            <li><a href="#account">账户 (account)</a></li>
+		            <li><a href="#traineeInfo">学员信息 (traineeInfo)</a></li>
+		            <li><a href="#mealCard">餐卡 (mealCard)</a></li>
+		            <li><a href="#healthCard">健康卡 (healthCard)</a></li>
+		            <li><a href="#workoutCard">运动卡 (workoutCard)</a></li>
+		            <li><a href="#group">群组 (group)</a></li>
+		        </ul>
+            </div>
+
+
+        	<!------------------------------------ Main Content ----------------------------------- -->
+            <div class="col-md-11 col-md-offset-1">
+            		<h1>PiPi健康后台API文档 <small>(v1 创建于12/23/2015)</small></h1>
+            	
+            	<div id="summary">
+            		<h2>1. 总览</h2>
+            		<h3>1.1 Base URL</h3>
+            			http://pipifit.carp.mopaasapp.com/app/v1
+            			<p class="todo">Todo: add SSL support. Switch URL from http to https.</p>
+            		<h3>1.2 Response format</h3>
+            			服务器以JSON格式返回信息，包括以下参数：
+            			<table class="table table-condensed table-bordered">
+            				<thead>
+            					<tr><th>key</th><th>format</th><th>description</th></tr>
+            				</thead>
+            				<tbody>
+            					<tr><td>data</td><td>json</td><td>requested information</td></tr>
+            					<tr><td>success</td><td>boolean</td><td>whether the request was successful</td></tr>
+            					<tr><td>status</td><td>integer</td>
+            						<td>the HTTP status code: 
+            							<ul>
+            								<li>200 - success</li>
+            								<li>400 - bad request</li>
+            								<li>401 - unauthorized</li>
+            								<li>404 - not found</li>
+            								<li>500 - internal server error</li>
+            								 </ul>
+            						</td>
+            					</tr>
+            					</tbody>
+            			</table>
+            			举例：
+             			<code>{
+  "data": {
+    "id": 11,
+    "mobile": "18811122222",
+    "name": "张三",
+    "roleTypeId": 3,
+    "infoCompleted": false,
+    "createdAt": "2015-12-23T03:34:56.130Z",
+    "updatedAt": "2015-12-23T03:34:56.130Z"
+  },
+  "status": 200,
+  "success": true
+}</code></code>
+            		<h3>1.3 用户 Authentication</h3>
+            			用户<a href="#login">登录</a>后服务器会返回一个JWT token。用户的后续API请求里需要包括这个token (通过"Auth" header).
+            			<br/>举例：
+            			<code>POST /api/v1/accounts/2/traineeInfo HTTP/1.1
+Host: pipifit.carp.mopaasapp.com
+Content-Type: application/json
+Auth: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbiI6IlUyRnNkR1ZrWDErZE91S2xMN1VJSDVPMU44WTA0bFdpcHpOdmoyMkJ3T2RFZnVvT3pISlJ3V3V0NUkxRkhwMXJIQThpVHg0aXdxRUZtOXhuR3pVUUlBPT0iLCJpYXQiOjE0NTA4Mzk4MDd9.QKzglRYTP2jDcFbOOEY3N1FqQ1Cmmk0XDvV99UdgBS4
+
+{
+	"isMale": "false", 
+	"nickname":"user", 
+	"birthdate":"1990-01-15", 
+	"email":"user@test.com", 
+	"profession":"attorney", 
+	"height":"180", 
+	"weight":"140", 
+	"bodyfat":"20.5", 
+	"weightGoal":"120.5", 
+	"bodyfatGoal":"12.5",
+	"signature":"no pain no gain",
+	"habbit":"",
+	"sponsorName":"Sam Jiang",
+	"sponsorMobile": "18888888888"
+}</code>
+				<h4>1.4 Client Authorization</h4>
+            			<p class="todo">Todo: add client authorization to limit which client can call these APIs</p>
+            	</div>
+
+
+<!---------------------------------------------------------------------------------------------------------- -->
+            	<div id="account">
+            		
+            		<h2>2. 账户</h2>
+
+            		<h3>2.1 注册</h3>
+            		<h4>2.1.1 Request</h4>
+            		<p>Method: POST</p>
+            		<p>URI: &lt;Base URL&gt;/accounts</p>
+            		<p>Body: JSON</p>
+            			<table class="table table-condensed table-bordered">
+            				<thead>
+            					<tr><th>key</th><th>format</th><th>description</th></tr>
+            				</thead>
+            				<tbody>
+            					<tr><td>name</td><td>string（不少于2位）</td><td>用户姓名</td></tr>
+            					<tr><td>mobile</td><td>integer（不少于11位）</td><td>用户手机号码</td></tr>
+            					<tr><td>password</td><td>string（不少于6位）</td><td>用户密码</td>
+            					</tr>
+            					</tbody>
+            			</table>
+            			举例：
+            			<code>POST /api/v1/accounts HTTP/1.1
+Host: pipifit.carp.mopaasapp.com
+Content-Type: application/json
+
+{
+    "mobile":"18811112222",
+    "password":"password",
+    "name":"姜山"
+}</code>
+            		<h4>2.1.2 Response</h4>
+            			<p>Response: 返回account的相关信息</p>
+            			<table class="table table-condensed table-bordered">
+            				<thead>
+            					<tr><th>key</th><th>format</th><th>description</th></tr>
+            				</thead>
+            				<tbody>
+            					<tr><td>id</td><td>integer</td><td>primary key in the accounts table</td></tr>
+            					<tr><td>mobile</td><td>integer（不少于11位）</td><td>用户手机号码</td></tr>
+            					<tr><td>name</td><td>string（不少于2位）</td><td>用户姓名</td></tr>
+            					<tr><td>roleTypeId</td><td>integer (1, 2 or 3)</td>
+            					<td>用户身份: 
+            					<ul><li>1 - admin(管理员)</li><li>2 - trainer(教练)</li><li>3 - 学员</li></ul>
+            					</td></tr>
+            					<tr><td>infoCompleted</td><td>boolean</td><td>该用户是否已经完成所有学员信息的输入</td>
+            					</tr>
+            					</tbody>
+            			</table>
+            			<p>举例：</p>
+            			<code>{
+  "data": {
+    "id": 11,
+    "mobile": "18811122222",
+    "name": "张三",
+    "roleTypeId": 3,
+    "infoCompleted": false,
+    "createdAt": "2015-12-23T03:34:56.130Z",
+    "updatedAt": "2015-12-23T03:34:56.130Z"
+  },
+  "status": 200,
+  "success": true
+}</code>
+
+            		<h3 id="login">2.2 登录</h3>
+            		<h4>2.2.1 Request</h4>
+            		<p>Method: POST</p>
+            		<p>URI: &lt;Base URL&gt;/accounts/login</p>
+            		<p>Body: JSON</p>
+            			<table class="table table-condensed table-bordered">
+            				<thead>
+            					<tr><th>key</th><th>format</th><th>description</th></tr>
+            				</thead>
+            				<tbody>
+            					<tr><td>mobile</td><td>integer（不少于11位）</td><td>用户手机号码</td></tr>
+            					<tr><td>password</td><td>string（不少于6位）</td><td>用户密码</td>
+            					</tr>
+            					</tbody>
+            			</table>
+            			举例：
+            			<code>POST /api/v1/accounts/login HTTP/1.1
+Host: pipifit.carp.mopaasapp.com
+Content-Type: application/json
+
+{
+    "mobile":"18811112222",
+    "password":"password"
+}</code>
+            		<h4>2.2.2 Response</h4>
+            			<p>Response: 返回account的相关信息和登录token</p>
+            			<table class="table table-condensed table-bordered">
+            				<thead>
+            					<tr><th>key</th><th>format</th><th>description</th></tr>
+            				</thead>
+            				<tbody>
+            					<tr><td>id</td><td>integer</td><td>账户id</td></tr>
+            					<tr><td>mobile</td><td>integer（不少于11位）</td><td>用户手机号码</td></tr>
+            					<tr><td>name</td><td>string（不少于2位）</td><td>用户姓名</td></tr>
+            					<tr><td>roleTypeId</td><td>integer (1, 2 or 3)</td>
+            					<td>用户身份: 
+            					<ul><li>1 - admin(管理员)</li><li>2 - trainer(教练)</li><li>3 - 学员</li></ul>
+            					</td></tr>
+            					<tr><td>infoCompleted</td><td>boolean</td><td>该用户是否已经完成所有学员信息的输入</td></tr>
+            					<tr><td>token</td><td>string</td><td>JWT token for authentication</td>
+            					</tr>
+            					</tbody>
+            			</table>
+            			<p>举例：</p>
+            			<code>{
+  "data": {
+    "id": 5,
+    "mobile": "18811112222",
+    "name": "姜山",
+    "roleTypeId": 3,
+    "infoCompleted": true,
+    "createdAt": "2015-12-22T09:09:01.071Z",
+    "updatedAt": "2015-12-22T09:10:04.974Z",
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbiI6IlUyRnNkR1ZrWDE5U3FSaEVrTTNqQWI0Y0U2aHNMTkhTeUlBMFFLd0pKTER5UmhuQ2p6Znd2dVhDYlpYODVUQUpOWEtzNmN6QVYxYlNLS2pPODF4QzB3PT0iLCJpYXQiOjE0NTA4NDMwMjJ9.wuvOAdZbG_Zao-ng793TnTrA_mTBWOefkDpUg7rco44"
+  },
+  "status": 200,
+  "success": true
+}</code>
+
+            		<h3>2.3 退出登录</h3>
+            		<h4>2.3.1 Request</h4>
+            		后台将删除Auth header中的token。
+            		<p>Method: DELETE</p>
+            		<p>URI: &lt;Base URL&gt;/accounts/login</p>
+            		<p>Body: 无</p>
+            			举例：
+            			<code>DELETE /api/v1/accounts/login HTTP/1.1
+Host: pipifit.carp.mopaasapp.com
+Auth: {{authToken}}</code>
+            		<h4>2.3.2 Response</h4>
+            			<p>Response: 空</p>
+            			<p>举例：</p>
+            			<code>{
+  "data": {},
+  "status": 200,
+  "success": true
+}</code>
+            	</div>
+
+<!---------------------------------------------------------------------------------------------------------- -->
+            	<div id="traineeInfo">
+            		
+            		<h2>3. 学员信息</h2>
+            		对应于每个学员个人基本信息的记录。
+
+            		<h3>3.1 创建学员信息</h3>
+            		<h4>3.1.1 Request</h4>
+            		<p>Method: POST</p>
+            		<p>URI: &lt;Base URL&gt;/accounts/:id/traineeInfo</p>
+            			<table class="table table-condensed table-bordered">
+            				<thead>
+            					<tr><th>parameter</th><th>format</th><th>description</th></tr>
+            				</thead>
+            				<tbody>
+            					<tr><td>id</td><td>integer</td><td>账户id</td></tr>
+            					</tbody>
+            			</table>
+
+            		<p>Body: JSON (下面各项除了单独说明之外，均不可为空)</p>
+            			<table class="table table-condensed table-bordered" id="traineeInfoTable">
+            				<thead>
+            					<tr><th>key</th><th>format</th><th>description</th></tr>
+            				</thead>
+            				<tbody>
+            					<tr><td>isMale</td><td>boolean</td><td>性别是否为男</td></tr>
+            					<tr><td>nickname</td><td>string (必须为'yyyy-mm-dd'格式)</td><td>昵称</td></tr>
+            					<tr><td>birthdate</td><td>date</td><td>生日</td></tr>
+            					<tr><td>email</td><td>string</td><td>邮箱</td></tr>
+            					<tr><td>profession</td><td>string</td><td>职业</td></tr>
+            					<tr><td>height</td><td>float (以厘米为单位)</td><td>身高</td></tr>
+            					<tr><td>weight</td><td>float (以斤为单位)</td><td>体重</td></tr>
+            					<tr><td>bodyfat</td><td>float (以％为单位，可为空)</td><td>体脂率</td></tr>
+            					<tr><td>weightGoal</td><td>float (以斤为单位)</td><td>目标体重</td></tr>
+            					<tr><td>bodyfatGoal</td><td>float (以％为单位，可为空)</td><td>目标体脂率</td></tr>	
+            					<tr><td>signature</td><td>string</td><td>个性签名</td></tr>
+            					<tr><td>habbit</td><td>string (可为空)</td><td>运动习惯</td></tr>
+            					<tr><td>location</td><td>string</td><td>所在城市</td></tr>
+            					<tr><td>sponsorName</td><td>string</td><td>介绍人姓名</td></tr>
+            					<tr><td>sponsorMobile</td><td>integer(至少11位，可为空）</td><td>介绍人在PiPi系统注册的手机号码</td>
+            					</tr>
+            					</tbody>
+            			</table>
+            			<p class="todo">todo: 详细描述每一项信息的检验标准（比如生日，身高，体重，体脂率的范围)</p>
+            			举例：
+            			<code>POST /api/v1/accounts/4/traineeInfo HTTP/1.1
+Host: pipifit.carp.mopaasapp.com
+Content-Type: application/json
+Auth: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbiI6IlUyRnNkR1ZrWDErWkpybzMwSHYyQXJhbXFTRGxuaENEeitpL01kUDl4andnTGZteEQ3WjhvSnpZdExPYlJORVJIeEYzcWlmTWtoMkdrd2NVQyt6c1lRPT0iLCJpYXQiOjE0NTA4NDQ1MTB9.h_vPSLJfgd0N1hFQhppFqqciCL-4p6Hp-mDL8UNu2Ys
+
+{
+	"isMale": "false", 
+	"nickname":"PiPi", 
+	"birthdate":"1990-01-15", 
+	"email":"user@test.com", 
+	"profession":"程序员", 
+	"height":"180", 
+	"weight":"140", 
+	"bodyfat":"20.5", 
+	"weightGoal":"120.5", 
+	"bodyfatGoal":"12.5",
+	"signature":"no pain no gain",
+	"habbit":"",
+	"location":"北京",
+	"sponsorName":"Sam Jiang",
+	"sponsorMobile": "18888888888"
+}</code>
+            		<h4>3.1.2 Response</h4>
+            			<p>Response: 返回该账户所有学员个人信息(见<a href="#traineeInfoTable">上表</a>)</p>
+            			<p>举例：</p>
+            			<code>{
+  "data": {
+    "id": 5,
+    "isMale": false,
+    "nickname": "pipi",
+    "birthdate": "1990-01-15T00:00:00.000Z",
+    "email": "user@test.com",
+    "profession": "程序员",
+    "location": "北京",
+    "height": 180,
+    "weight": 140,
+    "bodyfat": 20.5,
+    "weightGoal": 120.5,
+    "bodyfatGoal": 12.5,
+    "signature": "no pain no gain",
+    "habbit": null,
+    "sponsorName": "Sam Jiang",
+    "sponsorMobile": "18888888888",
+    "accountId": 12,
+    "sponsorAccountId": 1,
+    "updatedAt": "2015-12-23T04:38:32.879Z",
+    "createdAt": "2015-12-23T04:38:32.879Z"
+  },
+  "status": 200,
+  "success": true
+}</code>
+
+            		<h3>3.2 学员信息查询</h3>
+            		<h4>3.2.1 Request</h4>
+            		<p>Method: GET</p>
+            		<p>URI: &lt;Base URL&gt;/accounts/:id/traineeInfo</p>
+            		<p>Body: 无</p>
+            			举例：
+            			<code>GET /api/v1/accounts/12/traineeInfo HTTP/1.1
+Host: pipifit.carp.mopaasapp.com
+Content-Type: application/json
+Auth: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbiI6IlUyRnNkR1ZrWDE5amFSY3hPTE90bVJmQU5PeUVkSUtnaktmVVNjSlpJci9BdG1vbUZ1dVBoU2VpWWhLdVdTLzlCbGtrUmNLZXc5VjN6eFBYSFVtU05nPT0iLCJpYXQiOjE0NTA4NDU0MzR9.XgnahQqxZRiA54RYBZ1n8vDwrLVtWQze5UZAU7FJnVM
+</code>
+            		<h4>3.2.2 Response</h4>
+            			<p>Response: 返回全部学员个人信息 (见<a href="#traineeInfoTable">上表</a>)</p>
+
+            		<h3>3.3 学员信息修改</h3>
+            		<h4>3.3.1 Request</h4>
+            		<p>Method: PUT</p>
+            		<p>URI: accounts/:id/traineeInfo</p>
+            		<p>Body: 见<a href="#traineeInfoTable">上表</a>。可为其中的任意一项或多项信息</p>
+            			举例：
+            			<code>PUT /api/v1/accounts/12/traineeInfo HTTP/1.1
+Host: pipifit.carp.mopaasapp.com
+Content-Type: application/json
+Auth: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbiI6IlUyRnNkR1ZrWDE5amFSY3hPTE90bVJmQU5PeUVkSUtnaktmVVNjSlpJci9BdG1vbUZ1dVBoU2VpWWhLdVdTLzlCbGtrUmNLZXc5VjN6eFBYSFVtU05nPT0iLCJpYXQiOjE0NTA4NDU0MzR9.XgnahQqxZRiA54RYBZ1n8vDwrLVtWQze5UZAU7FJnVM
+
+{
+	"nickname":"擎天柱", 
+	"birthdate":"1980-01-15", 
+	"habbit":"跳绳",
+	"sponsorName":"新人",
+	"sponsorMobile": "18811112222"
+}</code>
+            		<h4>3.3.2 Response</h4>
+            			<p>Response: 返回全部学员个人信息 (见<a href="#traineeInfoTable">上表</a>)</p>
+
+            	</div>
+
+<!---------------------------------------------------------------------------------------------------------- -->
+            	<div id="mealCard">
+            		
+            		<h2>4. 餐卡信息</h2>
+
+            		对应于每天三餐是否打卡的记录。
+
+            		<h3>4.1 创建或重写餐卡信息</h3>
+            		request中的餐卡信息将完全取代后台已有的该学员该日期的餐卡信息。
+            		<h4>4.1.1 Request</h4>
+            		<p>Method: POST</p>
+            		<p>URI: &lt;Base URL&gt;/accounts/:id/mealCards/:date</p>
+            			<table class="table table-condensed table-bordered">
+            				<thead>
+            					<tr><th>parameter</th><th>format</th><th>description</th></tr>
+            				</thead>
+            				<tbody>
+            					<tr><td>id</td><td>integer</td><td>账户id</td></tr>
+            					<tr><td>date</td><td>string ('yyyy-mm-dd')</td><td>本餐卡记录相关的日期</td></tr>
+            					</tbody>
+            			</table>
+
+            		<p>Body: JSON array of {mealTypeId, recorded}</p>
+            			<table class="table table-condensed table-bordered" id="traineeInfoTable">
+            				<thead>
+            					<tr><th>key</th><th>format</th><th>description</th></tr>
+            				</thead>
+            				<tbody>
+            					<tr><td>mealTypeId</td><td>integer</td><td>
+            						<ul>
+            							<li>1 - 早餐</li><li>2 - 午餐</li><li>3 - 晚餐</li>
+            						</ul>
+            					</td></tr>
+            					<tr><td>recorded</td><td>boolean</td><td>该餐是否打卡</td></tr>
+            					</tr>
+            					</tbody>
+            			</table>
+            		<p>Permission: token中的账户必须是管理员或教练。学员不可以修改自己餐卡信息。</p>
+            			<p>举例：</p>
+            			<code>POST /api/v1/accounts/12/mealCards/2015-12-17 HTTP/1.1
+Host: pipifit.carp.mopaasapp.com
+Content-Type: application/json
+Auth: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbiI6IlUyRnNkR1ZrWDE5amFSY3hPTE90bVJmQU5PeUVkSUtnaktmVVNjSlpJci9BdG1vbUZ1dVBoU2VpWWhLdVdTLzlCbGtrUmNLZXc5VjN6eFBYSFVtU05nPT0iLCJpYXQiOjE0NTA4NDU0MzR9.XgnahQqxZRiA54RYBZ1n8vDwrLVtWQze5UZAU7FJnVM
+
+[
+    {
+        "mealTypeId": "1",
+        "recorded": true
+    },
+    {
+        "mealTypeId": "2",
+        "recorded": false        
+    },
+    {
+        "mealTypeId": "3",
+        "recorded": true        
+    }
+]</code>
+            		<h4>4.1.2 Response</h4>
+            			<p>Response: 如果管理员或教练发出该请求，返回该账户对应日期的餐卡信息。如果学员发出该请求，返回401错误信息。
+            			</p>
+            			<p>举例：</p>
+            			<code>{
+    "data": [
+        {
+            "id": 1,
+            "date": "2015-12-17",
+            "recorded": true,
+            "createdAt": "2015-12-23T05:03:11.828Z",
+            "updatedAt": "2015-12-23T05:03:11.828Z",
+            "accountId": 2,
+            "mealTypeId": 1
+        },
+        {
+            "id": 2,
+            "date": "2015-12-17",
+            "recorded": false,
+            "createdAt": "2015-12-23T05:03:11.828Z",
+            "updatedAt": "2015-12-23T05:03:11.828Z",
+            "accountId": 2,
+            "mealTypeId": 2
+        },
+        {
+            "id": 3,
+            "date": "2015-12-17",
+            "recorded": true,
+            "createdAt": "2015-12-23T05:03:11.828Z",
+            "updatedAt": "2015-12-23T05:03:11.828Z",
+            "accountId": 2,
+            "mealTypeId": 3
+        }
+    ],
+    "status": 200,
+    "success": true
+}</code>
+
+            		<h3>4.2 餐卡信息查询</h3>
+            		<h4>4.2.1 Request</h4>
+            		<p>Method: GET</p>
+            		<p>URI: &lt;Base URL&gt;/accounts/:id/mealCards/:date</p>
+            		<p>Body: 无</p>
+            			举例：
+            			<code>GET /api/v1/accounts/12/mealCards/2015-12-17 HTTP/1.1
+Host: pipifit.carp.mopaasapp.com
+Content-Type: application/json
+Auth: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbiI6IlUyRnNkR1ZrWDE5b2cwRElrYVpybnlFVGg1SzRSQkNsY0FMY2lKNEVJWE9BU2xOWUtUeHVoOHNHS0hsUDNhOHo0WWNwNmdpaHNmR3FNTjg3bHA4TDV3PT0iLCJpYXQiOjE0NTA4NDY5NzJ9.hdD56lsyrl7YjPujRqd3t7SNuC7YauHfSUn1wdCQQUI
+</code>
+            		<h4>4.2.2 Response</h4>
+            			<p>Response: 返回对应日期的餐卡信息</p>
+            			<p>举例：</p>
+            			<code>{
+    "data": [
+        {
+            "id": 4,
+            "date": "2015-12-17",
+            "recorded": true,
+            "createdAt": "2015-12-23T05:08:47.190Z",
+            "updatedAt": "2015-12-23T05:08:47.190Z",
+            "accountId": 12,
+            "mealTypeId": 1
+        },
+        {
+            "id": 5,
+            "date": "2015-12-17",
+            "recorded": false,
+            "createdAt": "2015-12-23T05:08:47.190Z",
+            "updatedAt": "2015-12-23T05:08:47.190Z",
+            "accountId": 12,
+            "mealTypeId": 2
+        },
+        {
+            "id": 6,
+            "date": "2015-12-17",
+            "recorded": true,
+            "createdAt": "2015-12-23T05:08:47.190Z",
+            "updatedAt": "2015-12-23T05:08:47.190Z",
+            "accountId": 12,
+            "mealTypeId": 3
+        }
+    ],
+    "status": 200,
+    "success": true
+}</code>
+</div>
+
+<!---------------------------------------------------------------------------------------------------------- -->            	<div id="healthCard">            		
+            		<h2>5. 健康卡信息</h2>
+
+            		对应于每天健康情况(包括体重和体脂率)的记录。
+
+            		<h3>5.1 创建或重写健康卡信息</h3>
+            		request中的健康卡信息将完全取代后台已有的该学员该日期的健康卡信息。
+            		<h4>5.1.1 Request</h4>
+            		<p>Method: POST</p>
+            		<p>URI: &lt;Base URL&gt;/accounts/:id/healthCards/:date</p>
+            			<table class="table table-condensed table-bordered">
+            				<thead>
+            					<tr><th>parameter</th><th>format</th><th>description</th></tr>
+            				</thead>
+            				<tbody>
+            					<tr><td>id</td><td>integer</td><td>账户id</td></tr>
+            					<tr><td>date</td><td>string ('yyyy-mm-dd')</td><td>本健康卡记录相关的日期</td></tr>
+            					</tbody>
+            			</table>
+
+            		<p>Body: JSON</p>
+            			<table class="table table-condensed table-bordered" id="traineeInfoTable">
+            				<thead>
+            					<tr><th>key</th><th>format</th><th>description</th></tr>
+            				</thead>
+            				<tbody>
+            					<tr><td>weight</td><td>float (以斤为单位)</td><td>体重</td></tr>
+            					<tr><td>bodyfat</td><td>float (以％为单位，可为空)</td><td>体脂率</td></tr>
+            					</tbody>
+            			</table>
+            		<p>Permission: 管理员，教练可为学员输入信息。学员也可以自己输入信息。</p>
+            			<p>举例：</p>
+            			<code>POST /api/v1/accounts/12/mealCards/2015-12-17 HTTP/1.1
+POST /api/v1/accounts/1/healthCards/2015-12-17 HTTP/1.1
+Host: pipifit.carp.mopaasapp.com
+Content-Type: application/json
+Auth: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbiI6IlUyRnNkR1ZrWDE5b2cwRElrYVpybnlFVGg1SzRSQkNsY0FMY2lKNEVJWE9BU2xOWUtUeHVoOHNHS0hsUDNhOHo0WWNwNmdpaHNmR3FNTjg3bHA4TDV3PT0iLCJpYXQiOjE0NTA4NDY5NzJ9.hdD56lsyrl7YjPujRqd3t7SNuC7YauHfSUn1wdCQQUI
+
+{
+    "bodyfat": "12",
+    "weight": "120"
+}</code>
+            		<h4>5.1.2 Response</h4>
+            			<p>Response: 健康卡信息</p>
+            			<p>举例：</p>
+            			<code>{
+  "data": {
+    "id": 6,
+    "date": "2015-12-17",
+    "weight": 120,
+    "bodyfat": 12,
+    "createdAt": "2015-12-23T05:19:53.901Z",
+    "updatedAt": "2015-12-23T05:19:53.901Z",
+    "accountId": 1
+  },
+  "status": 200,
+  "success": true
+}</code>
+
+            		<h3>5.2 健康卡信息查询</h3>
+            		<h4>5.2.1 Request</h4>
+            		<p>Method: GET</p>
+            		<p>URI: accounts/:id/healthCards/:date</p>
+            		<p>Body: 无</p>
+            			举例：
+            			<code>GET /api/v1/accounts/1/healthCards/2015-12-17 HTTP/1.1
+Host: pipifit.carp.mopaasapp.com
+Content-Type: application/json
+Auth: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbiI6IlUyRnNkR1ZrWDE5b2cwRElrYVpybnlFVGg1SzRSQkNsY0FMY2lKNEVJWE9BU2xOWUtUeHVoOHNHS0hsUDNhOHo0WWNwNmdpaHNmR3FNTjg3bHA4TDV3PT0iLCJpYXQiOjE0NTA4NDY5NzJ9.hdD56lsyrl7YjPujRqd3t7SNuC7YauHfSUn1wdCQQUI
+</code>
+            		<h4>5.2.2 Response</h4>
+            			<p>Response: 返回该学员对应日期的健康卡信息</p>
+            			<p>举例：</p>
+            			<code>{
+    "data": {
+        "id": 6,
+        "date": "2015-12-17",
+        "weight": 120,
+        "bodyfat": 12,
+        "createdAt": "2015-12-23T05:19:53.901Z",
+        "updatedAt": "2015-12-23T05:19:53.901Z",
+        "accountId": 1
+    },
+    "status": 200,
+    "success": true
+}</code>
+            </div>
+
+<!---------------------------------------------------------------------------------------------------------- -->
+            	<div id="workoutCard">
+            		
+            		<h2>6. 运动卡信息</h2>
+
+            		对应于每天运动的记录。一天可以有最多20项运动记录。
+
+            		<h3>6.1 创建或重写运动卡信息</h3>
+            		request中的运动卡信息将完全取代后台已有的该学员该日期的运动卡信息。
+            		<h4>6.1.1 Request</h4>
+            		<p>Method: POST</p>
+            		<p>URI: &lt;Base URL&gt;/accounts/:id/workoutCards/:date</p>
+            			<table class="table table-condensed table-bordered">
+            				<thead>
+            					<tr><th>parameter</th><th>format</th><th>description</th></tr>
+            				</thead>
+            				<tbody>
+            					<tr><td>id</td><td>integer</td><td>账户id</td></tr>
+            					<tr><td>date</td><td>string ('yyyy-mm-dd')</td><td>本运动卡记录相关的日期</td></tr>
+            					</tbody>
+            			</table>
+
+            		<p>Body: JSON array of {workoutTypeId, description, distance, duration}</p>
+            			<table class="table table-condensed table-bordered" id="traineeInfoTable">
+            				<thead>
+            					<tr><th>key</th><th>format</th><th>description</th></tr>
+            				</thead>
+            				<tbody>
+            					<tr><td>workoutTypeId</td><td>integer</td><td>
+            						<ul>
+            							<li>1 - 跑步 </li><li>2 - 游泳 </li><li>3 - 自行车</li><li>4 - 椭圆机</li>
+            							<li>5 - 瑜伽 </li><li>6 - Seven</li><li>7 - 足球</li><li>8 - 篮球</li>
+            							<li>9 - 羽毛球</li><li>10 - 其他</li>
+            						</ul>
+            					</td></tr>
+            					<tr><td>description</td><td>string</td><td>描述（如果workoutTypeId是10-其他, 描述不能为空)</td></tr>
+            					<tr><td>distance</td><td>float (千米为单位)</td><td>运动距离</td></tr>
+            					<tr><td>duration</td><td>integer (分钟为单位)</td><td>运动时间</td></tr>
+            					</tr>
+            					</tbody>
+            			</table>
+            			<p class="todo">Todo: 描述对所有参数的要求，比如distance和duration必须填一项</p>
+            		<p>Permission: 管理员或教练可为学员打卡。学员可为自己打卡。</p>
+            			<p>举例：</p>
+            			<code>POST /api/v1/accounts/1/workoutCards/2015-12-18 HTTP/1.1
+Host: pipifit.carp.mopaasapp.com
+Content-Type: application/json
+Auth: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbiI6IlUyRnNkR1ZrWDE5b2cwRElrYVpybnlFVGg1SzRSQkNsY0FMY2lKNEVJWE9BU2xOWUtUeHVoOHNHS0hsUDNhOHo0WWNwNmdpaHNmR3FNTjg3bHA4TDV3PT0iLCJpYXQiOjE0NTA4NDY5NzJ9.hdD56lsyrl7YjPujRqd3t7SNuC7YauHfSUn1wdCQQUI
+
+[
+    {
+        "workoutTypeId": "1",
+        "description": "长跑好",
+        "distance":"10",
+        "duration":"500"      
+    },
+    {
+        "workoutTypeId": "4",
+        "description": "",
+        "distance":"8",
+        "duration":"100"        
+    },
+    {
+        "workoutTypeId": "8",
+        "description": "跳伞",
+        "distance":"1",
+        "duration":"100"        
+    },
+    {
+        "workoutTypeId": "3",
+        "description": "沙漠",
+        "distance":"",
+        "duration":"10"        
+    },
+    {
+        "workoutTypeId": "1",
+        "description": "长跑更好",
+        "duration":"40"        
+    }    
+]</code>
+            		<h4>6.1.2 Response</h4>
+            			<p>Response: 当日全部运动卡信息。
+            			</p>
+            			<p>举例：</p>
+            			<code>{
+    "data": [
+        {
+            "id": 6,
+            "date": "2015-12-18",
+            "description": "长跑好",
+            "duration": 500,
+            "distance": 10,
+            "createdAt": "2015-12-23T05:33:49.624Z",
+            "updatedAt": "2015-12-23T05:33:49.624Z",
+            "accountId": 1,
+            "workoutTypeId": 1
+        },
+        {
+            "id": 7,
+            "date": "2015-12-18",
+            "description": null,
+            "duration": 100,
+            "distance": 8,
+            "createdAt": "2015-12-23T05:33:49.624Z",
+            "updatedAt": "2015-12-23T05:33:49.624Z",
+            "accountId": 1,
+            "workoutTypeId": 4
+        },
+        {
+            "id": 8,
+            "date": "2015-12-18",
+            "description": "跳伞",
+            "duration": 100,
+            "distance": 1,
+            "createdAt": "2015-12-23T05:33:49.624Z",
+            "updatedAt": "2015-12-23T05:33:49.624Z",
+            "accountId": 1,
+            "workoutTypeId": 8
+        },
+        {
+            "id": 9,
+            "date": "2015-12-18",
+            "description": "沙漠",
+            "duration": 10,
+            "distance": null,
+            "createdAt": "2015-12-23T05:33:49.624Z",
+            "updatedAt": "2015-12-23T05:33:49.624Z",
+            "accountId": 1,
+            "workoutTypeId": 3
+        },
+        {
+            "id": 10,
+            "date": "2015-12-18",
+            "description": "长跑更好",
+            "duration": 40,
+            "distance": null,
+            "createdAt": "2015-12-23T05:33:49.624Z",
+            "updatedAt": "2015-12-23T05:33:49.624Z",
+            "accountId": 1,
+            "workoutTypeId": 1
+        }
+    ],
+    "status": 200,
+    "success": true
+}</code>
+
+            		<h3>6.2 运动卡信息查询</h3>
+            		<h4>6.2.1 Request</h4>
+            		<p>Method: GET</p>
+            		<p>URI: accounts/:id/workoutCards/:date</p>
+            		<p>Body: 无</p>
+            			举例：
+            			<code>GET /api/v1/accounts/12/workoutCards/2015-12-18 HTTP/1.1
+Host: pipifit.carp.mopaasapp.com
+Content-Type: application/json
+Auth: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbiI6IlUyRnNkR1ZrWDE5b2cwRElrYVpybnlFVGg1SzRSQkNsY0FMY2lKNEVJWE9BU2xOWUtUeHVoOHNHS0hsUDNhOHo0WWNwNmdpaHNmR3FNTjg3bHA4TDV3PT0iLCJpYXQiOjE0NTA4NDY5NzJ9.hdD56lsyrl7YjPujRqd3t7SNuC7YauHfSUn1wdCQQUI
+</code>
+            		<h4>6.2.2 Response</h4>
+            			<p>Response: 返回对应日期的运动卡信息</p>
+            			<p>举例：</p>
+            			<code>{
+    "data": [
+        {
+            "id": 11,
+            "date": "2015-12-18",
+            "description": "长跑好",
+            "duration": 500,
+            "distance": 10,
+            "createdAt": "2015-12-23T05:44:48.148Z",
+            "updatedAt": "2015-12-23T05:44:48.148Z",
+            "accountId": 1,
+            "workoutTypeId": 1
+        },
+        {
+            "id": 12,
+            "date": "2015-12-18",
+            "description": null,
+            "duration": 100,
+            "distance": 8,
+            "createdAt": "2015-12-23T05:44:48.148Z",
+            "updatedAt": "2015-12-23T05:44:48.148Z",
+            "accountId": 1,
+            "workoutTypeId": 4
+        },
+        {
+            "id": 13,
+            "date": "2015-12-18",
+            "description": "跳伞",
+            "duration": 100,
+            "distance": 5,
+            "createdAt": "2015-12-23T05:44:48.148Z",
+            "updatedAt": "2015-12-23T05:44:48.148Z",
+            "accountId": 1,
+            "workoutTypeId": 8
+        },
+        {
+            "id": 14,
+            "date": "2015-12-18",
+            "description": "沙漠",
+            "duration": 10,
+            "distance": null,
+            "createdAt": "2015-12-23T05:44:48.148Z",
+            "updatedAt": "2015-12-23T05:44:48.148Z",
+            "accountId": 1,
+            "workoutTypeId": 3
+        },
+        {
+            "id": 15,
+            "date": "2015-12-18",
+            "description": "长跑更好",
+            "duration": 40,
+            "distance": null,
+            "createdAt": "2015-12-23T05:44:48.148Z",
+            "updatedAt": "2015-12-23T05:44:48.148Z",
+            "accountId": 1,
+            "workoutTypeId": 1
+        }
+    ],
+    "status": 200,
+    "success": true
+}</code>
+	</div>
+
+<!---------------------------------------------------------------------------------------------------------- -->
+            	<div id="group">
+            		
+            		<h2>7. 群组信息</h2>
+
+            		对应于每一群组信息。
+            		<h3>7.1 学员群组信息查询</h3>
+            		查询登录学员所属全部群组信息
+            		<h4>7.1.1 Request</h4>
+            		<p>Method: GET</p>
+            		<p>URI: &lt;Base URL&gt;/accounts/:id/groups</p>
+            		<p>Body: 无</p>
+            			举例：
+            			<code>GET /api/v1/accounts/1/groups HTTP/1.1
+Host: pipifit.carp.mopaasapp.com
+Content-Type: application/json
+Auth: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbiI6IlUyRnNkR1ZrWDE5b2cwRElrYVpybnlFVGg1SzRSQkNsY0FMY2lKNEVJWE9BU2xOWUtUeHVoOHNHS0hsUDNhOHo0WWNwNmdpaHNmR3FNTjg3bHA4TDV3PT0iLCJpYXQiOjE0NTA4NDY5NzJ9.hdD56lsyrl7YjPujRqd3t7SNuC7YauHfSUn1wdCQQUI
+</code>
+            		<h4>7.1.2 Response</h4>
+            			<p>Response: 返回该学员所属全部群组的信息(包括每一群组的成员信息)</p>
+            			<p>Format: JSON; an array of &lt;group info&gt; 每一个&lt;group info&gt包含以下信息：</p>
+            			<table class="table table-condensed table-bordered" id="traineeInfoTable">
+            				<thead>
+            					<tr><th>key</th><th>format</th><th>description</th></tr>
+            				</thead>
+            				<tbody>
+            					<tr><td>id</td><td>integer</td><td>群组id</td></tr>  
+            					<tr><td>name</td><td>string</td><td>群组名称</td></tr>            					  
+            					<tr><td>nickname</td><td>string</td><td>群组昵称</td></tr> 
+            					<tr><td>startdate</td><td>string</td><td>群组昵称</td></tr>
+            					<tr><td>enddate</td><td>string</td><td>群组昵称</td></tr>  
+            					<tr><td>groupTypeId</td><td>integer</td><td></td>
+            						<ul>
+            							<li>1 - 减脂 </li><li>2 - 增肌 </li><li>3 - 瘦腰</li><li>4 - 聊天</li>
+            						</ul>
+            					</td></tr>
+            					<tr><td>groupMember</td><td>json (array)</td><td>群组成员信息</td></tr>
+            					<tr><td>groupMember.accountId</td><td>integer</td><td>成员账户id</td></tr>
+            					<tr><td>groupMember.memberTypeId</td><td>integer</td><td>
+            						<ul>
+            							<li>1 - 主教 </li><li>2 - 助教 </li><li>3 - 学员</li>
+            						</ul>
+            					</td></tr>
+            					</tbody>
+            			</table>
+            			<p>举例：</p>
+	
+	<code>{
+  "data": [
+    {
+      "id": 1,
+      "name": "第100期减脂群",
+      "nickname": "牛群",
+      "startdate": "2015-12-25",
+      "enddate": "2016-01-20",
+      "createdAt": "2015-12-22T08:24:05.521Z",
+      "updatedAt": "2015-12-22T08:24:05.521Z",
+      "groupTypeId": 1,
+      "groupMember": {
+        "groupId": 1,
+        "accountId": 1,
+        "createdAt": "2015-12-23T05:58:24.376Z",
+        "updatedAt": "2015-12-23T05:58:24.376Z",
+        "memberTypeId": 3
+      }
+    },
+    {
+      "id": 2,
+      "name": "第10期瘦腰群",
+      "nickname": "霸群",
+      "startdate": "2015-12-20",
+      "enddate": "2016-01-15",
+      "createdAt": "2015-12-22T08:24:05.540Z",
+      "updatedAt": "2015-12-22T08:24:05.540Z",
+      "groupTypeId": 3,
+      "groupMember": {
+        "groupId": 2,
+        "accountId": 1,
+        "createdAt": "2015-12-23T05:58:24.376Z",
+        "updatedAt": "2015-12-23T05:58:24.376Z",
+        "memberTypeId": 3
+      }
+    }
+  ],
+  "status": 200,
+  "success": true
+}</code>
+
+    </div></div></div></div>
+
+</body> 
+
+	
+	
+</html>

@@ -1,0 +1,50 @@
+
+body { 
+    font-family: Arial,sans-serif;
+    background-color: black;
+    color: #CFCFCF;
+}
+
+.todo {
+	font-style: italic;
+	color: red;
+}
+
+h1 {
+	text-align: center;
+}
+
+h2 {
+	font-family: open_sanssemibold,Arial;
+	font-weight:700;
+	font-size: 19.6px;
+	line-height: 30px;
+	color: #FFFFFF;
+}
+
+h3 {
+	font-size: 15px;
+	text-decoration: underline;
+	line-height: 22px; 
+	margin-top: 5px;
+}
+
+h4 {
+	font-size: 14px;
+	font-style: italic;
+}
+
+th {
+	text-align: center;
+	font-weight: 900;	
+}
+
+code {
+	display: block;
+	color: green;
+	white-space: pre-wrap;
+	word-wrap:break-word;
+	background: black;
+	border: 1px solid grey;
+	margin: 5px 0 15px 0;
+}
