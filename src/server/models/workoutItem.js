@@ -60,7 +60,7 @@ module.exports = function(sequelize, DataTypes) {
 			},				
 			// 分钟
 			duration: {
-				type: DataTypes.INTEGER,
+				type: DataTypes.FLOAT,
 				allowNull: true,
 				validate: {
 					min: Limits.Workout.Duration.min,
@@ -75,7 +75,7 @@ module.exports = function(sequelize, DataTypes) {
 			},
 			// 公里
 			distance: {
-				type: DataTypes.INTEGER,
+				type: DataTypes.FLOAT,
 				allowNull: true,				
 				validate: {
 					min: Limits.Workout.Distance.min,

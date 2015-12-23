@@ -7,6 +7,7 @@
 var express = require('express');
 var db = require('./db.js');
 var bodyParser = require('body-parser');
+var compression = require('compression');
 
 // reference tables
 var RoleType = require('./constants.js').RoleType;
@@ -22,8 +23,11 @@ var groupRoutes = require('./routes/groupRoute.js');
 var app = express();
 var PORT = process.env.PORT || 3000;
 
+// compress HTML/CSS/JS/JSON files before serving them
+app.use(compression());
+
 // serve /public/index.html on request
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/public', { maxAge: 86400000 /*one day*/ }));
 
 // whenever a JSON request comes in, bodyParser middleware will parse it.
 app.use(bodyParser.json());
