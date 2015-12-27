@@ -16,6 +16,21 @@ Constants = Object.freeze({
 		3: '学员'
 	},
 
+	RoleType: {
+		Admin: {
+			id: 1,
+			description: '管理员'
+		},
+		Trainer: {
+			id: 2,
+			description: '教练'
+		},
+		Trainee: {
+			id: 3,
+			description: '学员'
+		}
+	},
+
 	MealType: {
 		Breakfast: {
 			id: 1,

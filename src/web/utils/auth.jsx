@@ -10,7 +10,7 @@ module.exports = {
   /*
   ** login
   */
-  login: function(mobile, pass, cb) {
+  login: function(mobile, pass, requiredRoleType, cb) {
 
     cb = arguments[arguments.length - 1];
 
@@ -45,6 +45,12 @@ module.exports = {
             this.onChange(false);
             return;
           }
+
+          // check the role
+          if (requiredRoleType && this.role !== requiredRoleType) {
+            this.logout();
+            return;
+          }  
 
           if (cb) cb(true)
           this.onChange(true);
@@ -160,8 +166,6 @@ function loginRequest(mobile, pass, cb) {
     'accounts/login', 
     {mobile: mobile, password: pass})
   .then(function(json){
-    console.log(json);
-    
     if (json.success) {
       cb({
         authenticated: true,

@@ -14,8 +14,7 @@ var notifier = require('node-notifier');
 var htmlreplace = require('gulp-html-replace');
 
 var path = {
-	HTML: './src/web/index.html',
-	ALL: ['./src/web/**/*.jsx', './src/web/**/*.scss', './src/web/scss/*', './src/web/index.html'],
+	HTML: ['./src/web/index.html', './src/web/admin.html', './src/web/trainer.html'],
 	JSX: ['./src/web/*.jsx', './src/web/**/*.jsx'],
 	SCSS: ['./src/web/*.scss','./src/web/**/*.scss', './src/web/scss/*.css'],
 	FONTS: ['./src/web/fonts/*'],
@@ -23,13 +22,19 @@ var path = {
 	SERVER_JS: ['./src/server/*.js', './src/server/**/*.js'],
 	SERVER_DB: ['./src/server/data/*.sqlite'],
 	ENTRY_POINT: './src/web/app.jsx',	
+	ENTRY_POINT_ADMIN: './src/web/admin.jsx',	
+	ENTRY_POINT_TRAINER: './src/web/trainer.jsx',	
 	OUT: 'build.js',
+	OUT_ADMIN: 'admin.js',
+	OUT_TRAINER: 'trainer.js',
 	OUT_CSS: 'style.css',
 	MINIFIED_OUT: 'build.min.js',
+	MINIFIED_OUT_ADMIN: 'admin.min.js',
+	MINIFIED_OUT_TRAINER: 'trainer.min.js',
 	DEST: 'dist',
 	DEST_SERVER_DB: 'dist/data',
 	DEST_WEB: 'dist/public',
-	DEST_WEB_SRC: 'dist/public/js',
+	DEST_WEB_JS: 'dist/public/js',
 	DEST_WEB_CSS: 'dist/public/css',
 	DEST_WEB_FONTS: 'dist/public/fonts',
 	DEST_WEB_IMAGES: 'dist/public/images',
@@ -123,16 +128,99 @@ gulp.task('watch', function() {
 	return watcher.on('update', function() {
 		watcher.bundle()
 		.pipe(source(path.OUT))
-		.pipe(gulp.dest(path.DEST_WEB_SRC))
+		.pipe(gulp.dest(path.DEST_WEB_JS))
 		console.log('Updated at ' + moment().format('MMMM Do YYYY, h:mm:ss a'));
 	})
 	.bundle()
 	.on('error', notify)
 	.pipe(source(path.OUT))
-	.pipe(gulp.dest(path.DEST_WEB_SRC));
+	.pipe(gulp.dest(path.DEST_WEB_JS));
 });
 
-gulp.task('default', ['copy-server-js', 'copy-server-data-dir', 'copy-html', 'copy-fonts', 'copy-images', 'sass', 'watch']);
+gulp.task('watch_admin', function() {
+
+	gulp.watch(path.HTML, ['copy-html']);
+	gulp.watch(path.FONTS, ['copy-fonts']);
+	gulp.watch(path.IMAGES, ['copy-images']);
+	gulp.watch(path.SCSS, ['sass']);
+	gulp.watch(path.SERVER_JS, ['copy-server-js']);
+
+	var watcher = watchify(browserify({
+		entries: [path.ENTRY_POINT_ADMIN],
+		transform: [reactify],
+		extensions: ['.jsx'],
+		debug: true,
+		cache: {}, packageCache: {}, fullPaths: true
+	}));
+
+	return watcher.on('update', function() {
+		watcher.bundle()
+		.pipe(source(path.OUT_ADMIN))
+		.pipe(gulp.dest(path.DEST_WEB_JS))
+		console.log('Updated at ' + moment().format('MMMM Do YYYY, h:mm:ss a'));
+	})
+	.bundle()
+	.on('error', notify)
+	.pipe(source(path.OUT_ADMIN))
+	.pipe(gulp.dest(path.DEST_WEB_JS));
+});
+
+gulp.task('watch_trainer', function() {
+
+	gulp.watch(path.HTML, ['copy-html']);
+	gulp.watch(path.FONTS, ['copy-fonts']);
+	gulp.watch(path.IMAGES, ['copy-images']);
+	gulp.watch(path.SCSS, ['sass']);
+	gulp.watch(path.SERVER_JS, ['copy-server-js']);
+		
+	var watcher = watchify(browserify({
+		entries: [path.ENTRY_POINT_TRAINER],
+		transform: [reactify],
+		extensions: ['.jsx'],
+		debug: true,
+		cache: {}, packageCache: {}, fullPaths: true
+	}));
+
+	return watcher.on('update', function() {
+		watcher.bundle()
+		.pipe(source(path.OUT_TRAINER))
+		.pipe(gulp.dest(path.DEST_WEB_JS))
+		console.log('Updated at ' + moment().format('MMMM Do YYYY, h:mm:ss a'));
+	})
+	.bundle()
+	.on('error', notify)
+	.pipe(source(path.OUT_TRAINER))
+	.pipe(gulp.dest(path.DEST_WEB_JS));
+});
+
+gulp.task('default', 
+	['copy-server-js', 
+	'copy-server-data-dir', 
+	'copy-html', 
+	'copy-fonts', 
+	'copy-images', 
+	'sass', 
+	'watch']);
+
+gulp.task('admin', 
+	['copy-server-js', 
+	'copy-server-data-dir', 
+	'copy-html', 
+	'copy-fonts', 
+	'copy-images', 
+	'sass', 
+	'watch_admin']);
+
+
+gulp.task('trainer', 
+	['copy-server-js', 
+	'copy-server-data-dir', 
+	'copy-html', 
+	'copy-fonts', 
+	'copy-images', 
+	'sass', 
+	'watch_trainer']);
+
 
 // Production task: concat all JS files, minify them and output to the build folder
 gulp.task('build', function() {

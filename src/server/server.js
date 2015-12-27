@@ -27,7 +27,9 @@ var PORT = process.env.PORT || 3000;
 app.use(compression());
 
 // serve /public/index.html on request
-app.use(express.static(__dirname + '/public', { maxAge: 86400000 /*one day*/ }));
+app.use(express.static(__dirname + '/public'
+//, { maxAge: 86400000 /*one day*/ }
+));
 
 // whenever a JSON request comes in, bodyParser middleware will parse it.
 app.use(bodyParser.json());
@@ -41,11 +43,65 @@ app.use(function(req, res, next) {
 	next();
 });
 
+
+app.get('*style.css', function(req, res) {
+	res.set('Content-Type', 'text/css');
+	res.sendFile(__dirname + '/public/css/style.css');
+});
+
+app.get('*glyphicons-halflings-regular.eot', function(req, res) {
+	res.set('Content-Type', 'application/vnd.ms-fontobject');
+	res.sendFile(__dirname + '/public/fonts/glyphicons-halflings-regular.eot');
+});
+
+app.get('*glyphicons-halflings-regular.svg', function(req, res) {
+	res.set('Content-Type', 'image/svg+xml');
+	res.sendFile(__dirname + '/public/fonts/glyphicons-halflings-regular.svg');
+});
+
+app.get('*glyphicons-halflings-regular.ttf', function(req, res) {
+	res.set('Content-Type', 'application/x-font-ttf');
+	res.sendFile(__dirname + '/public/fonts/glyphicons-halflings-regular.ttf');
+});
+
+app.get('*glyphicons-halflings-regular.woff', function(req, res) {
+	res.set('Content-Type', 'application/x-font-woff');
+	res.sendFile(__dirname + '/public/fonts/glyphicons-halflings-regular.woff');
+});
+
+app.get('*glyphicons-halflings-regular.woff2', function(req, res) {
+	res.set('Content-Type', 'application/font-woff2');
+	res.sendFile(__dirname + '/public/fonts/glyphicons-halflings-regular.woff2');
+});
+
+app.get('/admin/\*admin.js', function(req, res) {
+		res.set('Content-Type', 'application/javascript');
+	res.sendFile(__dirname + '/public/js/admin.js');
+});
+
+app.get('/admin*', function(req, res) {
+	res.set('Content-Type', 'text/html');
+	res.sendFile(__dirname + '/public/admin.html');
+});
+
+
+app.get('/trainer', function(req, res) {
+	res.set('Content-Type', 'text/html');
+	res.sendFile(__dirname + '/public/trainer.html');
+});
+
+app.get('/trainer/\*trainer.js', function(req, res) {
+		res.set('Content-Type', 'application/javascript');
+	res.sendFile(__dirname + '/public/js/trainer.js');
+});
+
+
 app.use('/api/v1/accounts', accountRoutes);
 app.use('/api/v1/groups', groupRoutes);
 
 // any unhandled requests will get back index.html
 app.get('/*', function(req, res) {
+	res.set('Content-Type', 'text/html');
 	res.sendFile(__dirname + '/public/index.html');
 });
 
