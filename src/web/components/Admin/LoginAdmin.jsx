@@ -20,6 +20,7 @@ module.exports = React.createClass({
 
 	getInitialState: function() {
 		return {
+			loading: false,
 			error: false,
 			errorMsg: '登录信息不正确'
 		}
@@ -31,6 +32,10 @@ module.exports = React.createClass({
 		const phone = this.refs.phone.getValue();
 		const pass = this.refs.pass.getValue();
 
+		this.setState({
+			loading:true
+		});
+
 		auth.login(
 			phone, 
 			pass, 
@@ -38,8 +43,9 @@ module.exports = React.createClass({
 			function(loggedIn, status) {
 			    if (!loggedIn) {
 			    	var errorMsg = '登录信息不正确'; 
-			    	this.setState({ error: true, errorMsg: errorMsg});
+			    	this.setState({ loading: false, error: true, errorMsg: errorMsg});
 			    } else {
+			    	this.setState({loading: false, error: false});
 		    		this.history.replaceState(null, '/admin');
 			    }
 			    // const location = this.props.location;
@@ -88,7 +94,7 @@ module.exports = React.createClass({
 		                	bsStyle="info"
 		                	block
 		                	onClick={this.handleLogin}>
-		                	登录
+		                	{this.state.loading? '请稍候...':'登录'}
 		                </Button>
 		                {this.state.error && errorMsg}
 		            </form>

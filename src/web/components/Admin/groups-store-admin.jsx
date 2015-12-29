@@ -4,19 +4,19 @@
 
 var Reflux = require('reflux');
 
-var GroupsActions = require('./admin-groups-actions');
-var Api = require('../utils/api');
-var Auth = require('../utils/auth');
+var GroupsActions = require('./groups-actions-admin');
+var Api = require('../../utils/api');
+var Auth = require('../../utils/auth');
 
 module.exports = Reflux.createStore({
 
   listenables: [GroupsActions],
 
   // create a group
-  createGroup: function(accountId, requestBody, token, cb) {
-    var url = 'groups/createDemos';
+  createGroup: function(token, cb) {
+    var url = 'groups';
 
-    Api.post(url, requestBody, token)
+    Api.post(url, null, token)
       .then(function(json){
         if (json.success) {
           this.groups = json.data;
@@ -26,10 +26,9 @@ module.exports = Reflux.createStore({
         if (cb) cb(json.success, json.status);
       }.bind(this))
       .catch(function (error) {
-          console.log('Error when calling createDemoGroup: ' + error);
+          console.log('Error when calling createGroup: ' + error);
           if (cb) cb(false, 500);
       });    
-
   },
   
   // getGroups: function(accountId, token, cb) {
@@ -83,26 +82,6 @@ module.exports = Reflux.createStore({
   //     }.bind(this));
   //   }
   // },
-  
-  // temp solution for demo
-  createDemoGroups: function(accountId, requestBody, token, cb) {
-    var url = 'groups/createDemos';
-
-    Api.post(url, requestBody, token)
-      .then(function(json){
-        if (json.success) {
-          this.groups = json.data;
-          this.triggerChange();
-        }
-        // return the error code so that the caller can display proper UI to user
-        if (cb) cb(json.success, json.status);
-      }.bind(this))
-      .catch(function (error) {
-          console.log('Error when calling createDemoGroup: ' + error);
-          if (cb) cb(false, 500);
-      });    
-
-  },
 
   triggerChange: function() {
 

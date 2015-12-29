@@ -40,19 +40,6 @@ module.exports = function(sequelize, DataTypes) {
 				validate: {
 					len: [Limits.Group.Name.minLen, Limits.Group.Name.maxLen]
 				}
-			},			
-			nickname: {
-				type: DataTypes.STRING,
-				allowNull: true,
-				validate: {
-					len: [Limits.Group.Nickname.minLen, Limits.Group.Nickname.maxLen]
-				}, 
-				set: function(val) {
-					if (typeof val === 'string' && val.trim() === '') {
-						val=null;
-					}
-					this.setDataValue('nickname', val);
-				}
 			},									
 			startdate: {
 				type: DataTypes.STRING,

@@ -122,7 +122,26 @@ Constants = Object.freeze({
 		Chat: {
 			id: 4,
 			description: '聊天'
-		}
+		},
+
+		items: [
+			{
+				value: 1, 
+				display: '减脂'
+			},
+			{
+				value: 2,
+				display: '增肌'
+			},
+			{
+				value: 3,
+				display: '瘦腰'
+			},
+			{
+				value: 4,
+				display: '聊天'
+			}
+		]
 	},
 
 	GroupMemberType: {
