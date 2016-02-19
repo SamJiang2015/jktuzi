@@ -1,9 +1,9 @@
 //
-// GroupListAdmin.jsx
+// GroupListTrainer.jsx
 //
 
 var React = require('react');
-var GroupSummary = require('./GroupSummaryAdmin');
+var GroupSummary = require('./GroupSummaryTrainer');
 
 module.exports = React.createClass({
 

@@ -1,0 +1,63 @@
+// 
+// admin.scss
+//
+
+
+.trainer-groups {
+
+	.active {
+		color: red; 
+	}
+}
+
+
+.loginTrainer {
+
+	h4 {
+		color: darkgray;
+		text-align: center;
+	}
+
+	.panel {			
+		top: 40px;
+	}
+	
+	.error {
+		color: red;
+		font-weight: bold;
+		text-align: center;
+		font-size: 1.2em;
+	}
+}
+
+.trainer-group {
+	.buttonTable {
+		td {
+			margin: 0;
+			text-align: center;
+		}
+	}
+
+	th {
+      background-color:#232f3e;
+      color:ghostwhite;
+    }
+
+	th, td {
+	    text-align: center;
+	    margin: 0;
+	  }
+
+	.Pass {
+		background-color: lightgreen;
+	}
+	.Fail {
+		background-color: #db8787;
+	}
+	.Miss {
+		background-color: lightgray;
+	}	
+	.OpenDay {
+		background-color: #a47eb5;
+	}
+}

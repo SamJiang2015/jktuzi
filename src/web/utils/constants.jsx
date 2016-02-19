@@ -46,6 +46,13 @@ Constants = Object.freeze({
 		}				
 	},
 
+	MealCardStatus: {
+		Miss: 0,
+		Pass: 1,
+		Fail: 2,
+		OpenDay: 3
+	},	
+
 	SportsTypes: {
 		items: [
 			{
@@ -249,7 +256,8 @@ Constants = Object.freeze({
 			minLen: 4,
 			maxLen: 50
 		}
-	}	
+	}
+
 });
 
 module.exports=Constants;

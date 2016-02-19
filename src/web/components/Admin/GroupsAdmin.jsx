@@ -18,8 +18,12 @@ var Input = require('react-bootstrap/lib/input');
 var GroupCreateMenu = require('./GroupCreateMenuAdmin');
 var GroupFindMenu = require('./GroupFindMenuAdmin');
 var GroupList = require('./GroupListAdmin');
+var GroupDetail = require('./GroupDetailAdmin');
+
+var Error = require('../common/Errors');
 
 // data layer
+var Auth = require('../../utils/auth');
 var GroupsActions = require('./groups-actions-admin');
 var GroupsStore = require('./groups-store-admin');
 
@@ -39,10 +43,12 @@ module.exports = React.createClass({
 	getInitialState: function() {
 		return {
 			groups: [],
+			selectedGroup: null,  // this is the group that the admin is editing
 
 			showCreate: false,
 			showFind: false,
 			showList: true,
+			showGroupDetail: false,
 
 			loaded: true,
 
@@ -51,10 +57,42 @@ module.exports = React.createClass({
 		};
 	},
 
-	createGroup: function() {
+	// on rerendering: just get the cached groups from the store
+	// this way if user click on other tabs and click back, the same
+	// set of groups will still show here.
+	componentDidMount: function() {
+		this.setState({
+			groups: GroupsStore.getCachedGroups()
+		});
+	},
 
-		// todo: call store function to create the group
-		return null;
+	createGroup: function(name, groupTypeId, startDate, endDate) {
+
+		var groupInfo = {
+			name: name,
+			groupTypeId: groupTypeId,
+			startdate: startDate,
+			enddate: endDate};
+
+		// show the spinner
+		this.setState({
+			loaded: false
+		})
+
+		GroupsStore.createGroup(
+			Auth.getToken(),
+			groupInfo,
+			function(success, status) {
+				this.setState({
+					loaded: true,
+					showCreate: false,
+					showFind: false,
+					showList: true,
+					showGroupDetail: false,
+					error: !success,
+					errorMsg: Error.getMsg(status)
+				});
+			}.bind(this));
 	},
 
 
@@ -72,6 +110,7 @@ module.exports = React.createClass({
 			showCreate: true,
 			showFind: false,
 			showList: false,
+			showGroupDetail: false,
 			loaded: true,
 			error: false,
 			errorMsg: ''
@@ -86,49 +125,99 @@ module.exports = React.createClass({
 			showCreate: false,
 			showFind: true,
 			showList: false,
+			showGroupDetail: false,
 			error: false,
 			errorMsg: ''
 		})
 	},
 
+	// when user clicked on the 列表
 	handleSelect_List: function(eventKey, href, target) {
+
+		var dateFilter;
+
 		switch (eventKey) {
-			case '1': 
-				// todo: call store function to retrieve all new classes
-				// upon successful callback:
-				this.setState({
-					groups: this.state.groups,
-					showCreate: false,
-					showFind: false,
-					showList: true,
-					error: false,
-					errorMsg: ''
-				});
+			case '1':  
+				// all newly created groups that have not started
+				// i.e., groups with a start date in the future
+				dateFilter.start = new Date();
+				dateFilter.end = null;
 				break;
 			case '2': 
-				// todo: call store function to retrieve all ongoing classes
-				// upon successful callback:
-				this.setState({
-					groups: this.state.groups,
-					showCreate: false,
-					showFind: false,
-					showList: true,
-					error: false,
-					errorMsg: ''
-				});
+				// all ongoing groups, i.e. groups with an end date in the future			
+				dateFilter.start = null;
+				dateFilter.end = new Date();
 				break;
 			case '3': 
-				// todo: call store function to retrieve all classes
-				// upon successful callback:
+				dateFilter = null;
+				break;
+		}
+
+		// show the spinner
+		this.setState({
+			loaded: false
+		})
+
+		// now hit the store to retrieve the groups based on the filter
+		GroupsStore.getGroups(
+			Auth.getToken(),
+			dateFilter,		
+			function(success, status) {
 				this.setState({
-					groups: this.state.groups,
+					loaded: true,
+					groups: this.state.groups,					
 					showCreate: false,
 					showFind: false,
 					showList: true,
-					error: false,
-					errorMsg: ''
+					showGroupDetail: false,
+					error: !success,
+					errorMsg: Error.getMsg(status)
 				});
-				break;						
+			}.bind(this));
+	},
+
+	handleShowGroupDetail(groupId) {
+		// first see if the group detail is already cached here/
+		// no need to call store since everytime store is changed,
+		// this.state.groups will change accordingly
+
+	    // search the cache first
+	    var selectedGroup;
+
+	    for (var i=0; i<this.state.groups.length; i++) {
+	      if (this.state.groups[i].id === groupId && this.state.groups[i].members) {
+	        selectedGroup = this.state.groups[i];
+	        break;
+	      }
+	    }
+
+	    if (selectedGroup) {
+			this.setState({
+				showCreate: false,
+				showFind: false,
+				showList: false,			
+				showGroupDetail: true,
+				selectedGroup: selectedGroup
+			});
+		} else {
+			//todo: call store to retrieve the detail info about this group
+
+			// now hit the store to retrieve the groups based on the filter
+			GroupsStore.getGroups(
+				Auth.getToken(),
+				groupId,		
+				function(success, status) {
+					this.setState({
+						loaded: true,
+						groups: this.state.groups,			
+						showCreate: false,
+						showFind: false,
+						showList: false,			
+						showGroupDetail: true,
+						error: !success,
+						errorMsg: Error.getMsg(status)
+					});
+				}.bind(this));
 		}
 	},
 
@@ -162,14 +251,14 @@ module.exports = React.createClass({
 			</ButtonToolbar>
 			);
 
-	},
+	},	
 
 	// based on which button the user clicked, render the proper content
 	renderMainArea: function() {
 		if (this.state.showCreate) {
 			return (
 				<GroupCreateMenu 
-					handleCreate={this.creatGroup} />);
+					handleSubmit={this.createGroup} />);
 		} else if (this.state.showFind) {
 			return (
 				<GroupFindMenu
@@ -177,7 +266,13 @@ module.exports = React.createClass({
 		} else if (this.state.showList) {
 			return (
 				<GroupList
-					groups={this.state.groups} />);
+					groups={this.state.groups} 
+					handleShowGroupDetail={this.handleShowGroupDetail}/>);
+		} else if (this.state.showGroupDetail) {
+			return (
+				<GroupDetail
+					group={this.state.selectedGroup}
+					 />);
 		} else {
 			return null;
 		}

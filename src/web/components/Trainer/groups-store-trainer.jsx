@@ -1,41 +1,41 @@
 //
-// sportcard-store.jsx
+// groups-store-trainer.jsx
 //
 
 var Reflux = require('reflux');
 
-var GroupsActions = require('./groups-actions-admin');
+var GroupsActions = require('./groups-actions-trainer');
 var Api = require('../../utils/api');
 var Auth = require('../../utils/auth');
+
+var TestGroups = require('./test-data').Test_Groups;
 
 module.exports = Reflux.createStore({
 
   listenables: [GroupsActions],
-
-  // create a group
-  createGroup: function(token, groupInfo, cb) {
-    var url = 'groups';
-
-    Api.post(url, groupInfo, token)
-      .then(function(json){
-        if (json.success) {
-          this.groups.push(json.data);
-          this.triggerChange();
-        }
-        // return the error code so that the caller can display proper UI to user
-        if (cb) cb(json.success, json.status);
-      }.bind(this))
-      .catch(function (error) {
-          console.log('Error when calling createGroup: ' + error);
-          if (cb) cb(false, 500);
-      });    
-  },
 
   // retrieve the groups already cached in store
   getCachedGroups: function() {
     return this.groups;
   },
   
+  findGroupCards: function(groupId) {
+    // look for the matching group
+    var showingGroup=null;
+    for (var i=0; i<this.groups.length; i++) {
+      if (this.groups[i].id.toString() === groupId) {
+        showingGroup = this.groups[i];
+        break;
+      }
+    }
+
+    if (!showingGroup) {
+      return null; 
+    } else {
+      return showingGroup;
+    }
+  },
+
   // retrieve the groups from store
   getGroups: function(token, dateFilter, cb) {
 
@@ -50,6 +50,12 @@ module.exports = Reflux.createStore({
 
           if (cb) cb(json.success, json.status);
         }.bind(this));
+  },
+
+  getGroupCards: function(groupId) {
+    // todo: add logic to hit the db
+    
+    this.triggerChange();
   },
 
   // retrieve detail info including membership of a particular group
@@ -128,5 +134,5 @@ module.exports = Reflux.createStore({
     this.trigger('change', this.groups);
   },
 
-  groups: []
+  groups: TestGroups
 });

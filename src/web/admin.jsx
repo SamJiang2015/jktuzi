@@ -14,6 +14,7 @@ var Main = require('./components/Admin/MainAdmin');
 var Login = require('./components/Admin/LoginAdmin');
 var Logout = require('./components/Admin/LogoutAdmin');
 var Groups = require('./components/Admin/GroupsAdmin');
+var GroupDetail = require('./components/Admin/GroupDetailAdmin');
 var Trainees = require('./components/Admin/TraineesAdmin');
 var Requests = require('./components/Admin/RequestsAdmin');
 var Success = require('./components/Common/Success');
@@ -31,7 +32,9 @@ ReactDOM.render((
 		<Route path='/admin' component={Main}>
 			<Route path='login' component={Login} />
 			<Route path='logout' component={Logout} onEnter={requireAuth} />
-			<Route path='groups' component={Groups} onEnter={requireAuth} />
+			<Route path='groups' component={Groups} onEnter={requireAuth} >
+				<Route path='details/:id' component={GroupDetail} onEnter={requireAuth} />
+			</Route>
 			<Route path='trainees' component={Trainees} onEnter={requireAuth} />
 			<Route path='requests' component={Requests} onEnter={requireAuth} />
 			<Route path='success' component={Success} onEnter={requireAuth} />

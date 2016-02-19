@@ -30,14 +30,14 @@ module.exports = {
 		// CHECK m TYPE
 		if (typeof m !== 'object' && m !== null && m.size!==3){return false;}
 					
-		var now = new Date();
+		//var now = new Date();
 		//var thisYear = now.getFullYear(); //YEAR now
-		var minYear = Limits.YearCardInfo.min; //MIN YEAR
+		//var minYear = Limits.YearCardInfo.min; //MIN YEAR
 		
 		// todo: check the date (y+m+d) is not in the future
 		// YEAR CHECK
 		if( (m[1].length < 4)  
-			|| m[1] < minYear  
+	//		|| m[1] < minYear  
 	//		||	m[1] < thisYear
 			) {
 			return false;

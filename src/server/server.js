@@ -74,20 +74,9 @@ app.get('*glyphicons-halflings-regular.woff2', function(req, res) {
 	res.sendFile(__dirname + '/public/fonts/glyphicons-halflings-regular.woff2');
 });
 
-app.get('/admin/\*admin.js', function(req, res) {
+app.get('/admin/*admin.js', function(req, res) {
 		res.set('Content-Type', 'application/javascript');
 	res.sendFile(__dirname + '/public/js/admin.js');
-});
-
-app.get('/admin*', function(req, res) {
-	res.set('Content-Type', 'text/html');
-	res.sendFile(__dirname + '/public/admin.html');
-});
-
-
-app.get('/trainer', function(req, res) {
-	res.set('Content-Type', 'text/html');
-	res.sendFile(__dirname + '/public/trainer.html');
 });
 
 app.get('/trainer/\*trainer.js', function(req, res) {
@@ -99,6 +88,18 @@ app.get('/trainer/\*trainer.js', function(req, res) {
 app.use('/api/v1/accounts', accountRoutes);
 app.use('/api/v1/groups', groupRoutes);
 
+// note: these catch-all paths must come after the real path handlers (/api/v1/....)
+app.get('/admin*', function(req, res) {
+	res.set('Content-Type', 'text/html');
+	res.sendFile(__dirname + '/public/admin.html');
+});
+
+
+app.get('/trainer*', function(req, res) {
+	res.set('Content-Type', 'text/html');
+	res.sendFile(__dirname + '/public/trainer.html');
+});
+
 // any unhandled requests will get back index.html
 app.get('/*', function(req, res) {
 	res.set('Content-Type', 'text/html');
@@ -107,7 +108,7 @@ app.get('/*', function(req, res) {
 
 // create the database and populate the reference table(s)
 db.sequelize.sync({
-	force: false
+	force: true
 })
 /////////////////////////////// Role Types /////////////////////////////////
 .then(function() {
@@ -203,11 +204,11 @@ db.sequelize.sync({
 .then(function() {
 	return db.group.findOrCreate({
 		where: {name: '第100期减脂群'}, 
-		defaults: {nickname: '牛群', startdate: '2015-12-25', enddate: '2016-01-20', groupTypeId: GroupType.FatLoss.id}});
+		defaults: {startdate: '2015-12-25', enddate: '2016-01-20', groupTypeId: GroupType.FatLoss.id}});
 }).then(function() {
 	return db.group.findOrCreate({
 		where: {name: '第10期瘦腰群'}, 
-		defaults: {nickname: '霸群', startdate: '2015-12-20', enddate: '2016-01-15', groupTypeId: GroupType.Waist.id}});
+		defaults: {startdate: '2015-12-20', enddate: '2016-01-15', groupTypeId: GroupType.Waist.id}});
 })
 // .then(function() {
 

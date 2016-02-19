@@ -1,11 +1,10 @@
 // 
-// GroupAddMenuAdmin.jsx
+// GroupCreateMenuAdmin.jsx
 //
 
 var React = require('react');
 var Input = require('react-bootstrap/lib/input');
 var Button = require('react-bootstrap/lib/button');
-var ButtonToolbar = require('react-bootstrap/lib/Buttontoolbar');
 var DynamicSelect = require('../Common/DynamicSelect');
 var GroupType = require('../../utils/constants').GroupType;
 
@@ -14,13 +13,54 @@ module.exports = React.createClass({
 	getInitialState: function() {
 		return {
 			name: null,
-			groupTypeId: null,
+			groupTypeId: 1,
 			startDate: null,
 			endDate: null,
 
 			error: false,
 			errorMsg: ''
 		}
+	},
+
+	handleNameChange: function(e) {
+		e.preventDefault();
+		
+		this.setState({
+			name: e.target.value,
+		});
+	},
+
+	handleTypeChange: function(val) {
+		this.setState({
+			groupTypeId: val,
+		});
+	},
+
+	handleStartDateChange: function(e) {
+		e.preventDefault();
+		
+		this.setState({
+			startDate: e.target.value,
+		});
+	},
+
+	handleEndDateChange: function(e) {
+		e.preventDefault();
+		
+		this.setState({
+			endDate: e.target.value,
+		});
+	},
+
+	handleSubmit: function() {
+
+		// todo: data validation here
+
+		this.props.handleSubmit(
+			this.state.name,
+			this.state.groupTypeId,
+			this.state.startDate,
+			this.state.endDate);
 	},
 
 	renderError: function() {
