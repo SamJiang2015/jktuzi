@@ -48,7 +48,7 @@ module.exports = React.createClass({
 
 		// render UI to show the new status
 		this.setState({
-			status: MealCardStatus.Pass
+			status: newStatus
 		});
 
 	},

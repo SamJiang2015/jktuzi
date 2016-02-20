@@ -23,7 +23,7 @@ module.exports = Reflux.createStore({
     // look for the matching group
     var showingGroup=null;
     for (var i=0; i<this.groups.length; i++) {
-      if (this.groups[i].id.toString() === groupId) {
+      if (this.groups[i].id.toString() === groupId.toString()) {
         showingGroup = this.groups[i];
         break;
       }
@@ -36,7 +36,7 @@ module.exports = Reflux.createStore({
     }
   },
 
-  // retrieve the groups from store
+  // retrieve the list of groups managed by a trainer from store
   getGroups: function(token, dateFilter, cb) {
 
       var url = 'groups'; 
@@ -52,9 +52,29 @@ module.exports = Reflux.createStore({
         }.bind(this));
   },
 
+  // retrieve the cards for all trainees belonging to a group
   getGroupCards: function(groupId) {
     // todo: add logic to hit the db
-    
+    //
+    this.triggerChange();
+  },
+
+  // write the cards info for all trainees belonging to a group
+  writeGroupCards: function(group) {
+
+    if (!group || !group.trainees || group.trainees.length===0) {
+      console.log("writeGroupCards called with null or empty group");
+      return;
+    }
+
+    // todo: replace this logic below, need to hit DB
+    for (var i=0; i<this.groups.length; i++) {
+      if (this.groups[i].id.toString() === group.id.toString()) {
+        this.groups[i] = group;
+        break;
+      }
+    }
+
     this.triggerChange();
   },
 

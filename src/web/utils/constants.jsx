@@ -32,11 +32,43 @@ Constants = Object.freeze({
 	},
 
 	CardType: {
-		Breakfast: 1,
-		Lunch: 2,
-		Dinner: 3,
-		Sports: 4,
-		Body: 5
+		Breakfast: {
+			description: '早餐卡',
+			propertyName: 'breakfast'
+		},
+		Lunch: {
+			description: '午餐卡',
+			propertyName: 'lunch'			
+		},
+		Dinner: {
+			description: '晚餐卡',
+			propertyName: 'dinner'			
+		},
+		Sports: {
+			description: '运动卡'
+		},
+		Body: {
+			description: '体重/体脂卡'
+		}
+	},
+
+	SportsType: {
+		Seven: {
+			description: 'Seven',
+			propertyName: 'seven'
+		},
+		Keep: {
+			description: 'Keep',
+			propertyName: 'keep'
+		},
+		Jogging: {
+			description: '跑步',
+			propertyName: 'jogging'
+		},
+		Others: {
+			description: '其他',
+			propertyName: 'others'
+		}
 	},
 
 	MealType: {
