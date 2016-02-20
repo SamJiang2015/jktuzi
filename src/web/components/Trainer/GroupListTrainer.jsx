@@ -34,7 +34,6 @@ module.exports = React.createClass({
 						startdate={group.startdate}
 						enddate={group.enddate}
 						groupTypeId={group.groupTypeId}
-						handleShowGroupDetail={this.props.handleShowGroupDetail}
 					/>
 			);
 		}.bind(this))

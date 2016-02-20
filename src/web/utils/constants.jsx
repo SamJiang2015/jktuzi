@@ -31,6 +31,14 @@ Constants = Object.freeze({
 		}
 	},
 
+	CardType: {
+		Breakfast: 1,
+		Lunch: 2,
+		Dinner: 3,
+		Sports: 4,
+		Body: 5
+	},
+
 	MealType: {
 		Breakfast: {
 			id: 1,

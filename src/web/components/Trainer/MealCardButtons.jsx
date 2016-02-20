@@ -56,6 +56,14 @@ module.exports = React.createClass({
 				<label className="radio-inline">
 					<input 
 						type="radio" 
+						value="miss"  
+						checked={this.state.status===MealCardStatus.Miss?'checked':null}
+						onChange={this.handleChange}/>
+						未打卡
+				</label>
+				<label className="radio-inline">
+					<input 
+						type="radio" 
 						value="pass"  
 						checked={this.state.status===MealCardStatus.Pass?'checked':null}
 						onChange={this.handleChange}/>
@@ -68,14 +76,6 @@ module.exports = React.createClass({
 						checked={this.state.status===MealCardStatus.Fail?'checked':null}
 						onChange={this.handleChange} />
 						不合格
-				</label>
-				<label className="radio-inline">
-					<input 
-						type="radio" 
-						value="miss"  
-						checked={this.state.status===MealCardStatus.Miss?'checked':null}
-						onChange={this.handleChange}/>
-						未打卡
 				</label>
 				<label className="radio-inline">								
 					<input 
