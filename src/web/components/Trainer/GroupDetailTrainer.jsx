@@ -37,24 +37,69 @@ module.exports = React.createClass({
 	],
 
 	onGroupCardsChange: function() {
+
+		var groupFromStore = GroupsStore.findGroupCards(this.props.params.id);
+
+		// need to deep copy so that user can easily roll back unsubmitted
+		// changes by clicking on "Cancel"
+		var deepCopiedGroup = JSON.parse(JSON.stringify(groupFromStore));
+
 	    this.setState({
-	      group: GroupsStore.findGroupCards(this.props.params.id)
+	      group: deepCopiedGroup,
 	    });
 	},
 
 	getInitialState: function(){
 	    return {
 	    	group: null,
-	    	cardType: CardType.Breakfast
+	    	groupFromStore: null, // cache the state from store so that user can cancel changes
+	    	cardType: CardType.Breakfast,
+	    	checkAllStatus: null
 	    }
 	},
 
 	componentDidMount: function() {
+		// trigger fetching of the detailed info for the selected group
+		// the change will be propgated from the store to this component
+		// through the change listening mechanism
 		GroupsActions.getGroupCards(this.props.params.id); 
 	},
 
 	componentWillReceiveProps: function(nextProps) {
+		// trigger fetching of the detailed info for the selected group
+		// the change will be propgated from the store to this component
+		// through the change listening mechanism
 		GroupsActions.getGroupCards(nextProps.params.id);
+	},
+
+	// when user clicks on one of these buttons, meal status for all trainees
+	// will be set to the value represented by the clicked button
+	handleCheckAllChange: function(e) {
+
+		var checkAllStatus; 
+
+		// determine which checkall button has been clicked
+		if (e.target.value==='pass' && e.target.checked) {
+			checkAllStatus = MealCardStatus.Pass;
+		} else if (e.target.value==='fail' && e.target.checked) {
+			checkAllStatus = MealCardStatus.Fail;
+		} else if (e.target.value==='miss' && e.target.checked) {
+			checkAllStatus = MealCardStatus.Miss;
+		} else if (e.target.value==='openday' && e.target.checked) {
+			checkAllStatus = MealCardStatus.OpenDay;
+		} else {
+			checkAllStatus = null;
+		}		
+
+		// set the meal status for all trainees in this group
+		for (var i=0; i<this.state.group.trainees.length; i++) {
+			this.state.group.trainees[i].breakfast = checkAllStatus;
+		}
+
+		this.setState({
+			group: this.state.group,
+			checkAllStatus: checkAllStatus
+		})
 	},
 
 	// when user clicks on cancel, just re-render the page using the data
@@ -62,10 +107,29 @@ module.exports = React.createClass({
 	handleCancel: function(e) {
 		e.preventDefault();
 
+		var groupFromStore = GroupsStore.findGroupCards(this.props.params.id);
+
+		// need to deep copy so that user can easily roll back unsubmitted
+		// changes by clicking on "Cancel"
+		var deepCopiedGroup = JSON.parse(JSON.stringify(groupFromStore));
+
 		this.setState({
-			group: this.state.group,
-			cardType: this.state.cardType
+			group: deepCopiedGroup,
+			cardType: this.state.cardType,
+			checkAllStatus: null
 		})
+	},
+
+	// when user changes the meal card status for a trainee, 
+	// save the new status so that we can commit to store later when
+	// user clicks on submit button
+	handleMealCardStatusChange: function(traineeId, newStatus) {
+		for (var i=0; i<this.state.group.trainees.length; i++) {
+			if (this.state.group.trainees[i].id.toString() === traineeId.toString()) {
+				this.state.group.trainees[i].breakfast = newStatus;
+				break;
+			}
+		}
 	},
 
 	// Buttons to switch the input card type: 早、中、晚、运动、体重/体脂
@@ -99,6 +163,7 @@ module.exports = React.createClass({
 							name={trainee.name}
 							nickname={trainee.nickname}
 							breakfast={trainee.breakfast}
+							handleMealCardStatusChange={this.handleMealCardStatusChange}
 						/>
 				);
 			}.bind(this))
@@ -111,36 +176,36 @@ module.exports = React.createClass({
 	renderMealStatusButtons: function() {
 		return (
 			<div className="form-group">
-				<label className="radio-inline">
+				<label className="checkbox-inline">
 					<input 
-						type="radio" 
+						type="checkbox" 
 						value="miss"  
-						checked={this.state.status===MealCardStatus.Miss?'checked':null}
-						onChange={this.handleChange}/>
+						checked={this.state.checkAllStatus===MealCardStatus.Miss?'checked':null}
+						onChange={this.handleCheckAllChange}/>
 						未打卡
 				</label>
-				<label className="radio-inline">
+				<label className="checkbox-inline">
 					<input 
-						type="radio" 
+						type="checkbox" 
 						value="pass"  
-						checked={this.state.status===MealCardStatus.Pass?'checked':null}
-						onChange={this.handleChange}/>
+						checked={this.state.checkAllStatus===MealCardStatus.Pass?'checked':null}
+						onChange={this.handleCheckAllChange}/>
 						合格
 				</label>
-				<label className="radio-inline">								
+				<label className="checkbox-inline">								
 					<input 
-						type="radio" 
+						type="checkbox" 
 						value="fail" 
-						checked={this.state.status===MealCardStatus.Fail?'checked':null}
-						onChange={this.handleChange} />
+						checked={this.state.checkAllStatus===MealCardStatus.Fail?'checked':null}
+						onChange={this.handleCheckAllChange} />
 						不合格
 				</label>
-				<label className="radio-inline">								
+				<label className="checkbox-inline">								
 					<input 
-						type="radio" 
+						type="checkbox" 
 						value="openday" 
-						checked={this.state.status===MealCardStatus.OpenDay?'checked':null}
-						onChange={this.handleChange} />
+						checked={this.state.checkAllStatus===MealCardStatus.OpenDay?'checked':null}
+						onChange={this.handleCheckAllChange} />
 						开放日
 				</label>				
 			</div>

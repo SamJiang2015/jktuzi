@@ -26,28 +26,31 @@ module.exports = React.createClass({
 		});
 	 },
 
+	// when user clicks on one of the meal status button
 	handleChange: function(e) {
+		var newStatus; 
+
+		// determine which button has been clicked 
 		if (e.target.value==='pass' && e.target.checked) {
-			this.setState({
-				status: MealCardStatus.Pass
-			});
+				newStatus = MealCardStatus.Pass;
 		} else if (e.target.value==='fail' && e.target.checked) {
-			this.setState({
-				status: MealCardStatus.Fail
-			});
+				newStatus = MealCardStatus.Fail;
 		} else if (e.target.value==='miss' && e.target.checked) {
-			this.setState({
-				status: MealCardStatus.Miss
-			});
+				newStatus = MealCardStatus.Miss;
 		} else if (e.target.value==='openday' && e.target.checked) {
-			this.setState({
-				status: MealCardStatus.OpenDay
-			});
+				newStatus = MealCardStatus.OpenDay;
 		} else {
-			this.setState({
-				status: null
-			})
+			newStatus = null;
 		}
+
+		// call handler from parent component to pass up the new status
+		this.props.handleMealCardStatusChange(newStatus);
+
+		// render UI to show the new status
+		this.setState({
+			status: MealCardStatus.Pass
+		});
+
 	},
 
 	render: function() {

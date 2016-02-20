@@ -35,6 +35,11 @@ module.exports = React.createClass({
 		this.setStateHelper(newProps);
 	},	
 
+	handleMealCardStatusChange: function(newStatus) {
+		// pass the new meal card status to the parent component
+		this.props.handleMealCardStatusChange(this.state.id, newStatus);
+	},
+
 	render: function() {
 
 		var mealCardClassName;
@@ -61,6 +66,7 @@ module.exports = React.createClass({
 				<td>
 					<MealCardButtons 
 						status={this.state.breakfast}
+						handleMealCardStatusChange={this.handleMealCardStatusChange}
 					/>
 				</td>					
 			</tr>
