@@ -133,24 +133,23 @@ module.exports = React.createClass({
 
 			switch(this.state.mealCardStatus) {
 				case MealCardStatus.Pass: 
-					mealCardClassName="Pass";
+					mealCardClassName="success";
 					break;
 				case MealCardStatus.Fail: 
-					mealCardClassName="Fail";
+					mealCardClassName="danger";
 					break;
 				case MealCardStatus.OpenDay: 
-					mealCardClassName="OpenDay";
+					mealCardClassName="info";
 					break;
 				case MealCardStatus.Miss:
 				default: 
-					mealCardClassName="Miss";
+					mealCardClassName="active";
 			}
 		}
 
 		return (
 			<tr className={mealCardClassName}> 
 				<td>{this.state.nickname}</td>
-				<td>{this.state.name}</td>	
 				{this.renderCards()}
 			</tr>
 		);

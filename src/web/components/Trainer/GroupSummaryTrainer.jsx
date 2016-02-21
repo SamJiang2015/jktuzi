@@ -66,8 +66,6 @@ module.exports = React.createClass({
 			<tr className='group'
 		        onClick={this.handleClick.bind(this, this.state.id)}>
 				<td>{this.state.name}</td>
-				<td>{this.getGroupTypeDisplay(this.state.groupTypeId)}</td>						
-				<td>{this.state.startdate}</td>
 				<td>{this.state.enddate}</td>		
 			</tr>
 		);

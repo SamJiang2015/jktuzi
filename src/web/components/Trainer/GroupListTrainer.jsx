@@ -31,7 +31,6 @@ module.exports = React.createClass({
 						key={group.id}
 						id={group.id}
 						name={group.name}
-						startdate={group.startdate}
 						enddate={group.enddate}
 						groupTypeId={group.groupTypeId}
 					/>
@@ -47,7 +46,7 @@ module.exports = React.createClass({
 				<table className="table table-condensed table-hover">
 					<thead>
 						<tr>
-							<th>名字</th><th>类别</th><th>开始日期</th><th>结束日期</th>
+							<th>名字</th><th>结束日</th>
 						</tr>
 					</thead>
 					<tbody>

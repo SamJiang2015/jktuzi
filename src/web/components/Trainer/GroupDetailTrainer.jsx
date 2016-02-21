@@ -238,7 +238,7 @@ module.exports = React.createClass({
 						className={this.state.cardType===CardType.Body?'active':null}				    	
 				    	onClick={function(e){
 				    		e.preventDefault(); this.setState({cardType:CardType.Body, showTrainees:true})}.bind(this)}>
-				    	体重/脂
+				    	体卡
 				    </Button>
 				</ButtonGroup>			
 			);
@@ -303,8 +303,7 @@ module.exports = React.createClass({
 						<thead>
 							<tr>
 								<th style={{width: '10%'}}>昵称</th>
-								<th style={{width: '10%'}}>姓名</th>
-								<th style={{width: '80%'}}>{this.state.cardType.description}</th>
+								<th style={{width: '90%'}}>{this.state.cardType.description}</th>
 							</tr>
 							{this.renderMealStatusCheckAllButtons()}								
 						</thead>
@@ -328,7 +327,7 @@ module.exports = React.createClass({
 		}
 
 		return (
-			<tr><td></td><td></td><td>
+			<tr><td></td><td>
 				<div className="form-group">
 					<label className="checkbox-inline">
 						<input 
