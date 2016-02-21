@@ -54,8 +54,10 @@ module.exports = React.createClass({
 	    return {
 	    	group: null,
 	    	groupFromStore: null, // cache the state from store so that user can cancel changes
-	    	cardType: CardType.Breakfast,
-	    	checkAllStatus: null
+	    	cardType: null,
+	    	checkAllStatus: null,
+	    	showTrainees: false,
+	    	cardDate: new Date().toISOString().slice(0,10)
 	    }
 	},
 
@@ -71,6 +73,16 @@ module.exports = React.createClass({
 		// the change will be propgated from the store to this component
 		// through the change listening mechanism
 		GroupsActions.getGroupCards(nextProps.params.id);
+	},
+
+	handleCardDateChange: function(e) {
+		e.preventDefault();
+
+		this.setState({
+			cardDate: e.target.value
+		});		
+
+		//todo: fetch card info for the new date from store
 	},
 
 	// when user clicks on one of these buttons, meal status for all trainees
@@ -129,7 +141,10 @@ module.exports = React.createClass({
 
 		// todo: wrap this in an async call
 		GroupsActions.writeGroupCards(this.state.group);
-		alert('您已成功提交本班级的餐卡、运动卡和体重体脂卡');
+		alert('您已成功提交打卡信息');
+		this.setState({
+			showTrainees: false
+		})
 	},
 
 	// when user changes the meal card status for a trainee, 
@@ -161,6 +176,30 @@ module.exports = React.createClass({
 		}
 	},	
 
+	// when user changes the weight value for a trainee, 
+	// save the new weight so that we can commit to store later when
+	// user clicks on submit button
+	handleWeightChange: function(traineeId, newValue) {
+		for (var i=0; i<this.state.group.trainees.length; i++) {
+			if (this.state.group.trainees[i].id.toString() === traineeId.toString()) {
+				this.state.group.trainees[i].weight = newValue;
+				break;
+			}
+		}
+	},
+
+	// when user changes the bodyfat value for a trainee, 
+	// save the new value so that we can commit to store later when
+	// user clicks on submit button
+	handleFatChange: function(traineeId, newValue) {
+		for (var i=0; i<this.state.group.trainees.length; i++) {
+			if (this.state.group.trainees[i].id.toString() === traineeId.toString()) {
+				this.state.group.trainees[i].bodyfat = newValue;
+				break;
+			}
+		}
+	},
+
 	// Buttons to switch the input card type: 早、中、晚、运动、体重/体脂
 	renderCardTypeButtons: function() {
 
@@ -169,31 +208,36 @@ module.exports = React.createClass({
 				    <Button 
 				    	href="#" 
 						className={this.state.cardType===CardType.Breakfast?'active':null}				    	
-				    	onClick={function(e){e.preventDefault(); this.setState({cardType:CardType.Breakfast})}.bind(this)}>
+				    	onClick={function(e){
+				    		e.preventDefault(); this.setState({cardType:CardType.Breakfast, showTrainees:true})}.bind(this)}>
 				    	早餐
 		    		</Button>
 				    <Button 
 				    	href="#" 
 						className={this.state.cardType===CardType.Lunch?'active':null}				    	
-				    	onClick={function(e){e.preventDefault(); this.setState({cardType:CardType.Lunch})}.bind(this)}>
+				    	onClick={function(e){
+				    		e.preventDefault(); this.setState({cardType:CardType.Lunch, showTrainees:true})}.bind(this)}>
 				    	午餐
 				    </Button>
 				    <Button 
 				    	href="#" 
 						className={this.state.cardType===CardType.Dinner?'active':null}				    	
-				    	onClick={function(e){e.preventDefault(); this.setState({cardType:CardType.Dinner})}.bind(this)}>
+				    	onClick={function(e){
+				    		e.preventDefault(); this.setState({cardType:CardType.Dinner, showTrainees:true})}.bind(this)}>
 				    	晚餐
 				    </Button>
 				    <Button 
 				    	href="#" 
 						className={this.state.cardType===CardType.Sports?'active':null}				    	
-				    	onClick={function(e){e.preventDefault(); this.setState({cardType:CardType.Sports})}.bind(this)}>
+				    	onClick={function(e){
+				    		e.preventDefault(); this.setState({cardType:CardType.Sports, showTrainees:true})}.bind(this)}>
 				    	运动
 				    </Button>
 				    <Button 
 				    	href="#" 
 						className={this.state.cardType===CardType.Body?'active':null}				    	
-				    	onClick={function(e){e.preventDefault(); this.setState({cardType:CardType.Body})}.bind(this)}>
+				    	onClick={function(e){
+				    		e.preventDefault(); this.setState({cardType:CardType.Body, showTrainees:true})}.bind(this)}>
 				    	体重/脂
 				    </Button>
 				</ButtonGroup>			
@@ -201,32 +245,77 @@ module.exports = React.createClass({
 	},	
 
 	// render table of trainees
-	renderTrainees: function() {
+	renderTraineesList: function() {
 
-		if (this.state.group && this.state.group.trainees) {
-			// first sort the list of trainees based on current meal status
-			var traineesSortedByMealCardStatus = _.sortBy(this.state.group.trainees, this.state.cardType.propertyName);
+		if (!this.state.group || !this.state.group.trainees) {
+			return null;
+		}		
 
-			return traineesSortedByMealCardStatus.map(function(trainee) {
-				return (<Trainee 
-							key={trainee.id}
-							id={trainee.id}
-							name={trainee.name}
-							nickname={trainee.nickname}
-							mealCardStatus={trainee[this.state.cardType.propertyName]}
-							seven={trainee.seven}
-							keep={trainee.keep}
-							jogging={trainee.jogging}
-							others={trainee.others}
-							cardType={this.state.cardType}
-							handleMealCardStatusChange={this.handleMealCardStatusChange}
-							handleSportsCardStatusChange={this.handleSportsCardStatusChange}
-						/>
-				);
-			}.bind(this))
-		} else {
+		var sortedByField;
+
+		// if meal card, sort by meal card status; otherwise sort by wechat nickname
+		switch(this.state.cardType) {
+			case CardType.Breakfast:
+			case CardType.Lunch:
+			case CardType.Dinner:
+				sortedByField = this.state.cardType.propertyName;
+				break;
+			default: 
+				sortedByField = 'nickname';
+		}
+
+		// first sort the list of trainees based on current meal status
+		var traineesSorted = _.sortBy(this.state.group.trainees, sortedByField);
+
+		return traineesSorted.map(function(trainee) {
+			return (<Trainee 
+						key={trainee.id}
+						id={trainee.id}
+						name={trainee.name}
+						nickname={trainee.nickname}
+						mealCardStatus={trainee[this.state.cardType.propertyName]}
+						seven={trainee.seven}
+						keep={trainee.keep}
+						jogging={trainee.jogging}
+						others={trainee.others}
+						weight={trainee.weight}
+						fat={trainee.bodyfat}
+						cardType={this.state.cardType}
+						handleMealCardStatusChange={this.handleMealCardStatusChange}
+						handleSportsCardStatusChange={this.handleSportsCardStatusChange}
+						handleWeightChange={this.handleWeightChange}
+						handleFatChange={this.handleFatChange}
+					/>
+			);
+		}.bind(this))
+	},
+
+	renderTraineesTable: function() {
+
+		if (!this.state.showTrainees) {
 			return null;
 		}
+
+		return (
+			<div>
+				<div class="table-responsive">
+					<table className="table table-condensed table-hover">
+						<thead>
+							<tr>
+								<th style={{width: '10%'}}>昵称</th>
+								<th style={{width: '10%'}}>姓名</th>
+								<th style={{width: '80%'}}>{this.state.cardType.description}</th>
+							</tr>
+							{this.renderMealStatusCheckAllButtons()}								
+						</thead>
+						<tbody>
+							{this.renderTraineesList()}					
+						</tbody>
+					</table>
+				</div>
+				{this.renderSCButtons()}
+			</div>
+		);
 	},
 
 	// click on these buttons will set all trainees' meal status 
@@ -313,21 +402,21 @@ module.exports = React.createClass({
 					</div>
 					<div className="panel-body">
 						<div className="well">
+							<div className="row">
+								<div className="col-sm-2">
+									<p>选择打卡日期和类型：</p>
+								</div>
+								<div className="col-sm-4">
+									<Input 
+										type="date" 
+										value={this.state.cardDate}						
+										className="form-control" 
+										onChange={this.handleCardDateChange}/>
+								</div>
+							</div>
 							{this.renderCardTypeButtons()}
-						</div>					
-						<table className="table table-condensed table-hover table-responsive">
-							<thead>
-								<tr>
-									<th>姓名</th><th>微信昵称</th><th>{this.state.cardType.description}</th>
-								</tr>
-								{this.renderMealStatusCheckAllButtons()}								
-							</thead>
-							<tbody>
-								{this.renderTrainees()}					
-							</tbody>
-						</table>
-
-						{this.renderSCButtons()}
+						</div>
+						{this.renderTraineesTable()}					
 					</div>
 				</div>			
 			</div>

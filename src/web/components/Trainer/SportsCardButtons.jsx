@@ -36,7 +36,6 @@ module.exports = React.createClass({
 	 },
 
 	 handleSevenChange: function(e) {
-	 	e.preventDefault();
 
 	 	var newValue=e.target.checked ? 1:0;
 
@@ -49,7 +48,6 @@ module.exports = React.createClass({
 	 },
 
 	 handleKeepChange: function(e) {
-	 	e.preventDefault();
 
 	 	var newValue=e.target.checked ? 1:0;
 
@@ -62,7 +60,6 @@ module.exports = React.createClass({
 	 },
 
 	 handleJoggingChange: function(e) {
-	 	e.preventDefault();
 
 	 	var newValue=e.target.checked ? 1:0;
 
@@ -75,7 +72,6 @@ module.exports = React.createClass({
 	 },
 
 	 handleOthersChange: function(e) {
-	 	e.preventDefault();
 
 	 	var newValue=e.target.checked ? 1:0;
 
@@ -94,7 +90,7 @@ module.exports = React.createClass({
 					<input 
 						type="checkbox" 
 						value="seven"  
-						checked={this.state.seven===1?'checked':null}
+						checked={this.state.seven==1?'checked':null}
 						onChange={this.handleSevenChange}/>
 						Seven
 				</label>
@@ -102,7 +98,7 @@ module.exports = React.createClass({
 					<input 
 						type="checkbox" 
 						value="keep"  
-						checked={this.state.keep===1?'checked':null}
+						checked={this.state.keep==1?'checked':null}
 						onChange={this.handleKeepChange}/>
 						Keep
 				</label>
@@ -110,7 +106,7 @@ module.exports = React.createClass({
 					<input 
 						type="checkbox" 
 						value="jogging" 
-						checked={this.state.jogging===1?'checked':null}
+						checked={this.state.jogging==1?'checked':null}
 						onChange={this.handleJoggingChange} />
 						跑步
 				</label>
@@ -118,7 +114,7 @@ module.exports = React.createClass({
 					<input 
 						type="checkbox" 
 						value="others" 
-						checked={this.state.others===1?'checked':null}
+						checked={this.state.others==1?'checked':null}
 						onChange={this.handleOthersChange} />
 						其他
 				</label>				

@@ -6,6 +6,7 @@ var React = require('react');
 
 var MealCardButtons = require('./MealCardButtons');
 var SportsCardButtons = require('./SportsCardButtons');
+var BodyInputs = require('./BodyInputs');
 
 var CardType = require('../../utils/constants').CardType;
 var MealCardStatus = require('../../utils/constants').MealCardStatus;
@@ -31,7 +32,9 @@ module.exports = React.createClass({
 			seven: props.seven,
 			keep: props.keep,
 			jogging: props.jogging,
-			others: props.others
+			others: props.others,
+			weight: props.weight,
+			fat: props.fat
 		});
 	},
 
@@ -52,6 +55,16 @@ module.exports = React.createClass({
 		// pass the new sports card status to the parent component
 		this.props.handleSportsCardStatusChange(this.state.id, sportsType, newValue);		
 	},
+
+	handleWeightChange: function(newValue) {
+		// pass the new body weight card status to the parent component
+		this.props.handleWeightChange(this.state.id, newValue);		
+	},
+
+	handleFatChange: function(newValue) {
+		// pass the new body fat card status to the parent component
+		this.props.handleFatChange(this.state.id, newValue);		
+	},	
 
 	renderMealCards: function() {
 
@@ -79,6 +92,19 @@ module.exports = React.createClass({
 		);
 	},
 
+	renderBodyInputs: function() {
+		return (
+			<td>
+				<BodyInputs 
+					weight={this.state.weight}
+					fat={this.state.fat}
+					handleWeightChange={this.handleWeightChange}
+					handleFatChange={this.handleFatChange}
+				/>
+			</td>					
+		);
+	},
+
 	renderCards: function() {
 		switch (this.props.cardType) {
 			case CardType.Breakfast:
@@ -89,6 +115,8 @@ module.exports = React.createClass({
 			case CardType.Sports:
 				return this.renderSportsCards();
 				break;
+			case CardType.Body:
+				return this.renderBodyInputs();
 			default:
 				return null;
 		}
@@ -121,8 +149,8 @@ module.exports = React.createClass({
 
 		return (
 			<tr className={mealCardClassName}> 
-				<td>{this.state.name}</td>
-				<td>{this.state.nickname}</td>	
+				<td>{this.state.nickname}</td>
+				<td>{this.state.name}</td>	
 				{this.renderCards()}
 			</tr>
 		);

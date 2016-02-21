@@ -44,7 +44,7 @@ module.exports = React.createClass({
 		return (
 			<div>
 				<p>点击任一班级进行操作</p> 
-				<table className="table table-condensed table-striped table-hover">
+				<table className="table table-condensed table-hover">
 					<thead>
 						<tr>
 							<th>名字</th><th>类别</th><th>开始日期</th><th>结束日期</th>

@@ -26,8 +26,8 @@ module.exports = {
 					keep: 1,
 					jogging: 1,
 					others: 0,
-					weight: null,
-					bodyfat: null
+					weight: 70,
+					bodyfat: 25.0
 				},
 				{
 					id: 2,
@@ -40,7 +40,7 @@ module.exports = {
 					keep: 0,
 					jogging: 1,
 					others: 0,
-					weight: null,
+					weight: 65,
 					bodyfat: null
 				},
 				{
@@ -54,7 +54,7 @@ module.exports = {
 					keep: 1,
 					jogging: 1,
 					others: 1,
-					weight: null,
+					weight: 90,
 					bodyfat: null
 				},
 				{
@@ -82,7 +82,7 @@ module.exports = {
 					keep: 1,
 					jogging: 0,
 					others: 0,
-					weight: null,
+					weight: 100,
 					bodyfat: null
 				},
 				{
@@ -96,7 +96,7 @@ module.exports = {
 					keep: 0,
 					jogging: 1,
 					others: 0,
-					weight: null,
+					weight: 89.2,
 					bodyfat: null
 				},
 				{
