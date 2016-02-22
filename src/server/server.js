@@ -49,6 +49,11 @@ app.get('*style.css', function(req, res) {
 	res.sendFile(__dirname + '/public/css/style.css');
 });
 
+app.get('*pipi_logo.jpg', function(req, res) {
+	res.set('Content-Type', 'image/jpeg');
+	res.sendFile(__dirname + '/public/images/pipi_logo.jpg');
+});
+
 app.get('*glyphicons-halflings-regular.eot', function(req, res) {
 	res.set('Content-Type', 'application/vnd.ms-fontobject');
 	res.sendFile(__dirname + '/public/fonts/glyphicons-halflings-regular.eot');
@@ -72,6 +77,21 @@ app.get('*glyphicons-halflings-regular.woff', function(req, res) {
 app.get('*glyphicons-halflings-regular.woff2', function(req, res) {
 	res.set('Content-Type', 'application/font-woff2');
 	res.sendFile(__dirname + '/public/fonts/glyphicons-halflings-regular.woff2');
+});
+
+app.get('*build.min.js', function(req, res) {
+		res.set('Content-Type', 'application/javascript');
+	res.sendFile(__dirname + '/public/build/build.min.js');
+});
+
+app.get('*admin.min.js', function(req, res) {
+		res.set('Content-Type', 'application/javascript');
+	res.sendFile(__dirname + '/public/build/admin.min.js');
+});
+
+app.get('*trainer.min.js', function(req, res) {
+		res.set('Content-Type', 'application/javascript');
+	res.sendFile(__dirname + '/public/build/trainer.min.js');
 });
 
 app.get('/admin/*admin.js', function(req, res) {

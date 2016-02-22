@@ -247,3 +247,30 @@ gulp.task('replaceHTML', function() {
 
 
 gulp.task('production', ['copy-server-js','copy-fonts', 'copy-images','replaceHTML', 'sass', 'build']);
+
+// Production task for trainer: concat all JS files, minify them and output to the build folder
+gulp.task('build-trainer', function() {
+	browserify({
+		entries: [path.ENTRY_POINT_TRAINER],
+		transform: [reactify],
+		extensions: ['.jsx'],
+		debug: false
+	})
+		.bundle()
+		.pipe(source(path.MINIFIED_OUT_TRAINER))
+		.pipe(streamify(uglify()))
+		.pipe(gulp.dest(path.DEST_WEB_BUILD));
+	});
+
+// also replace the js reference in index.html to the minified version
+gulp.task('replaceHTML-trainer', function() {
+	gulp.src(path.HTML)
+	.pipe(htmlreplace({
+		'js': 'build/' + path.MINIFIED_OUT_TRAINER
+	}))
+	.pipe(gulp.dest(path.DEST_WEB));
+})
+
+
+gulp.task('production-trainer', ['copy-server-js','copy-fonts', 'copy-images','replaceHTML-trainer', 'sass', 'build-trainer']);
+

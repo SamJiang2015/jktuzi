@@ -60,7 +60,7 @@ module.exports = React.createClass({
             <div className="form-group">
                 <div className="col-sm-4 col-sm-offset-2">
 					<Input 
-						type="text" 
+						type="number" 
 						addonAfter="kg"
 						min="50"
 						max="350"
@@ -69,14 +69,14 @@ module.exports = React.createClass({
 						onChange={this.handleWeightChange}/>
                 </div>
                 <div className="col-sm-4">
-						<Input 
-							type="text"  
-							addonAfter="%"
-							min="5"
-							max="50"
-							value={this.state.fat}  												
-							className="form-control" 
-							onChange={this.handleFatChange}/>
+					<Input 
+						type="number"  
+						addonAfter="%"
+						min="5"
+						max="50"
+						value={this.state.fat}  												
+						className="form-control" 
+						onChange={this.handleFatChange}/>
                 </div>
             </div>
 		);

@@ -91,7 +91,6 @@ module.exports = React.createClass({
 		                	feedbackIcon={passwordGlyphicon} 
 		                />
 		                <Button 
-		                	bsStyle="info"
 		                	block
 		                	onClick={this.handleLogin}>
 		                	{this.state.loading? '请稍候...':'登录'}

@@ -143,7 +143,8 @@ module.exports = React.createClass({
 		GroupsActions.writeGroupCards(this.state.group);
 		alert('您已成功提交打卡信息');
 		this.setState({
-			showTrainees: false
+			showTrainees: false,
+			cardType: null
 		})
 	},
 
@@ -335,7 +336,7 @@ module.exports = React.createClass({
 							value="miss"  
 							checked={this.state.checkAllStatus===MealCardStatus.Miss?'checked':null}
 							onChange={this.handleCheckAllChange}/>
-							未打卡
+							Miss
 					</label>
 					<label className="checkbox-inline">
 						<input 
@@ -343,7 +344,7 @@ module.exports = React.createClass({
 							value="pass"  
 							checked={this.state.checkAllStatus===MealCardStatus.Pass?'checked':null}
 							onChange={this.handleCheckAllChange}/>
-							合格
+							Pass
 					</label>
 					<label className="checkbox-inline">								
 						<input 
@@ -351,7 +352,7 @@ module.exports = React.createClass({
 							value="fail" 
 							checked={this.state.checkAllStatus===MealCardStatus.Fail?'checked':null}
 							onChange={this.handleCheckAllChange} />
-							不合格
+							Fail
 					</label>
 					<label className="checkbox-inline">								
 						<input 
@@ -359,7 +360,7 @@ module.exports = React.createClass({
 							value="openday" 
 							checked={this.state.checkAllStatus===MealCardStatus.OpenDay?'checked':null}
 							onChange={this.handleCheckAllChange} />
-							开放日
+							Open
 					</label>				
 				</div>
 			</td></tr>

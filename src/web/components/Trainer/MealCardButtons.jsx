@@ -62,7 +62,7 @@ module.exports = React.createClass({
 						value="miss"  
 						checked={this.state.status===MealCardStatus.Miss?'checked':null}
 						onChange={this.handleChange}/>
-						未打卡
+						Miss
 				</label>
 				<label className="radio-inline">
 					<input 
@@ -70,7 +70,7 @@ module.exports = React.createClass({
 						value="pass"  
 						checked={this.state.status===MealCardStatus.Pass?'checked':null}
 						onChange={this.handleChange}/>
-						合格
+						Pass
 				</label>
 				<label className="radio-inline">								
 					<input 
@@ -78,7 +78,7 @@ module.exports = React.createClass({
 						value="fail" 
 						checked={this.state.status===MealCardStatus.Fail?'checked':null}
 						onChange={this.handleChange} />
-						不合格
+						Fail
 				</label>
 				<label className="radio-inline">								
 					<input 
@@ -86,7 +86,7 @@ module.exports = React.createClass({
 						value="openday" 
 						checked={this.state.status===MealCardStatus.OpenDay?'checked':null}
 						onChange={this.handleChange} />
-						开放日
+						Open
 				</label>				
 			</div>
 		);

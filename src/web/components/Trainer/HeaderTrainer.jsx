@@ -49,7 +49,7 @@ module.exports = React.createClass({
 			<Navbar.Header>
 				<Navbar.Brand>
 	      			<Link to="/trainer/" onClick={this.handleNavClick}>
-	          			PiPi健康教练端
+	          			<span className="logo-img"><img src="images/pipi_logo.jpg"/></span>PiPi健康-教练端
 	      			</Link>
 				</Navbar.Brand>
 				<Navbar.Toggle  />
@@ -98,8 +98,7 @@ module.exports = React.createClass({
 	render: function() {
 	   	return (
 		    <div className="header">
-        		<Navbar 
-        			inverse 
+        		<Navbar  
         			fixedTop 
         			expanded={this.state.navExpanded} 
         			onToggle={this.handleToggle} >
