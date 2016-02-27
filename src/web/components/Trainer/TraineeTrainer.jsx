@@ -3,6 +3,8 @@
 // 
 
 var React = require('react');
+var Reflux = require('reflux');
+var Loader = require('react-loader');
 
 var MealCardButtons = require('./MealCardButtons');
 var SportsCardButtons = require('./SportsCardButtons');
@@ -78,6 +80,10 @@ module.exports = React.createClass({
 		this.props.handleFatChange(this.state.id, newValue);		
 	},	
 
+	handleLabelChange: function(newLabels) {
+		this.props.handleLabelChange(this.state.id, newLabels);
+	},
+
 	handleClick: function(id, e) {
 		e.preventDefault();
 
@@ -92,6 +98,7 @@ module.exports = React.createClass({
 				<TraineeInfoModal
 					{...this.props}
 					showModal={this.state.showModal}
+					submitLabelInfo={this.handleLabelChange}
 					/>
 			);
 		}

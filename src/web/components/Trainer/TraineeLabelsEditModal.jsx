@@ -6,6 +6,7 @@ var React = require('react');
 var LabelDisplay = require('../../utils/constants').LabelDisplay;
 var Modal = require('react-bootstrap/lib/modal');
 var Button = require('react-bootstrap/lib/button');
+var ButtonToolbar = require('react-bootstrap/lib/Buttontoolbar');
 
 module.exports = React.createClass({
 
@@ -53,10 +54,15 @@ module.exports = React.createClass({
 		this.setStateHelper(newProps);
 	 },
 
-	close: function() {		
+	close: function() {
 		this.setState({
 			showSelf: false
 		})
+	},
+
+	save: function() {
+		this.props.saveData(this.state.labels);
+		this.close();
 	},
 
 	open: function() {
@@ -74,9 +80,9 @@ module.exports = React.createClass({
 
 		// based on the new status array, generate the list of selected labels
 		var labels=[];
-		for (var i=1; i<labelStatus.legnth; i++) {
+		for (var i=1; i<labelStatus.length; i++) {
 			if (labelStatus[i] === 1) {
-				labels.push[i];
+				labels.push(i);
 			}
 		}
 
@@ -100,7 +106,7 @@ module.exports = React.createClass({
 								<Button 
 									onClick={function(e){e.preventDefault(); this.updateLabel(1)}.bind(this)} 
 									bsSize="small"
-									bsStyle={this.checkLabelSelected(1)?'warning':'default'}
+									bsStyle={this.checkLabelSelected(1)?'info':'default'}
 								>
 									{LabelDisplay[1]}
 								</Button>
@@ -109,7 +115,7 @@ module.exports = React.createClass({
 								<Button 
 									onClick={function(e){e.preventDefault(); this.updateLabel(2)}.bind(this)} 
 									bsSize="small"
-									bsStyle={this.checkLabelSelected(2)?'warning':'default'}									
+									bsStyle={this.checkLabelSelected(2)?'info':'default'}									
 								>
 									{LabelDisplay[2]}
 								</Button>						
@@ -118,7 +124,7 @@ module.exports = React.createClass({
 								<Button 
 									onClick={function(e){e.preventDefault(); this.updateLabel(3)}.bind(this)} 
 									bsSize="small"
-									bsStyle={this.checkLabelSelected(3)?'warning':'default'}									
+									bsStyle={this.checkLabelSelected(3)?'info':'default'}									
 								>
 									{LabelDisplay[3]}
 								</Button>
@@ -127,7 +133,7 @@ module.exports = React.createClass({
 								<Button 
 									onClick={function(e){e.preventDefault(); this.updateLabel(4)}.bind(this)} 
 									bsSize="small"
-									bsStyle={this.checkLabelSelected(4)?'warning':'default'}									
+									bsStyle={this.checkLabelSelected(4)?'info':'default'}									
 								>
 									{LabelDisplay[4]}
 								</Button>						
@@ -138,7 +144,7 @@ module.exports = React.createClass({
 								<Button 
 									onClick={function(e){e.preventDefault(); this.updateLabel(5)}.bind(this)} 
 									bsSize="small"
-									bsStyle={this.checkLabelSelected(5)?'warning':'default'}									
+									bsStyle={this.checkLabelSelected(5)?'info':'default'}									
 								>
 									{LabelDisplay[5]}
 								</Button>
@@ -147,7 +153,7 @@ module.exports = React.createClass({
 								<Button 
 									onClick={function(e){e.preventDefault(); this.updateLabel(6)}.bind(this)}  
 									bsSize="small"
-									bsStyle={this.checkLabelSelected(6)?'warning':'default'}										
+									bsStyle={this.checkLabelSelected(6)?'info':'default'}										
 								>
 									{LabelDisplay[6]}
 								</Button>						
@@ -156,7 +162,7 @@ module.exports = React.createClass({
 								<Button 
 									onClick={function(e){e.preventDefault(); this.updateLabel(7)}.bind(this)} 
 									bsSize="small"
-									bsStyle={this.checkLabelSelected(7)?'warning':'default'}										
+									bsStyle={this.checkLabelSelected(7)?'info':'default'}										
 								>
 									{LabelDisplay[7]}
 								</Button>
@@ -165,7 +171,7 @@ module.exports = React.createClass({
 								<Button 
 									onClick={function(e){e.preventDefault(); this.updateLabel(8)}.bind(this)} 
 									bsSize="small"
-									bsStyle={this.checkLabelSelected(8)?'warning':'default'}										
+									bsStyle={this.checkLabelSelected(8)?'info':'default'}										
 								>
 									{LabelDisplay[8]}
 								</Button>						
@@ -176,7 +182,7 @@ module.exports = React.createClass({
 								<Button 
 									onClick={function(e){e.preventDefault(); this.updateLabel(9)}.bind(this)} 
 									bsSize="small"
-									bsStyle={this.checkLabelSelected(9)?'warning':'default'}										
+									bsStyle={this.checkLabelSelected(9)?'info':'default'}										
 								>
 									{LabelDisplay[9]}
 								</Button>
@@ -185,7 +191,7 @@ module.exports = React.createClass({
 								<Button 
 									onClick={function(e){e.preventDefault(); this.updateLabel(10)}.bind(this)} 
 									bsSize="small"
-									bsStyle={this.checkLabelSelected(10)?'warning':'default'}										
+									bsStyle={this.checkLabelSelected(10)?'info':'default'}										
 								>
 									{LabelDisplay[10]}
 								</Button>						
@@ -194,7 +200,7 @@ module.exports = React.createClass({
 								<Button 
 									onClick={function(e){e.preventDefault(); this.updateLabel(11)}.bind(this)} 
 									bsSize="small"
-									bsStyle={this.checkLabelSelected(11)?'warning':'default'}										
+									bsStyle={this.checkLabelSelected(11)?'info':'default'}										
 								>
 									{LabelDisplay[11]}
 								</Button>
@@ -203,7 +209,7 @@ module.exports = React.createClass({
 								<Button 
 									onClick={function(e){e.preventDefault(); this.updateLabel(12)}.bind(this)} 
 									bsSize="small"
-									bsStyle={this.checkLabelSelected(12)?'warning':'default'}										
+									bsStyle={this.checkLabelSelected(12)?'info':'default'}										
 								>
 									{LabelDisplay[12]}
 								</Button>						
@@ -214,7 +220,7 @@ module.exports = React.createClass({
 								<Button 
 									onClick={function(e){e.preventDefault(); this.updateLabel(13)}.bind(this)} 
 									bsSize="small"
-									bsStyle={this.checkLabelSelected(13)?'warning':'default'}										
+									bsStyle={this.checkLabelSelected(13)?'info':'default'}										
 								>
 									{LabelDisplay[13]}
 								</Button>						
@@ -239,7 +245,10 @@ module.exports = React.createClass({
 					{this.renderModalBody()}
 				</Modal.Body>
 				<Modal.Footer>
-					<Button bsStyle="success" onClick={this.close}>OK</Button>
+					<ButtonToolbar>
+						<Button bsStyle="success" onClick={this.save}>OK</Button>
+						<Button bsStyle="default" onClick={this.close}>取消</Button>
+					</ButtonToolbar>	
 				</Modal.Footer>
 			</Modal>);
 	}

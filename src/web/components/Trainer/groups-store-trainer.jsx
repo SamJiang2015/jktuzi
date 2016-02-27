@@ -78,6 +78,12 @@ module.exports = Reflux.createStore({
     this.triggerChange();
   },
 
+  // TODO: consider moving this to a separate store, since this is an action on
+  // a trainee
+  writeTraineeLabels: function(traineeId, labels) {
+
+  },
+
   // retrieve detail info including membership of a particular group
   getGroupDetails: function(token, groupId, cb) {
 

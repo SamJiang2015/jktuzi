@@ -287,6 +287,7 @@ module.exports = React.createClass({
 						handleSportsCardStatusChange={this.handleSportsCardStatusChange}
 						handleWeightChange={this.handleWeightChange}
 						handleFatChange={this.handleFatChange}
+						handleLabelChange={this.handleLabelChange}
 					/>
 			);
 		}.bind(this))

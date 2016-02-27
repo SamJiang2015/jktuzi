@@ -22,6 +22,7 @@ module.exports = React.createClass({
 
 	getInitialState: function(){
 		return {
+			labels: [],
 			showSelf: false,
 			showLabelEditModal: false
 		};
@@ -29,6 +30,7 @@ module.exports = React.createClass({
 
 	setStateHelper: function(props) {
 		this.setState({
+			labels: props.labels,
 			showSelf: props.showModal,
 			showLabelEditModal: false			
 		});
@@ -54,24 +56,41 @@ module.exports = React.createClass({
 		})
 	},	
 
-	renderLabels: function(){
-		var labels='';
-		if (this.props.labels && this.props.labels.length>0) {
-			for (var i=0; i<this.props.labels.length; i++) {
-				labels+=LabelDisplay[this.props.labels[i]]+' '
-			}
-		} else {
-			labels='无'
-		}
+	saveLabelData: function(labels) {
+		this.setState({
+			labels: labels,
+			showSelf: true,
+			showLabelEditModal: false
+		})
+	},
 
-		return labels;
+	submitLabelInfo: function() {
+		this.props.submitLabelInfo(this.state.labels);
+
+		alert('您已成功提交标签信息');
+	},
+
+	renderLabels: function(){
+		if (this.state.labels && this.state.labels.length>0) {
+			return this.state.labels.map(function(label) {
+				return (<Button
+							bsSize='small' 
+							bsStyle='info'>
+						{LabelDisplay[label]}
+						</Button>
+				);
+			})
+		} else {
+			return '无';
+		}
 	},
 
 	renderLabelsEditModal: function() {
 		if (this.state.showLabelEditModal) {
 			return (
 				<LabelsEditModal
-					{...this.props}
+					labels={this.state.labels}
+					saveData={this.saveLabelData}
 					showModal={this.state.showLabelEditModal}
 					/>
 			);
@@ -95,7 +114,7 @@ module.exports = React.createClass({
 							</tr>
 							<tr>
 								<td>标签</td>
-								<td>{this.renderLabels()}</td>						
+								<td className="traineeLabelsDisplay">{this.renderLabels()}</td>						
 								<td>
 									<Button
 										onClick={function(e) {e.preventDefault(); this.setState({showLabelEditModal: true});}.bind(this)} 
@@ -125,7 +144,8 @@ module.exports = React.createClass({
 				</Modal.Body>
 				<Modal.Footer>
 					<ButtonToolbar>
-						<Button bsStyle="success" onClick={this.close}>OK</Button>
+						<Button bsStyle="success" onClick={this.submitInfo}>提交</Button>
+						<Button bsStyle="default" onClick={this.close}>取消</Button>
 					</ButtonToolbar>	
 				</Modal.Footer>
 			</Modal>);
