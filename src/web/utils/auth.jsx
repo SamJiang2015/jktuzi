@@ -47,10 +47,20 @@ module.exports = {
           }
 
           // check the role
-          if (requiredRoleType && this.role !== requiredRoleType) {
-            this.logout();
-            return;
-          }  
+          var roleCheckSuccess=false;
+          if (requiredRoleType) {
+            for (var i=0; i<requiredRoleType.length; i++) {
+              if (this.role == requiredRoleType[i]) {
+                roleCheckSuccess = true;
+              }
+            }
+            if (!roleCheckSuccess) {
+              this.onChange(false);
+              if(cb) cb(false, 400);
+              this.logout();
+              return;
+            }  
+          }
 
           if (cb) cb(true)
           this.onChange(true);

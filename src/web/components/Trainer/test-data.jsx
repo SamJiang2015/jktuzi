@@ -19,6 +19,7 @@ module.exports = {
 					id: 1,
 					name: "学员001",
 					nickname: "微信001",
+					labels: [1, 2],
 					breakfast: 0,
 					lunch: 1,
 					dinner: 2,
@@ -32,7 +33,8 @@ module.exports = {
 				{
 					id: 2,
 					name: "学员002",
-					nickname: "微信002",					
+					nickname: "微信002",
+					labels: [3, 5],					
 					breakfast: 1,
 					lunch: 2,
 					dinner: 0,

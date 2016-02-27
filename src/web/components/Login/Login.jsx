@@ -10,6 +10,7 @@ var Button = require('react-bootstrap/lib/button');
 //var Button = require('react-progress-button');
 
 var auth = require('../../utils/auth');
+var RoleType = require('../../utils/constants').RoleType;
 var Error = require('../Common/Errors');
 
 module.exports = React.createClass({
@@ -29,7 +30,7 @@ module.exports = React.createClass({
 		const phone = this.refs.phone.getValue();
 		const pass = this.refs.pass.getValue();
 
-		auth.login(phone, pass, function(loggedIn, status) {
+		auth.login(phone, pass, null, function(loggedIn, status) {
 
 		    if (!loggedIn) {
 		    	var errorMsg = (status===401) ? '登录信息不正确' : Error.getMsg(status); 

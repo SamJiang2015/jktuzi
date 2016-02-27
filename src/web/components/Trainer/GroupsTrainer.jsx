@@ -71,8 +71,8 @@ module.exports = React.createClass({
 	render: function() {
 		return (
 			<div className="groups trainer-groups">
-				<div className="panel panel-primary">
-					<div className="panel-heading">	
+				<div className="panel panel-info">
+					<div className="panel-heading panel-warning">	
 						<h5>我管理的班级</h5>
 					</div>
 					<div className="panel-body">

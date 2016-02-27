@@ -93,6 +93,23 @@ Constants = Object.freeze({
 		OpenDay: 3
 	},	
 
+	LabelDisplay: [
+		null,  //because label values in the DB start from 1
+		"糖尿病",
+		"高血压",
+		"心脏病",
+		"甲减",
+		"痛风",
+		"素食",
+		"哺乳期",
+		"食物过敏",
+		"特别忌口",
+		"少数民族",
+		"腰部损伤",
+		"膝盖损伤",
+		"脚踝损伤"
+	],
+
 	SportsTypes: {
 		items: [
 			{

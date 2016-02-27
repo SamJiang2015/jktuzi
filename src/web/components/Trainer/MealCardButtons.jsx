@@ -48,45 +48,46 @@ module.exports = React.createClass({
 
 		// render UI to show the new status
 		this.setState({
-			status: newStatus
+			status: newStatus,
+			disabled: false
 		});
 
 	},
 
 	render: function() {
 		return (
-			<div className="form-group">
+			<div className={"form-group"}>
 				<label className="radio-inline">
 					<input 
 						type="radio" 
 						value="miss"  
 						checked={this.state.status===MealCardStatus.Miss?'checked':null}
 						onChange={this.handleChange}/>
-						Miss
+						未打卡
 				</label>
 				<label className="radio-inline">
 					<input 
 						type="radio" 
 						value="pass"  
-						checked={this.state.status===MealCardStatus.Pass?'checked':null}
+						checked={this.state.status===MealCardStatus.Pass?'checked':null}					
 						onChange={this.handleChange}/>
-						Pass
+						合格
 				</label>
 				<label className="radio-inline">								
 					<input 
 						type="radio" 
 						value="fail" 
-						checked={this.state.status===MealCardStatus.Fail?'checked':null}
+						checked={this.state.status===MealCardStatus.Fail?'checked':null}				
 						onChange={this.handleChange} />
-						Fail
+						不合格
 				</label>
 				<label className="radio-inline">								
 					<input 
 						type="radio" 
 						value="openday" 
-						checked={this.state.status===MealCardStatus.OpenDay?'checked':null}
+						checked={this.state.status===MealCardStatus.OpenDay?'checked':null}				
 						onChange={this.handleChange} />
-						Open
+						开放日
 				</label>				
 			</div>
 		);

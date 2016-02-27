@@ -7,7 +7,7 @@ require('es6-promise').polyfill();
 //var rootUrl = 'http://pipifit.carp.mopaasapp.com/api/v1/';
 
 var rootUrl = 'http://localhost:3000/api/v1/'; 
-
+//var rootUrl = "https://api.s.pipifit.com/";
 
 console.log('rootUrl: ' + rootUrl);
 

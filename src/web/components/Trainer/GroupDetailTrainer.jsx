@@ -112,7 +112,7 @@ module.exports = React.createClass({
 		this.setState({
 			group: this.state.group,
 			checkAllStatus: checkAllStatus
-		})
+		});
 	},
 
 	// when user clicks on cancel, just re-render the page using the data
@@ -281,6 +281,7 @@ module.exports = React.createClass({
 						others={trainee.others}
 						weight={trainee.weight}
 						fat={trainee.bodyfat}
+						labels={trainee.labels}
 						cardType={this.state.cardType}
 						handleMealCardStatusChange={this.handleMealCardStatusChange}
 						handleSportsCardStatusChange={this.handleSportsCardStatusChange}
@@ -299,7 +300,7 @@ module.exports = React.createClass({
 
 		return (
 			<div>
-				<div class="table-responsive">
+				<div className="table-responsive">
 					<table className="table table-condensed table-hover">
 						<thead>
 							<tr>
@@ -336,7 +337,7 @@ module.exports = React.createClass({
 							value="miss"  
 							checked={this.state.checkAllStatus===MealCardStatus.Miss?'checked':null}
 							onChange={this.handleCheckAllChange}/>
-							Miss
+							未打卡
 					</label>
 					<label className="checkbox-inline">
 						<input 
@@ -344,7 +345,7 @@ module.exports = React.createClass({
 							value="pass"  
 							checked={this.state.checkAllStatus===MealCardStatus.Pass?'checked':null}
 							onChange={this.handleCheckAllChange}/>
-							Pass
+							合格
 					</label>
 					<label className="checkbox-inline">								
 						<input 
@@ -352,7 +353,7 @@ module.exports = React.createClass({
 							value="fail" 
 							checked={this.state.checkAllStatus===MealCardStatus.Fail?'checked':null}
 							onChange={this.handleCheckAllChange} />
-							Fail
+							不合格
 					</label>
 					<label className="checkbox-inline">								
 						<input 
@@ -360,7 +361,7 @@ module.exports = React.createClass({
 							value="openday" 
 							checked={this.state.checkAllStatus===MealCardStatus.OpenDay?'checked':null}
 							onChange={this.handleCheckAllChange} />
-							Open
+							开放日
 					</label>				
 				</div>
 			</td></tr>
@@ -396,7 +397,7 @@ module.exports = React.createClass({
 	render: function() {
 		return (
 			<div className="groups trainer-group">
-				<div className="panel panel-primary">
+				<div className="panel panel-info">
 					<div className="panel-heading">	
 						<h5>{this.state.group? this.state.group.name : ''}</h5>
 					</div>

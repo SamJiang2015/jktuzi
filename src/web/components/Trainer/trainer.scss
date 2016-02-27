@@ -14,14 +14,6 @@
 	color: ghostwhite
 }
 
-.trainer-groups {
-
-	.active {
-		color: red; 
-	}
-}
-
-
 .loginTrainer {
 
 	h4 {
@@ -41,6 +33,34 @@
 	}
 }
 
+.trainer-groups {
+
+	.active {
+		color: red; 
+	}
+}
+
+.clickable {
+	text-decoration: underline
+}
+
+.clickable:hover {
+	color:ghostwhite
+}
+
+.panel-heading h4 {
+	text-align: center
+}
+
+.grayedout span {
+	color:gray
+}
+
+.bold span {
+	color:black;
+	font-weight: bold
+}
+
 .trainer-group {
 	.buttonTable {
 		td {
@@ -58,17 +78,18 @@
 	    text-align: center;
 	    margin: 0;
 	  }
-
-	.Pass {
-		background-color: #e8f4f0 //lightgreen;
-	}
-	.Fail {
-		background-color: #f7efef // #db8787 ;
-	}
-	.Miss {
-		background-color: white //lightgray;
-	}	
-	.OpenDay {
-		background-color: #f7eff9 //#a47eb5;
-	}
 }
+
+.traineeLabels a {
+	width: 75px;
+	text-align: center;
+}
+
+.traineeLabels button {
+	width: 75px;
+	text-align: center;
+}
+
+
+
+

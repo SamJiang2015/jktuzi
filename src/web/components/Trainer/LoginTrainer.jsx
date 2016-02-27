@@ -39,7 +39,7 @@ module.exports = React.createClass({
 		auth.login(
 			phone, 
 			pass, 
-			RoleType.Trainer.id, // must be trainer
+			[RoleType.Trainer.id], // must be trainer
 			function(loggedIn, status) {
 			    if (!loggedIn) {
 			    	var errorMsg = '登录信息不正确'; 
