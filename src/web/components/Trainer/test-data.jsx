@@ -7,6 +7,110 @@ var GroupType = require('../../utils/constants').GroupType;
 
 module.exports = {
 
+	Test_Trainees: [
+		{
+			id: 1,
+			labels: [1,2]
+		},
+		{
+			id: 2,
+			labels: [3,4,5]
+		},		
+		{
+			id: 3,
+			labels: []
+		},
+		{
+			id: 4,
+			labels: null
+		},
+		{
+			id: 5,
+			labels: [6,7,8,9,10,11,12,13]
+		},
+		{
+			id: 6,
+			labels: [3, 8, 9]
+		},
+		{
+			id: 7,
+			labels: [1,2]
+		},
+		{
+			id: 8,
+			labels: [1,2]
+		},
+		{
+			id: 9,
+			labels: [1,2]
+		},
+		{
+			id: 10,
+			labels: [1,2]
+		},
+		{
+			id: 11,
+			labels: [1,2]
+		},
+		{
+			id: 12,
+			labels: [1,2]
+		},		
+		{
+			id: 13,
+			labels: [1,2]
+		},
+		{
+			id: 14,
+			labels: [1,2]
+		},
+		{
+			id: 15,
+			labels: [1,2]
+		},
+		{
+			id: 21,
+			labels: [1,2]
+		},
+		{
+			id: 22,
+			labels: [1,2]
+		},		
+		{
+			id: 23,
+			labels: [1,2]
+		},
+		{
+			id: 24,
+			labels: [1,2]
+		},
+		{
+			id: 25,
+			labels: [1,2]
+		},
+		{
+			id: 26,
+			labels: [1,2]
+		},
+		{
+			id: 27,
+			labels: [1,2]
+		},
+		{
+			id: 28,
+			labels: [1,2]
+		},
+		{
+			id: 29,
+			labels: [1,2]
+		},
+		{
+			id: 30,
+			labels: [1,2]
+		}	
+
+	],
+
 	Test_Groups: [
 		{
 			id: 1,
@@ -19,7 +123,6 @@ module.exports = {
 					id: 1,
 					name: "学员001",
 					nickname: "微信001",
-					labels: [1, 2],
 					breakfast: 0,
 					lunch: 1,
 					dinner: 2,
@@ -33,8 +136,7 @@ module.exports = {
 				{
 					id: 2,
 					name: "学员002",
-					nickname: "微信002",
-					labels: [3, 5],					
+					nickname: "微信002",			
 					breakfast: 1,
 					lunch: 2,
 					dinner: 0,

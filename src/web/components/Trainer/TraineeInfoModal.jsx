@@ -9,6 +9,12 @@
 //		a new SportCardItem or Updating an existing one
 
 var React = require('react');
+var Reflux = require('reflux');
+var Loader = require('react-loader');
+
+var TraineeActions = require('./trainee-actions');
+var TraineeStore = require('./trainee-store');
+
 var LabelsEditModal = require('./TraineeLabelsEditModal');
 
 var Modal = require('react-bootstrap/lib/modal');
@@ -20,6 +26,27 @@ var LabelDisplay = require('../../utils/constants').LabelDisplay;
 
 module.exports = React.createClass({
 
+	// mixins: [
+	// 	Reflux.listenTo(TraineeStore, 'onLabelsChange')
+	// ],
+
+	// onLabelsChange: function() {
+
+ //    	var labelsFromStore = TraineeStore.findTrainee(this.props.id).labels;
+
+	// 	// need to deep copy so that user can easily roll back unsubmitted
+	// 	// changes by clicking on "Cancel"
+	// 	var copiedLabels = [];
+	// 	for (var i=0; i<labelsFromStore.length; i++) {
+	// 		copiedLabels.push(labelsFromStore[i]);
+	// 	}
+
+	//     this.setState({
+	//       labels: copiedLabels,
+	//       showSelf: this.props.showModal      
+	//     });
+	// },
+
 	getInitialState: function(){
 		return {
 			labels: [],
@@ -28,20 +55,43 @@ module.exports = React.createClass({
 		};
 	},
 
-	setStateHelper: function(props) {
-		this.setState({
-			labels: props.labels,
-			showSelf: props.showModal,
-			showLabelEditModal: false			
-		});
-	},
-
 	componentDidMount: function() {
-		this.setStateHelper(this.props);	
+		// todo: put this in an async call
+		TraineeActions.getTraineeLabels(this.props.id);
+
+    	var labelsFromStore = TraineeStore.findTrainee(this.props.id).labels;
+
+		// need to deep copy so that user can easily roll back unsubmitted
+		// changes by clicking on "Cancel"
+		var copiedLabels = [];
+		for (var i=0; i<labelsFromStore.length; i++) {
+			copiedLabels.push(labelsFromStore[i]);
+		}
+
+	    this.setState({
+	      labels: copiedLabels,
+	      showSelf: this.props.showModal,
+	      showLabelEditModal: false      
+	    });
 	},
 
-	componentWillReceiveProps: function(newProps) {
-		this.setStateHelper(newProps);
+	componentWillReceiveProps: function(nextProps) {
+		TraineeActions.getTraineeLabels(nextProps.id);
+
+    	var labelsFromStore = TraineeStore.findTrainee(nextProps.id).labels;
+
+		// need to deep copy so that user can easily roll back unsubmitted
+		// changes by clicking on "Cancel"
+		var copiedLabels = [];
+		for (var i=0; i<labelsFromStore.length; i++) {
+			copiedLabels.push(labelsFromStore[i]);
+		}
+
+	    this.setState({
+	      labels: copiedLabels,
+	      showSelf: nextProps.showModal,
+	      showLabelEditModal: false      
+	    });		
 	},	
 
 	close: function() {		
@@ -64,16 +114,20 @@ module.exports = React.createClass({
 		})
 	},
 
-	submitLabelInfo: function() {
-		this.props.submitLabelInfo(this.state.labels);
-
-		alert('您已成功提交标签信息');
+	submitInfo: function() {
+		// todo: wrap this in an async call
+		TraineeActions.writeTraineeLabels(this.props.id, this.state.labels);
+		alert('您已成功提交'+this.props.nickname+'的标签信息');
+		this.setState({
+			showSelf: false
+		});
 	},
 
 	renderLabels: function(){
 		if (this.state.labels && this.state.labels.length>0) {
 			return this.state.labels.map(function(label) {
 				return (<Button
+							key={label}
 							bsSize='small' 
 							bsStyle='info'>
 						{LabelDisplay[label]}

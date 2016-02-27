@@ -3,8 +3,6 @@
 // 
 
 var React = require('react');
-var Reflux = require('reflux');
-var Loader = require('react-loader');
 
 var MealCardButtons = require('./MealCardButtons');
 var SportsCardButtons = require('./SportsCardButtons');
@@ -80,8 +78,11 @@ module.exports = React.createClass({
 		this.props.handleFatChange(this.state.id, newValue);		
 	},	
 
-	handleLabelChange: function(newLabels) {
-		this.props.handleLabelChange(this.state.id, newLabels);
+	// once the user clicks on 提交 from the info modal, close it 
+	handleLabelChange: function() {
+		this.setState({
+			showModal: false
+		});
 	},
 
 	handleClick: function(id, e) {
@@ -96,9 +97,11 @@ module.exports = React.createClass({
 		if (this.state.showModal) {
 			return (
 				<TraineeInfoModal
-					{...this.props}
+					id={this.state.id}
+					nickname={this.state.nickname}
+					name={this.state.name}
 					showModal={this.state.showModal}
-					submitLabelInfo={this.handleLabelChange}
+					handleLabelChange={this.handleLabelChange}
 					/>
 			);
 		}

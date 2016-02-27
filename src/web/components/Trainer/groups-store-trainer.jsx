@@ -81,7 +81,7 @@ module.exports = Reflux.createStore({
   // TODO: consider moving this to a separate store, since this is an action on
   // a trainee
   writeTraineeLabels: function(traineeId, labels) {
-
+    
   },
 
   // retrieve detail info including membership of a particular group
