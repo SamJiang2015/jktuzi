@@ -79,27 +79,27 @@ app.get('*glyphicons-halflings-regular.woff2', function(req, res) {
 	res.sendFile(__dirname + '/public/fonts/glyphicons-halflings-regular.woff2');
 });
 
-app.get('*build.min.js', function(req, res) {
-		res.set('Content-Type', 'application/javascript');
-	res.sendFile(__dirname + '/public/build/build.min.js');
-});
+// app.get('*build.min.js', function(req, res) {
+// 		res.set('Content-Type', 'application/javascript');
+// 	res.sendFile(__dirname + '/public/build/build.min.js');
+// });
 
-app.get('*admin.min.js', function(req, res) {
-		res.set('Content-Type', 'application/javascript');
-	res.sendFile(__dirname + '/public/build/admin.min.js');
-});
+// app.get('*admin.min.js', function(req, res) {
+// 		res.set('Content-Type', 'application/javascript');
+// 	res.sendFile(__dirname + '/public/build/admin.min.js');
+// });
 
 app.get('*trainer.min.js', function(req, res) {
 		res.set('Content-Type', 'application/javascript');
 	res.sendFile(__dirname + '/public/build/trainer.min.js');
 });
 
-app.get('/admin/*admin.js', function(req, res) {
-		res.set('Content-Type', 'application/javascript');
-	res.sendFile(__dirname + '/public/js/admin.js');
-});
+// app.get('/admin/*admin.js', function(req, res) {
+// 		res.set('Content-Type', 'application/javascript');
+// 	res.sendFile(__dirname + '/public/js/admin.js');
+// });
 
-app.get('/trainer/\*trainer.js', function(req, res) {
+app.get('*trainer.js', function(req, res) {
 		res.set('Content-Type', 'application/javascript');
 	res.sendFile(__dirname + '/public/js/trainer.js');
 });
@@ -119,19 +119,13 @@ app.use('/api/v1/accounts', accountRoutes);
 app.use('/api/v1/groups', groupRoutes);
 
 
-// note: these catch-all paths must come after the real path handlers (/api/v1/....)
-app.get('/admin*', function(req, res) {
-	res.set('Content-Type', 'text/html');
-	res.sendFile(__dirname + '/public/admin.html');
-});
+// // note: these catch-all paths must come after the real path handlers (/api/v1/....)
+// app.get('/admin*', function(req, res) {
+// 	res.set('Content-Type', 'text/html');
+// 	res.sendFile(__dirname + '/public/admin.html');
+// });
 
-
-app.get('/trainer*', function(req, res) {
-	res.set('Content-Type', 'text/html');
-	res.sendFile(__dirname + '/public/trainer.html');
-});
-
-// any unhandled requests will get back index.html
+// any unhandled requests will get back trainer.html
 app.get('/*', function(req, res) {
 	res.set('Content-Type', 'text/html');
 	res.sendFile(__dirname + '/public/index.html');

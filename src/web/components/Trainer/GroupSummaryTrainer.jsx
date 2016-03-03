@@ -44,7 +44,7 @@ module.exports = React.createClass({
 
 	    //this.props.handleShowGroupDetail(id);
 
-	    this.history.pushState(null, '/trainer/groups/'+id)
+	    this.history.pushState(null, '/groups/'+id);
 	},
 
 	// getGroupTypeDisplay: function(groupTypeId) {

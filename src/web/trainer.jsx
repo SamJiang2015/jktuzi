@@ -27,7 +27,7 @@ function requireAuth(nextState, replaceState) {
 
 ReactDOM.render((
 	<Router history={createBrowserHistory()}>
-		<Route path='/trainer' component={Main}>
+		<Route path='/' component={Main}>
 			<Route path='login' component={Login} />
 			<Route path='logout' component={Logout} onEnter={requireAuth} />
 			<Route path='groups' component={Groups} onEnter={requireAuth} />

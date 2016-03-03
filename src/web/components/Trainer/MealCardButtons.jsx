@@ -3,6 +3,8 @@
 // 
 
 var React = require('react');
+
+var Glyphicon = require('react-bootstrap/lib/glyphicon');
 var MealCardStatus = require('../../utils/constants').MealCardStatus;
 var EMPTY = require('../../utils/constants').EMPTY;
 
@@ -32,20 +34,20 @@ module.exports = React.createClass({
 		var newStatus; 
 
 		// determine which button has been clicked 
-		if (e.target.value==='pass' && e.target.checked) {
+		if (e.target.value==='pass' && this.state.status!==MealCardStatus.Pass) {
 				newStatus = MealCardStatus.Pass;
-		} else if (e.target.value==='fail' && e.target.checked) {
+		} else if (e.target.value==='fail' && this.state.status!==MealCardStatus.Fail) {
 				newStatus = MealCardStatus.Fail;
-		} else if (e.target.value==='miss' && e.target.checked) {
+		} else if (e.target.value==='miss' && this.state.status!==MealCardStatus.Miss) {
 				newStatus = MealCardStatus.Miss;
-		} else if (e.target.value==='openday' && e.target.checked) {
+		} else if (e.target.value==='openday' && this.state.status!==MealCardStatus.OpenDay) {
 				newStatus = MealCardStatus.OpenDay;
 		} else {
 			newStatus = null;
 		}
 
 		// call handler from parent component to pass up the new status
-		this.props.handleMealCardStatusChange(newStatus?newStatus:EMPTY);
+		this.props.handleMealCardStatusChange(newStatus!==null?newStatus:EMPTY);
 
 		// render UI to show the new status
 		this.setState({
@@ -61,18 +63,10 @@ module.exports = React.createClass({
 				<label className="radio-inline">
 					<input 
 						type="radio" 
-						value="miss"  
-						checked={this.state.status===MealCardStatus.Miss?'checked':null}
-						onChange={this.handleChange}/>
-						未打卡
-				</label>
-				<label className="radio-inline">
-					<input 
-						type="radio" 
 						value="pass"  
 						checked={this.state.status===MealCardStatus.Pass?'checked':null}					
 						onChange={this.handleChange}/>
-						合格
+						<Glyphicon glyph="ok-circle"/>
 				</label>
 				<label className="radio-inline">								
 					<input 
@@ -80,15 +74,23 @@ module.exports = React.createClass({
 						value="fail" 
 						checked={this.state.status===MealCardStatus.Fail?'checked':null}				
 						onChange={this.handleChange} />
-						不合格
+						<Glyphicon glyph="remove-circle"/>
 				</label>
+				<label className="radio-inline">
+					<input 
+						type="radio" 
+						value="miss"  
+						checked={this.state.status===MealCardStatus.Miss?'checked':null}
+						onChange={this.handleChange}/>
+						<Glyphicon glyph="ban-circle"/>
+				</label>				
 				<label className="radio-inline">								
 					<input 
 						type="radio" 
 						value="openday" 
 						checked={this.state.status===MealCardStatus.OpenDay?'checked':null}				
 						onChange={this.handleChange} />
-						开放日
+						<Glyphicon glyph="cutlery"/>
 				</label>				
 			</div>
 		);

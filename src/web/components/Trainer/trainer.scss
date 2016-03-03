@@ -46,7 +46,7 @@
 }
 
 .clickable:hover {
-	color:ghostwhite
+	font-weight: bold
 }
 
 .panel-heading h4 {
@@ -73,12 +73,17 @@
 	th {
       background-color:#232f3e;
       color:ghostwhite;
+      text-decoration: underline;
     }
 
 	th, td {
 	    text-align: center;
 	    margin: 0;
-	  }
+	}
+
+    th:hover {
+    	color: orange
+    }	
 }
 
 .traineeLabels a {
@@ -121,7 +126,22 @@
 }
 
 .ownRemark span:hover {
-	color:ghostwhite
+	font-weight: bold
 }
 
+.glyphicon-ok-circle {
+	color: purple
+}
+
+.glyphicon-remove-circle {
+	color: purple
+}
+
+.glyphicon-ban-circle {
+	color: purple
+}
+
+.glyphicon-cutlery {
+	color: purple
+}
 

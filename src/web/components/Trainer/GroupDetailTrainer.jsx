@@ -6,15 +6,13 @@
 var React = require('react');
 var Reflux = require('reflux');
 var Loader = require('react-loader');
-var _=require('underscore');
 
 // Bootstrap UI components
 var ButtonToolbar = require('react-bootstrap/lib/buttontoolbar');
 var ButtonGroup = require('react-bootstrap/lib/buttongroup');
 var Button = require('react-bootstrap/lib/button');
-var DropdownButton = require('react-bootstrap/lib/dropdownbutton');
-var MenuItem = require('react-bootstrap/lib/menuitem');
 var Input = require('react-bootstrap/lib/input');
+var Glyphicon = require('react-bootstrap/lib/glyphicon');
 
 // UI components
 var Trainee = require('./TraineeTrainer');
@@ -63,6 +61,10 @@ module.exports = React.createClass({
 			}
 		}
 
+		deepCopiedGroup.trainees.sort(function(a,b){
+		  return (a.nickname.localeCompare(b.nickname));
+		});
+
 	    this.setState({
 	      group: deepCopiedGroup,
 	      newRemarks: [],
@@ -92,7 +94,7 @@ module.exports = React.createClass({
 
 	componentDidMount: function() {
 		// by default, retrieve today's info first
-		var date = new Date().toISOString().slice(0,10);
+		var date = new Date().toJSON().slice(0,10);
 		// trigger fetching of the detailed info for the selected group
 		// the change will be propgated from the store to this component
 		// through the change listening mechanism
@@ -105,7 +107,7 @@ module.exports = React.createClass({
 
 	componentWillReceiveProps: function(nextProps) {
 		// by default, retrieve today's info first
-		var date = new Date().toISOString().slice(0,10);
+		var date = new Date().toJSON().slice(0,10);
 
 		// trigger fetching of the detailed info for the selected group
 		// the change will be propgated from the store to this component
@@ -158,13 +160,13 @@ module.exports = React.createClass({
 		var checkAllStatus; 
 
 		// determine which checkall button has been clicked
-		if (e.target.value==='pass' && e.target.checked) {
+		if (e.target.value==='pass' && this.state.checkAllStatus!==MealCardStatus.Pass) {
 			checkAllStatus = MealCardStatus.Pass;
-		} else if (e.target.value==='fail' && e.target.checked) {
+		} else if (e.target.value==='fail' && this.state.checkAllStatus!==MealCardStatus.Fail) {
 			checkAllStatus = MealCardStatus.Fail;
-		} else if (e.target.value==='miss' && e.target.checked) {
+		} else if (e.target.value==='miss' && this.state.checkAllStatus!==MealCardStatus.Miss) {
 			checkAllStatus = MealCardStatus.Miss;
-		} else if (e.target.value==='openday' && e.target.checked) {
+		} else if (e.target.value==='openday' && this.state.checkAllStatus!==MealCardStatus.OpenDay) {
 			checkAllStatus = MealCardStatus.OpenDay;
 		} else {
 			checkAllStatus = null;
@@ -176,7 +178,7 @@ module.exports = React.createClass({
 
 			// save the new status to the array of info that will be submitted
 			// when coach clicks on 'submit'
-			this.handleMealCardStatusChange(trainee.userId, checkAllStatus);
+			this.handleMealCardStatusChange(trainee.userId, checkAllStatus===null?EMPTY:checkAllStatus);
 
 			// update state to show the UI.
 			if (!trainee.cardInfo) {
@@ -359,32 +361,8 @@ module.exports = React.createClass({
 		}
 	},
 
-	// when user changes the weight value for a trainee, 
-	// save the new weight so that we can commit to store later when
-	// user clicks on submit button
-	handleWeightChange: function(traineeId, newValue) {
-		for (var i=0; i<this.state.group.trainees.length; i++) {
-			if (this.state.group.trainees[i].userId.toString() === traineeId.toString()) {
-				this.state.group.trainees[i].weight = newValue;
-				break;
-			}
-		}
-	},
-
-	// when user changes the bodyfat value for a trainee, 
-	// save the new value so that we can commit to store later when
-	// user clicks on submit button
-	handleFatChange: function(traineeId, newValue) {
-		for (var i=0; i<this.state.group.trainees.length; i++) {
-			if (this.state.group.trainees[i].userId.toString() === traineeId.toString()) {
-				this.state.group.trainees[i].bodyfat = newValue;
-				break;
-			}
-		}
-	},
-
 	// helper function
-	pickObjectByUserId(userId, objects) {
+	pickObjectByUserId: function(userId, objects) {
 		var obj = null;
 
 		for (var i=0; i<objects.length; i++) {
@@ -413,6 +391,26 @@ module.exports = React.createClass({
 				remark: newValue 				
  			})
 		}
+
+		// also update the state -- this way when we set loading to true
+		// which causes a re-render, the UI will not jump back
+		var trainee = this.pickObjectByUserId(traineeId, this.state.group.trainees);
+		if (!trainee.remarks) {trainee.remarks=[];}
+		for(var i=0; i<trainee.remarks.length; i++) {
+			if (trainee.remarks[i].coachId.toString()===Auth.getCoachId().toString()) {
+				trainee.remarks[i].remark=newValue;
+				trainee=null;
+				break;
+			}
+		}
+		// we did not find a matching remark made by this coach
+		if (trainee!==null) {
+			trainee.remarks.push({
+				coachId: Auth.getCoachId(),
+				coachName: Auth.getAccountName(),
+				remark: newValue
+			})
+		}
 	},
 
 	// when user changes the sport card status for a trainee, 
@@ -421,17 +419,37 @@ module.exports = React.createClass({
 	handleSportsCardStatusChange: function(traineeId, newExerciseInfo) {
 		
 		var exercise=this.pickObjectByUserId(traineeId, this.state.newExerciseInfo);
+
+		// need to convert to string as otherwise the backend API will throw errors
+		// if these 1s and 0s are passed in without ""s
+		var newExerciseInfoStringFormat = {
+					seven: newExerciseInfo.seven.toString(),
+					keep: newExerciseInfo.keep.toString(),
+					run: newExerciseInfo.run.toString(),
+					otherDetail: newExerciseInfo.otherDetail.toString()
+			};
+
 		if (exercise) {
-			exercise.exerciseInfo=newExerciseInfo;
+			exercise.exerciseInfo=newExerciseInfoStringFormat;
 		} else {
  			this.state.newExerciseInfo.push({
 				userId: traineeId,
-				exerciseInfo: newExerciseInfo
+				exerciseInfo: newExerciseInfoStringFormat
  			})
 		}
+
+		// also update the state -- this way when we set loading to true
+		// which causes a re-render, the UI will not jump back
+		var trainee = this.pickObjectByUserId(traineeId, this.state.group.trainees);
+		if (!trainee.cardInfo) {trainee.cardInfo={};}
+		trainee.cardInfo.seven=newExerciseInfo.seven;
+		trainee.cardInfo.keep=newExerciseInfo.keep;
+		trainee.cardInfo.run=newExerciseInfo.run;
+		trainee.cardInfo.otherdetail=newExerciseInfo.otherDetail; // note the API server returns "otherdetail"
+																  // but demands "otherDetail" when passing data in
 	},	
 
-	// when user changes the sport card status for a trainee, 
+	// when user changes the body card status for a trainee, 
 	// save the new status so that we can commit to store later when
 	// user clicks on submit button
 	handleBodyCardStatusChange: function(traineeId, bodyWeight, bodyFat) {
@@ -447,6 +465,13 @@ module.exports = React.createClass({
 				bodyFat: bodyFat.toString()
  			});
 		}
+
+		// also update the state -- this way when we set loading to true
+		// which causes a re-render, the UI will not jump back
+		var trainee = this.pickObjectByUserId(traineeId, this.state.group.trainees);
+		if (!trainee.cardInfo) {trainee.cardInfo={};}
+		trainee.cardInfo.bodyweight=bodyWeight;
+		trainee.cardInfo.bodyfat=bodyFat;
 	},	
 
 	// when user changes the meal card status for a trainee, 
@@ -462,26 +487,50 @@ module.exports = React.createClass({
 		}
 
 		mealInfo[this.state.cardType.propertyName]=newStatus.toString();
+
+		// also update the state -- this way when we set loading to true
+		// which causes a re-render, the UI will not jump back
+		var trainee = this.pickObjectByUserId(traineeId, this.state.group.trainees);
+		if (!trainee.cardInfo) {trainee.cardInfo={};}
+		trainee.cardInfo[this.state.cardType.propertyName]=newStatus;
 	},
 
-	// handleNickNameClick: function(e) {
-	// 	e.preventDefault();
+	handleNickNameClick: function(e) {
+		e.preventDefault();
 
-	// 	this.state.group.trainees.sort(function(a,b){
-	// 	  return (a.nickname.localeCompare(b.nickname, ['zh-CN-u-co-pinyin']));
-	// 	});
+		this.state.group.trainees.sort(function(a,b){
+		  return (a.nickname.localeCompare(b.nickname));
+		});
 
-	// 	this.setState({
-	// 		group: this.state.group
-	// 	})
-	// },
+		this.setState({
+			group: this.state.group
+		})
+	},
 
-	// helper function
-	clearInfoToBeSubmitted: function() {
-		this.state.newRemarks=[];
-		this.state.newMealInfo=[];
-		this.state.newExerciseInfo=[];
-		this.state.newBodyInfo=[];
+	handleCardTypeClick: function(e) {
+		e.preventDefault();
+
+		var compareFunc; 
+
+		switch (this.state.cardType) {
+			case CardType.Breakfast:
+			case CardType.Lunch:
+			case CardType.Dinner:
+				compareFunc=function(a,b) {
+				  return (a[this.state.cardType.propertyName] - b[this.state.cardType.propertyName]);
+						}.bind(this);					
+				break;
+			case CardType.Sports: 
+			default: 
+				compareFunc=function(a,b) {
+					return a.nickname.localeCompare(b.nickname);
+				};
+		}
+		this.state.group.trainees.sort(compareFunc);
+
+		this.setState({
+			group: this.state.group
+		})
 	},
 
 	// Buttons to switch the input card type: 早、中、晚、运动、体重/体脂
@@ -496,7 +545,6 @@ module.exports = React.createClass({
 						className={this.state.cardType===CardType.Breakfast?'active':null}				    	
 				    	onClick={function(e){
 				    		e.preventDefault(); 
-				    		if (this.cardType!==CardType.Breakfast) {this.clearInfoToBeSubmitted();}
 				    		this.setState({cardType:CardType.Breakfast, showTrainees:true});
 				    	}.bind(this)}>
 				    	早
@@ -506,7 +554,6 @@ module.exports = React.createClass({
 						className={this.state.cardType===CardType.Lunch?'active':null}				    	
 				    	onClick={function(e){
 				    		e.preventDefault(); 
-				    		if (this.cardType!==CardType.Lunch) {this.clearInfoToBeSubmitted();}
 				    		this.setState({cardType:CardType.Lunch, showTrainees:true})}.bind(this)}>
 				    	午
 				    </Button>
@@ -515,7 +562,6 @@ module.exports = React.createClass({
 						className={this.state.cardType===CardType.Dinner?'active':null}				    	
 				    	onClick={function(e){
 				    		e.preventDefault(); 
-				    		if (this.cardType!==CardType.Dinner) {this.clearInfoToBeSubmitted();}
 				    		this.setState({cardType:CardType.Dinner, showTrainees:true})}.bind(this)}>
 				    	晚
 				    </Button>
@@ -526,7 +572,6 @@ module.exports = React.createClass({
 						className={this.state.cardType===CardType.Sports?'active':null}				    	
 				    	onClick={function(e){
 				    		e.preventDefault(); 
-				    		if (this.cardType!==CardType.Sports) {this.clearInfoToBeSubmitted();}
 				    		this.setState({cardType:CardType.Sports, showTrainees:true})}.bind(this)}>
 				    	运动
 				    </Button>
@@ -536,8 +581,7 @@ module.exports = React.createClass({
 				    	href="#" 
 						className={this.state.cardType===CardType.Body?'active':null}				    	
 				    	onClick={function(e){
-				    		e.preventDefault(); 
-				    		if (this.cardType!==CardType.Body) {this.clearInfoToBeSubmitted();}				    		
+				    		e.preventDefault(); 		    		
 				    		this.setState({cardType:CardType.Body, showTrainees:true})}.bind(this)}>
 				    	体卡
 				    </Button>
@@ -547,8 +591,7 @@ module.exports = React.createClass({
 				    	href="#" 
 						className={this.state.cardType===CardType.Remarks?'active':null}				    	
 				    	onClick={function(e){
-				    		e.preventDefault(); 
-				    		if (this.cardType!==CardType.Remarks) {this.clearInfoToBeSubmitted();}				    		
+				    		e.preventDefault(); 			    		
 				    		this.setState({cardType:CardType.Remarks, showTrainees:true})}.bind(this)}>
 				    	备注
 				    </Button>
@@ -564,23 +607,7 @@ module.exports = React.createClass({
 			return null;
 		}		
 
-		var sortedByField;
-
-		// if meal card, sort by meal card status; otherwise sort by wechat nickname
-		switch(this.state.cardType) {
-			case CardType.Breakfast:
-			case CardType.Lunch:
-			case CardType.Dinner:
-				sortedByField = this.state.cardType.propertyName;
-				break;
-			default: 
-				sortedByField = 'nickname';
-		}
-
-		// first sort the list of trainees based on current meal status
-		var traineesSorted = _.sortBy(this.state.group.trainees, sortedByField);
-
-		return traineesSorted.map(function(trainee) {
+		return this.state.group.trainees.map(function(trainee) {
 			return (<Trainee 
 						key={trainee.userId}
 						id={trainee.userId}
@@ -613,12 +640,12 @@ module.exports = React.createClass({
 
 		return (
 			<div>
-				<div className="table-responsive">
+				<div className="table-responsive cardTable">
 					<table className="table table-condensed table-hover">
 						<thead>
 							<tr>
 								<th style={{width: '9%'}} onClick={this.handleNickNameClick}>昵称</th>
-								<th style={{width: '90%'}}>{this.state.cardType.description}</th>
+								<th style={{width: '90%'}} onClick={this.handleCardTypeClick}>{this.state.cardType.description}</th>
 								<th style={{width: '1%'}}></th>
 							</tr>
 							{this.renderMealStatusCheckAllButtons()}								
@@ -648,18 +675,10 @@ module.exports = React.createClass({
 					<label className="checkbox-inline">
 						<input 
 							type="checkbox" 
-							value="miss"  
-							checked={this.state.checkAllStatus===MealCardStatus.Miss?'checked':null}
-							onChange={this.handleCheckAllChange}/>
-							未打卡
-					</label>
-					<label className="checkbox-inline">
-						<input 
-							type="checkbox" 
 							value="pass"  
 							checked={this.state.checkAllStatus===MealCardStatus.Pass?'checked':null}
 							onChange={this.handleCheckAllChange}/>
-							合格
+							<Glyphicon glyph="ok-circle"/>
 					</label>
 					<label className="checkbox-inline">								
 						<input 
@@ -667,15 +686,23 @@ module.exports = React.createClass({
 							value="fail" 
 							checked={this.state.checkAllStatus===MealCardStatus.Fail?'checked':null}
 							onChange={this.handleCheckAllChange} />
-							不合格
+							<Glyphicon glyph="remove-circle"/>
 					</label>
+					<label className="checkbox-inline">
+						<input 
+							type="checkbox" 
+							value="miss"  
+							checked={this.state.checkAllStatus===MealCardStatus.Miss?'checked':null}
+							onChange={this.handleCheckAllChange}/>
+							<Glyphicon glyph="ban-circle"/>
+					</label>					
 					<label className="checkbox-inline">								
 						<input 
 							type="checkbox" 
 							value="openday" 
 							checked={this.state.checkAllStatus===MealCardStatus.OpenDay?'checked':null}
 							onChange={this.handleCheckAllChange} />
-							开放日
+							<Glyphicon glyph="cutlery"/>
 					</label>				
 				</div>
 			</td></tr>
@@ -713,7 +740,7 @@ module.exports = React.createClass({
 			<div className="groups trainer-group">
 				<div className="panel panel-info">
 					<div className="panel-heading">	
-						<h5>{this.state.group? this.state.group.name : ''}</h5>
+						<h5>{this.state.group? this.state.group.classname : ''}</h5>
 					</div>
 					<div className="panel-body">
 						<div className="well">

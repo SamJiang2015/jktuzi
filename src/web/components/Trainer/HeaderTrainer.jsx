@@ -48,7 +48,7 @@ module.exports = React.createClass({
 		return (
 			<Navbar.Header>
 				<Navbar.Brand>
-	      			<Link to="/trainer/" onClick={this.handleNavClick}>
+	      			<Link to="/" onClick={this.handleNavClick}>
 	          			<span className="logo-img"><img src="images/pipi_logo.jpg"/></span>PiPi健康-教练端
 	      			</Link>
 				</Navbar.Brand>
@@ -61,9 +61,9 @@ module.exports = React.createClass({
 	renderNavbarItemsLoggedIn: function() {
 		return (
            <Nav pullRight>
-           		<LinkContainer to="/trainer/"><NavItem eventKey={1}>欢迎您，{this.props.accountName + this.props.roleName}</NavItem></LinkContainer>
-                <LinkContainer to="/trainer/"><NavItem eventKey={2}>打卡管理</NavItem></LinkContainer>
-            	<LinkContainer to="/trainer/logout"><NavItem eventKey={3}>退出登录</NavItem></LinkContainer>
+           		<LinkContainer to="/"><NavItem eventKey={1}>欢迎您，{this.props.accountName + this.props.roleName}</NavItem></LinkContainer>
+                <LinkContainer to="/groups"><NavItem eventKey={2}>打卡管理</NavItem></LinkContainer>
+            	<LinkContainer to="/logout"><NavItem eventKey={3}>退出登录</NavItem></LinkContainer>
         	</Nav>);
 
 	},

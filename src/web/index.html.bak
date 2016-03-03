@@ -5,15 +5,15 @@
     <meta charset="utf-8" />
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0" />
-    <title>PiPi健康数据管理教练端</title>
+    <title>PiPi健康数据管理</title>
     <link rel="stylesheet" href="./css/style.css">
 </head>
 
 <body>
-    <div id="trainer">
+    <div id="app">
     </div>
     <!-- build:js -->
-    <script src="./js/trainer.js"></script>
+    <script src="./js/build.js"></script>
     <!-- endbuild -->
 </body> 
 

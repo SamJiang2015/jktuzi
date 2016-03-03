@@ -41,10 +41,10 @@ module.exports = React.createClass({
 		// call handler from parent component to pass up the new status
 	 	this.props.handleSportsCardStatusChange(
 	 		{
-	 			seven: newValue.toString(),
-	 			keep: this.state.keep.toString(),
-	 			run: this.state.jogging.toString(),
-	 			otherDetail: this.state.others.toString()
+	 			seven: newValue,
+	 			keep: this.state.keep,
+	 			run: this.state.jogging,
+	 			otherDetail: this.state.others
 	 		});
 
 	 	this.setState({
@@ -59,10 +59,10 @@ module.exports = React.createClass({
 		// call handler from parent component to pass up the new status
 	 	this.props.handleSportsCardStatusChange(	 		
 	 		{
-	 			seven: this.state.seven.toString(),
-	 			keep: newValue.toString(),
-	 			run: this.state.jogging.toString(),
-	 			otherDetail: this.state.others.toString()
+	 			seven: this.state.seven,
+	 			keep: newValue,
+	 			run: this.state.jogging,
+	 			otherDetail: this.state.others
 	 		});
 
 	 	this.setState({
@@ -77,10 +77,10 @@ module.exports = React.createClass({
 		// call handler from parent component to pass up the new status
 	 	this.props.handleSportsCardStatusChange(
 	 		{
-	 			seven: this.state.seven.toString(),
-	 			keep: this.state.keep.toString(),
-	 			run: newValue.toString(),
-	 			otherDetail: this.state.others.toString()
+	 			seven: this.state.seven,
+	 			keep: this.state.keep,
+	 			run: newValue,
+	 			otherDetail: this.state.others
 	 		});
 
 	 	this.setState({
@@ -95,10 +95,10 @@ module.exports = React.createClass({
 		// call handler from parent component to pass up the new status
 	 	this.props.handleSportsCardStatusChange(
 	 		{
-	 			seven: this.state.seven.toString(),
-	 			keep: this.state.keep.toString(),
-	 			run: this.state.jogging.toString(),
-	 			otherDetail: newValue.toString()
+	 			seven: this.state.seven,
+	 			keep: this.state.keep,
+	 			run: this.state.jogging,
+	 			otherDetail: newValue
 	 		});
 
 	 	this.setState({
@@ -115,7 +115,7 @@ module.exports = React.createClass({
 						value="seven"  
 						checked={this.state.seven===1?'checked':null}
 						onChange={this.handleSevenChange}/>
-						Seven
+						7
 				</label>
 				<label className="checkbox-inline">
 					<input 
@@ -123,7 +123,7 @@ module.exports = React.createClass({
 						value="keep"  
 						checked={this.state.keep===1?'checked':null}
 						onChange={this.handleKeepChange}/>
-						Keep
+						K
 				</label>
 				<label className="checkbox-inline">								
 					<input 

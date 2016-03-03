@@ -46,7 +46,7 @@ module.exports = React.createClass({
 			    	this.setState({ loading: false, error: true, errorMsg: errorMsg});
 			    } else {
 			    	this.setState({loading: false, error: false});
-		    		this.history.replaceState(null, '/trainer');
+		    		this.history.replaceState(null, '/');
 			    }
 			    // const location = this.props.location;
 
