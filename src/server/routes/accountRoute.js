@@ -34,6 +34,9 @@ router.post('/',
 // log in an account -- POST /accounts/login 
 router.post('/login',
 	function(req, res) {
+
+		res.set('Access-Control-Allow-Origin', '*');
+
 		var body = _.pick(req.body, 'mobile', 'password');
 		var accountInstance; // to save the account returned 
 							 // from the authenticate call so that it can be used 

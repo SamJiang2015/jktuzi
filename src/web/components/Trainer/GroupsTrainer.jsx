@@ -48,13 +48,11 @@ module.exports = React.createClass({
 		};
 	},
 
-	// on rerendering: just get the cached groups from the store
-	// this way if user click on other tabs and click back, the same
-	// set of groups will still show here.
 	componentDidMount: function() {
-		this.setState({
-			groups: GroupsStore.getCachedGroups()
-		});
+		// trigger fetching of the detailed info for the selected group
+		// the change will be propgated from the store to this component
+		// through the change listening mechanism
+		GroupsActions.getGroups(Auth.getCoachId(), Auth.getToken()); 
 	},
 
 	renderMainArea: function() {

@@ -4,29 +4,31 @@
 
 Constants = Object.freeze({
 
+	EMPTY: -1,
+
 	RoleValue: {
-		Admin: 1,
-		Trainer: 2, 
-		Trainee: 3
+		Admin: 2,
+		Trainer: 0, 
+		Trainee: 1
 	},
 
 	RoleName: {
-		1: '管理员',
-		2: '教练',
-		3: '学员'
+		2: '管理员',
+		0: '教练',
+		1: '学员'
 	},
 
 	RoleType: {
 		Admin: {
-			id: 1,
+			id: 2,
 			description: '管理员'
 		},
 		Trainer: {
-			id: 2,
+			id: 0,
 			description: '教练'
 		},
 		Trainee: {
-			id: 3,
+			id: 1,
 			description: '学员'
 		}
 	},
@@ -49,7 +51,10 @@ Constants = Object.freeze({
 		},
 		Body: {
 			description: '体重/体脂卡'
-		}
+		},
+		Remarks: {
+			description: '备注'
+		}		
 	},
 
 	SportsType: {

@@ -6,7 +6,6 @@ var Reflux = require('reflux');
 
 var GroupsActions = require('./groups-actions-trainer');
 var Api = require('../../utils/api');
-var Auth = require('../../utils/auth');
 
 var TestGroups = require('./test-data').Test_Groups;
 
@@ -18,141 +17,182 @@ module.exports = Reflux.createStore({
   getCachedGroups: function() {
     return this.groups;
   },
-  
-  findGroupCards: function(groupId) {
-    // look for the matching group
-    var showingGroup=null;
-    for (var i=0; i<this.groups.length; i++) {
-      if (this.groups[i].id.toString() === groupId.toString()) {
-        showingGroup = this.groups[i];
-        break;
-      }
-    }
-
-    if (!showingGroup) {
-      return null; 
-    } else {
-      return showingGroup;
-    }
-  },
 
   // retrieve the list of groups managed by a trainer from store
-  getGroups: function(token, dateFilter, cb) {
+  getGroups: function(coachId, token, cb) {
 
-      var url = 'groups'; 
+      var url = 'coachclasslist'; 
 
-      Api.get(url, token)
+      var params = {coachId: coachId};
+
+      Api.get(url, token, params)
         .then(function(json){
-          if (json.success) {
+          if (json.code===200) {
             this.groups = json.data;
             this.triggerChange();
           }
 
-          if (cb) cb(json.success, json.status);
+          if (cb) cb(json.code===200);
         }.bind(this));
   },
 
-  // retrieve the cards for all trainees belonging to a group
-  getGroupCards: function(groupId) {
-    // todo: add logic to hit the db
-    //
-    this.triggerChange();
-  },
-
-  // write the cards info for all trainees belonging to a group
-  writeGroupCards: function(group) {
-
-    if (!group || !group.trainees || group.trainees.length===0) {
-      console.log("writeGroupCards called with null or empty group");
-      return;
-    }
-
-    // todo: replace this logic below, need to hit DB
-    for (var i=0; i<this.groups.length; i++) {
-      if (this.groups[i].id.toString() === group.id.toString()) {
-        this.groups[i] = group;
-        break;
+  // helper function
+  pickGroupById: function(groupId) {
+    var group; 
+    for (var i=0; i< this.groups.length; i++) {
+      if (this.groups[i].classid.toString()===groupId.toString()) {
+        group = this.groups[i];
       }
     }
 
-    this.triggerChange();
+    return group;
   },
 
-  // TODO: consider moving this to a separate store, since this is an action on
-  // a trainee
-  writeTraineeLabels: function(traineeId, labels) {
-    
-  },
+  // retrieve the cards for all trainees belonging to a group
+  getGroupCards: function(groupId, date, accountId, token, cb) {
+      var url = 'cards'; 
 
-  // retrieve detail info including membership of a particular group
-  getGroupDetails: function(token, groupId, cb) {
+      var params = {classId: groupId, date: date, operatorId: accountId};
 
-      var url = 'groups/' + groupId; 
-
-      Api.get(url, token)
+      Api.get(url, token, params)
         .then(function(json){
-
-          if (json.success) {
-            var groupData = json.data;
-            var cachedGroupIndex;
-
-            // cache the return result in this.groups
-            for (var i=0; i<this.groups.length; i++) {
-              if (this.groups[i].id === groupData.id) {
-                cachedGroupIndex = i;
-                break;
-              }
-            }
-
-            if (cachedGroupIndex) {
-              this.groups[cachedGroupIndex] = groupData;
-            } else {
-              this.groups.push(groupData);
-            }
-
+          if (json.code===200) {
+            // cache the cards info in the groups array. 
+            var group = this.pickGroupById(groupId);
+            // todo: consider caching the info for different dates in the group object
+            // this can be done by: group[date] = json.data
+            // however, reason to not cache is to hit DB to refresh data any chance we get
+            group.trainees = json.data;
             this.triggerChange();
           }
 
-          if (cb) cb(json.success, json.status);
+          if (cb) cb(json.code===200);
         }.bind(this));
-  },  
+  },
 
-  // getGroupMembers: function(accountId, groupId, token, cb) {
+  // write remarks into DB
+  writeRemarks: function(groupId, coachId, operatorId, date, remarks, token, cb) {
 
-  //   // look for the matching group
-  //   var showingGroup=null;
-  //   var index=null;
+    var url = 'remarks'; 
+
+    var payload = {
+      classId: groupId, 
+      coachId: coachId,
+      operatorId: operatorId,
+      date: date,
+      remarks: remarks
+    };
+
+    Api.post(url, payload, token)
+      .then(function(json){
+        if (json.code===200) {
+            // cache the cards info in the groups array. 
+            var group = this.pickGroupById(groupId);
+            // this can be done by: group[date] = json.data
+            // however, reason to not cache is to hit DB to refresh data any chance we get
+            group.trainees = json.data;
+            this.triggerChange();
+        }
+        if (cb) cb(json.code===200);
+      }.bind(this));    
+  },
+
+  // write exercise info into DB
+  writeExerciseInfo: function(groupId, coachId, operatorId, date, exerciseInfo, token, cb) {
+
+    var url = 'exercise'; 
+
+    var payload = {
+      classId: groupId, 
+      coachId: coachId,
+      operatorId: operatorId,
+      cardDate: date,
+      cards: exerciseInfo
+    };
+
+    Api.post(url, payload, token)
+      .then(function(json){
+        if (json.code===200) {
+            // cache the cards info in the groups array. 
+            var group = this.pickGroupById(groupId);
+            // this can be done by: group[date] = json.data
+            // however, reason to not cache is to hit DB to refresh data any chance we get
+            group.trainees = json.data;
+            this.triggerChange();
+        }
+        if (cb) cb(json.code===200);
+      }.bind(this));    
+  },
+
+  // write meal info into DB
+  writeMealInfo: function(groupId, coachId, operatorId, date, url, mealInfo, token, cb) {
+
+    var payload = {
+      classId: groupId, 
+      coachId: coachId,
+      operatorId: operatorId,
+      cardDate: date,
+      cards: mealInfo
+    };
+
+    Api.post(url, payload, token)
+      .then(function(json){
+        if (json.code===200) {
+            // cache the cards info in the groups array. 
+            var group = this.pickGroupById(groupId);
+            // this can be done by: group[date] = json.data
+            // however, reason to not cache is to hit DB to refresh data any chance we get
+            group.trainees = json.data;
+            this.triggerChange();
+        }
+        if (cb) cb(json.code===200);
+      }.bind(this));    
+  },
+
+  // write exercise info into DB
+  writeBodyInfo: function(groupId, coachId, operatorId, date, bodyInfo, token, cb) {
+
+    var url = 'body'; 
+
+    var payload = {
+      classId: groupId, 
+      coachId: coachId,
+      operatorId: operatorId,
+      cardDate: date,
+      cards: bodyInfo
+    };
+
+    Api.post(url, payload, token)
+      .then(function(json){
+        if (json.code===200) {
+            // cache the cards info in the groups array. 
+            var group = this.pickGroupById(groupId);
+            // this can be done by: group[date] = json.data
+            // however, reason to not cache is to hit DB to refresh data any chance we get
+            group.trainees = json.data;
+            this.triggerChange();
+        }
+        if (cb) cb(json.code===200);
+      }.bind(this));    
+  },
+
+  // // write the cards info for all trainees belonging to a group
+  // writeGroupCards: function(group) {
+
+  //   if (!group || !group.trainees || group.trainees.length===0) {
+  //     console.log("writeGroupCards called with null or empty group");
+  //     return;
+  //   }
+
+  //   // todo: replace this logic below, need to hit DB
   //   for (var i=0; i<this.groups.length; i++) {
-  //     if (this.groups[i].id === groupId) {
-  //       showingGroup = this.groups[i];
-  //       index=i;
+  //     if (this.groups[i].id.toString() === group.id.toString()) {
+  //       this.groups[i] = group;
   //       break;
   //     }
   //   }
 
-  //   if (!showingGroup) {
-  //     console.log('getGroupMembers called with unrecognized groupId');
-  //     if (cb) cb(false, 400);
-  //     return; 
-  //   }
-
-  //   if (showingGroup.members && showingGroup.members.legnth>0) {
-  //     // we already fetched members of this group
-  //     if (cb) cb(true, 200);
-  //     return;
-  //   } else {
-  //     // fetch from DB
-  //     var url = 'groups/'+ groupId; 
-  //     Api.get(url, token)
-  //       .then(function(json){
-  //         if (json.success) {
-  //           // note that the call return the full info of the group
-  //           this.groups[index] = json.data;
-  //           this.triggerChange();
-  //       }
-  //       if (cb) cb(true, json.status);
-  //     }.bind(this));
-  //   }
+  //   this.triggerChange();
   // },
 
   triggerChange: function() {
@@ -160,5 +200,5 @@ module.exports = Reflux.createStore({
     this.trigger('change', this.groups);
   },
 
-  groups: TestGroups
+  groups: []
 });

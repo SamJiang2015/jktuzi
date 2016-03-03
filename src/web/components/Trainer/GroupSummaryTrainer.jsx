@@ -47,18 +47,18 @@ module.exports = React.createClass({
 	    this.history.pushState(null, '/trainer/groups/'+id)
 	},
 
-	getGroupTypeDisplay: function(groupTypeId) {
-		switch(groupTypeId) {
-			case GroupType.FatLoss.id:
-				return GroupType.FatLoss.description;
-			case GroupType.MuscleBuilding.id:
-				return GroupType.MuscleBuilding.description;
-			case GroupType.Waist.id:
-				return GroupType.Waist.description;
-			case GroupType.Chat.id:
-				return GroupType.Chat.description;				
-		}
-	},
+	// getGroupTypeDisplay: function(groupTypeId) {
+	// 	switch(groupTypeId) {
+	// 		case GroupType.FatLoss.id:
+	// 			return GroupType.FatLoss.description;
+	// 		case GroupType.MuscleBuilding.id:
+	// 			return GroupType.MuscleBuilding.description;
+	// 		case GroupType.Waist.id:
+	// 			return GroupType.Waist.description;
+	// 		case GroupType.Chat.id:
+	// 			return GroupType.Chat.description;				
+	// 	}
+	// },
 
 	render: function() {
 
@@ -66,7 +66,6 @@ module.exports = React.createClass({
 			<tr className='group'
 		        onClick={this.handleClick.bind(this, this.state.id)}>
 				<td>{this.state.name}</td>
-				<td>{this.state.enddate}</td>		
 			</tr>
 		);
 	}

@@ -78,7 +78,7 @@ module.exports = React.createClass({
 		                	type="tel" 
 		                	ref="phone" 
 		                	placeholder="手机"
-		                	defaultValue="18877777777"
+		                	defaultValue="17718436520"
 		                	hasFeedback 
 		                	feedbackIcon={mobileGlyphicon} 
 		                />
@@ -86,7 +86,7 @@ module.exports = React.createClass({
 		                	type="password" 
 		                	ref="pass" 
 		                	placeholder="密码" 
-		                	defaultValue="password"
+		                	defaultValue="abc138"
 		                	hasFeedback 
 		                	feedbackIcon={passwordGlyphicon} 
 		                />

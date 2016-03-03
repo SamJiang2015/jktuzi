@@ -41,7 +41,8 @@
 }
 
 .clickable {
-	text-decoration: underline
+	text-decoration: underline;
+	color: black
 }
 
 .clickable:hover {
@@ -104,7 +105,23 @@
 	margin-bottom: 5px;
 }
 
+.remarksList ul {
+	list-style: none;
+	text-align: left;
+}
 
+.remarksList .trainerName {
+	font-weight: bold;
+	margin-right: 2px;
+}
 
+.ownRemark span{
+	text-decoration: underline;
+	margin-right: 2px;
+}
+
+.ownRemark span:hover {
+	color:ghostwhite
+}
 
 

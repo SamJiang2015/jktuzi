@@ -4,6 +4,7 @@
 
 var React = require('react');
 var MealCardStatus = require('../../utils/constants').MealCardStatus;
+var EMPTY = require('../../utils/constants').EMPTY;
 
 module.exports = React.createClass({
 
@@ -44,7 +45,7 @@ module.exports = React.createClass({
 		}
 
 		// call handler from parent component to pass up the new status
-		this.props.handleMealCardStatusChange(newStatus);
+		this.props.handleMealCardStatusChange(newStatus?newStatus:EMPTY);
 
 		// render UI to show the new status
 		this.setState({

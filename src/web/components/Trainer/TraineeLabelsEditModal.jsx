@@ -42,7 +42,7 @@ module.exports = React.createClass({
 		this.setState({
 			labels: props.labels,
 			labelStatus: labelStatus,
-			showSelf: this.props.showModal			
+			showSelf: props.showModal			
 		});
 	},
 

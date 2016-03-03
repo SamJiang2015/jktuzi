@@ -4,29 +4,46 @@
 
 var React = require('react');
 var Input = require('react-bootstrap/lib/input');
+var EMPTY = require('../../utils/constants').EMPTY;
 
 module.exports = React.createClass({
 
 	getInitialState: function() {
 
 		return {
-			weight: 0,
-			fat: 0
+			weight: null,
+			fat: null
 		}
 	},
 
-	componentDidMount: function() {
+	setStateHelper: function(props) {
+		var weight=parseFloat(props.weight);
+		var fat=parseFloat(props.fat);
+
+		if (!isNaN(weight) && weight !== EMPTY) {
+			weight = weight.toFixed(1);
+		} else {
+			weight=null;
+		}
+
+		if (!isNaN(fat) && fat !== EMPTY) {
+			fat = fat.toFixed(1);
+		} else {
+			fat=null;
+		}
+
 		this.setState({
-			weight: this.props.weight,
-			fat: this.props.fat
+			weight: weight,
+			fat: fat
 		});
+	},
+
+	componentDidMount: function() {
+		this.setStateHelper(this.props);
 	 },
 
 	 componentWillReceiveProps: function(newProps) {
-		this.setState({
-			weight: newProps.weight,
-			fat: newProps.fat
-		});
+		this.setStateHelper(newProps);
 	 },
 
 	 handleWeightChange: function(e) {
@@ -34,12 +51,17 @@ module.exports = React.createClass({
 
 	 	var newValue = e.target.value;
 
-		// call handler from parent component to pass up the new status
-	 	this.props.handleWeightChange(newValue);
+	 	newNumber = parseFloat(newValue);
 
-	 	this.setState({
-	 		weight: newValue
-	 	});
+	 	if (!isNaN(newNumber)) {
+			// call handler from parent component to pass up the new status
+			// 四舍五入保留小数点后一位
+		 	this.props.handleBodyCardStatusChange(newNumber.toFixed(1), this.state.fat);
+		}
+
+		this.setState({
+			weight: newValue
+		});			 	
 	 },
 
 	 handleFatChange: function(e) {
@@ -47,13 +69,25 @@ module.exports = React.createClass({
 
 	 	var newValue = e.target.value;
 
-		// call handler from parent component to pass up the new status
-	 	this.props.handleFatChange(newValue);
+	 	newNumber = parseFloat(newValue);
 
-	 	this.setState({
-	 		fat: newValue
-	 	});
+	 	if (!isNaN(newNumber)) {
+			// call handler from parent component to pass up the new value
+			// 四舍五入保留小数点后一位
+		 	this.props.handleBodyCardStatusChange(this.state.weight, newNumber.toFixed(1));
+		}
+
+		this.setState({
+			fat: newValue
+		});			 	
 	 },
+
+	handleFocus: function(e) {
+		var target = e.target;
+		setTimeout(function() {
+		    target.select();
+		  }, 0);
+	},
 
 	render: function() {
 		return (
@@ -62,11 +96,12 @@ module.exports = React.createClass({
 					<Input 
 						type="number" 
 						addonAfter="kg"
-						min="50"
+						min="30"
 						max="350"
 						value={this.state.weight}  												
 						className="form-control" 
-						onChange={this.handleWeightChange}/>
+						onChange={this.handleWeightChange}
+						onFocus={this.handleFocus}/>
                 </div>
                 <div className="col-sm-4">
 					<Input 
@@ -75,8 +110,9 @@ module.exports = React.createClass({
 						min="5"
 						max="50"
 						value={this.state.fat}  												
-						className="form-control" 
-						onChange={this.handleFatChange}/>
+						className="form-control"					 
+						onChange={this.handleFatChange}
+						onFocus={this.handleFocus}/>
                 </div>
             </div>
 		);

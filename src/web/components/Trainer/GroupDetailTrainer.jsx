@@ -30,6 +30,7 @@ var GroupsStore = require('./groups-store-trainer');
 var CardType = require('../../utils/constants').CardType;
 var SportsType = require('../../utils/constants').SportsType;
 var MealCardStatus = require('../../utils/constants').MealCardStatus;
+var EMPTY = require('../../utils/constants').EMPTY;
 
 module.exports = React.createClass({
 
@@ -39,14 +40,35 @@ module.exports = React.createClass({
 
 	onGroupCardsChange: function() {
 
-		var groupFromStore = GroupsStore.findGroupCards(this.props.params.id);
+		var groupFromStore = GroupsStore.pickGroupById(this.props.params.id);
 
 		// need to deep copy so that user can easily roll back unsubmitted
 		// changes by clicking on "Cancel"
 		var deepCopiedGroup = JSON.parse(JSON.stringify(groupFromStore));
 
+		// move breakfast, lunch and dinner out of group.cardinfo, so that
+		// we can easily sort by these three fields
+		if (deepCopiedGroup.trainees) {
+			for (var i=0; i<deepCopiedGroup.trainees.length; i++) {
+				var trainee = deepCopiedGroup.trainees[i];
+				if (trainee.cardInfo) {
+					trainee.breakfast = trainee.cardInfo.breakfast;
+					trainee.lunch = trainee.cardInfo.lunch;
+					trainee.dinner= trainee.cardInfo.dinner;
+				} else {
+					trainee.breakfast = null;
+					trainee.lunch = null;
+					trainee.dinner= null;					
+				}
+			}
+		}
+
 	    this.setState({
 	      group: deepCopiedGroup,
+	      newRemarks: [],
+	      newExerciseInfo: [],
+	      newMealInfo: [],
+	      newBodyInfo: []
 	    });
 	},
 
@@ -57,32 +79,76 @@ module.exports = React.createClass({
 	    	cardType: null,
 	    	checkAllStatus: null,
 	    	showTrainees: false,
-	    	cardDate: new Date().toISOString().slice(0,10)
+	    	cardDate: new Date().toJSON().slice(0,10),
+
+	    	newRemarks: [],
+		    newExerciseInfo: [],
+		    newMealInfo:[],		    
+		    newBodyInfo: [],    	
+
+	    	loading: false
 	    }
 	},
 
 	componentDidMount: function() {
+		// by default, retrieve today's info first
+		var date = new Date().toISOString().slice(0,10);
 		// trigger fetching of the detailed info for the selected group
 		// the change will be propgated from the store to this component
 		// through the change listening mechanism
-		GroupsActions.getGroupCards(this.props.params.id); 
+		GroupsActions.getGroupCards(
+			this.props.params.id,
+			date,
+			Auth.getAccountId(),
+			Auth.getToken()); 
 	},
 
 	componentWillReceiveProps: function(nextProps) {
+		// by default, retrieve today's info first
+		var date = new Date().toISOString().slice(0,10);
+
 		// trigger fetching of the detailed info for the selected group
 		// the change will be propgated from the store to this component
 		// through the change listening mechanism
-		GroupsActions.getGroupCards(nextProps.params.id);
+		GroupsActions.getGroupCards(
+			nextProps.params.id,
+			date,
+			Auth.getAccountId(),
+			Auth.getToken());
 	},
 
 	handleCardDateChange: function(e) {
 		e.preventDefault();
 
-		this.setState({
-			cardDate: e.target.value
-		});		
+		var dateInput = e.target.value;
 
-		//todo: fetch card info for the new date from store
+		// date is in the format of "YYYY-MM-DD"
+		// m[1] is year 'YYYY' * m[2] is month 'MM' * m[3] is day 'DD'				
+		var m = dateInput.match(/(\d{4})-(\d{2})-(\d{2})/);
+
+		var inputDate = new Date(m[1], m[2]-1, m[3]);
+        var startDate = new Date();
+        startDate.setDate(startDate.getDate() - 7);// 7 days before today        
+        var endDate = new Date();
+
+        if(inputDate < startDate || inputDate > endDate) {
+            alert("您只能编辑过去7天以内的信息");
+        } else {
+
+		GroupsActions.getGroupCards(
+			this.props.params.id,
+			dateInput, //date
+			Auth.getAccountId(),
+			Auth.getToken(),
+			function(success) {      
+				if (success) {  		
+					this.setState({
+						cardDate: dateInput,
+						showTrainees: false
+					});
+				}
+			}.bind(this));		
+		}
 	},
 
 	// when user clicks on one of these buttons, meal status for all trainees
@@ -106,7 +172,28 @@ module.exports = React.createClass({
 
 		// set the meal status for all trainees in this group
 		for (var i=0; i<this.state.group.trainees.length; i++) {
-			this.state.group.trainees[i][this.state.cardType.propertyName] = checkAllStatus;
+			var trainee=this.state.group.trainees[i];
+
+			// save the new status to the array of info that will be submitted
+			// when coach clicks on 'submit'
+			this.handleMealCardStatusChange(trainee.userId, checkAllStatus);
+
+			// update state to show the UI.
+			if (!trainee.cardInfo) {
+				trainee.cardInfo = {
+					breakfast: EMPTY,
+					lunch: EMPTY,
+					dinner: EMPTY,
+					seven: 0,
+					keep: 0,
+					run: 0,
+					otherDetal: 0,
+					bodyweight: EMPTY,
+					bodyfat: EMPTY
+				};
+			}
+
+			trainee.cardInfo[this.state.cardType.propertyName] = checkAllStatus;
 		}
 
 		this.setState({
@@ -120,7 +207,7 @@ module.exports = React.createClass({
 	handleCancel: function(e) {
 		e.preventDefault();
 
-		var groupFromStore = GroupsStore.findGroupCards(this.props.params.id);
+		var groupFromStore = GroupsStore.pickGroupById(this.props.params.id);
 
 		// need to deep copy so that user can easily roll back unsubmitted
 		// changes by clicking on "Cancel"
@@ -129,60 +216,155 @@ module.exports = React.createClass({
 		this.setState({
 			group: deepCopiedGroup,
 			cardType: this.state.cardType,
-			checkAllStatus: null
+			checkAllStatus: null,
+			newRemarks: [],
+			newBodyInfo: [],
+			newMealInfo: [],
+			newExerciseInfo: []
 		})
 	},
 
-	// when user clicks on submit, write the card info saved in this 
+	// when user clicks on submit, write the corresponding card info saved in this 
 	// component to store.  Store function will automatically broadcast 
 	// the change and trigger a re-render
 	handleSubmit: function(e) {
 		e.preventDefault();
 
-		// todo: wrap this in an async call
-		GroupsActions.writeGroupCards(this.state.group);
-		alert('您已成功提交打卡信息');
+		if (this.state.newMealInfo.length===0 &&
+			this.state.newBodyInfo.length===0 &&
+			this.state.newExerciseInfo.length===0 &&
+			this.state.newRemarks.length===0) {
+			alert('您还没有修改信息');
+			return;
+		}
+
 		this.setState({
-			showTrainees: false,
-			cardType: null
-		})
-	},
+			loading: true
+		});
 
-	// when user changes the meal card status for a trainee, 
-	// save the new status so that we can commit to store later when
-	// user clicks on submit button
-	handleMealCardStatusChange: function(traineeId, newStatus) {
-		for (var i=0; i<this.state.group.trainees.length; i++) {
-			if (this.state.group.trainees[i].id.toString() === traineeId.toString()) {
-				this.state.group.trainees[i][this.state.cardType.propertyName] = newStatus;
+		switch (this.state.cardType) {
+			case CardType.Breakfast:
+			case CardType.Lunch:
+			case CardType.Dinner:
+				if (this.state.newMealInfo.length>0) {
+					GroupsActions.writeMealInfo(
+						this.props.params.id, //classId
+						Auth.getCoachId(), //coachId
+						Auth.getAccountId(), //operatorId,
+						this.state.cardDate, // date,
+						this.state.cardType.propertyName, // URI path
+						this.state.newMealInfo, // new info
+						Auth.getToken(),
+						function(success) {
+							if (success) {
+								alert('您已成功提交餐卡信息');
+								this.setState({
+									loading: false,
+									showTrainees: false,
+									cardType: null,
+									newMealInfo: [],
+								})
+							} else {
+								alert('抱歉提交未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');							
+								this.setState({
+									loading: false						
+								});							
+							}
+						}.bind(this));
+				}						
 				break;
-			}
+			case CardType.Sports:
+				if (this.state.newExerciseInfo.length>0) {
+					GroupsActions.writeExerciseInfo(
+						this.props.params.id, //classId
+						Auth.getCoachId(), //coachId
+						Auth.getAccountId(), //operatorId,
+						this.state.cardDate, // date
+						this.state.newExerciseInfo, // new info
+						Auth.getToken(),
+						function(success) {
+							if (success) {
+								alert('您已成功提交运动卡信息');
+								this.setState({
+									showTrainees: false,
+									cardType: null,
+									newExerciseInfo: [],
+									loading: false
+								})
+							} else {
+								alert('抱歉提交未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');							
+								this.setState({
+									loading: false						
+								});														
+							}
+						}.bind(this));			
+				}
+				break;
+			case CardType.Body:
+				if (this.state.newBodyInfo.length>0) {
+					GroupsActions.writeBodyInfo(			
+						this.props.params.id, //classId
+						Auth.getCoachId(), //coachId
+						Auth.getAccountId(), //operatorId,
+						this.state.cardDate, // date,
+						this.state.newBodyInfo, // new info
+						Auth.getToken(),
+						function(success) {
+							if (success) {
+								alert('您已成功提交体卡信息');
+								this.setState({
+									showTrainees: false,
+									cardType: null,
+									newBodyInfo: [],
+									loading: false
+								})
+							} else {
+								alert('抱歉提交未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');							
+								this.setState({
+									loading: false						
+								});														
+							}
+						}.bind(this));					
+				}
+				break;
+			case CardType.Remarks:
+				if (this.state.newRemarks.length>0) {
+					GroupsActions.writeRemarks(
+						this.props.params.id, //classId
+						Auth.getCoachId(), //coachId
+						Auth.getAccountId(), //operatorId,
+						this.state.cardDate, // date
+						this.state.newRemarks, // remarks
+						Auth.getToken(),
+						function(success) {
+							if (success) {
+								alert('您已成功提交备注信息');
+								this.setState({
+									showTrainees: false,
+									cardType: null,
+									newRemarks: [],
+									loading: false
+								})
+							} else {
+								alert('抱歉提交未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');							
+								this.setState({
+									loading: false						
+								});														
+							}
+						}.bind(this));
+				}
+				break;
+			default:
+				//should not be here
 		}
 	},
-
-	// when user changes the sport card status for a trainee, 
-	// save the new status so that we can commit to store later when
-	// user clicks on submit button
-	handleSportsCardStatusChange: function(traineeId, sportsType, newStatus) {
-		
-		if (this.state.cardType!==CardType.Sports) {
-			console.log('Error: handleSportsCardStatusChange called when card type is not sports!');
-		}
-
-		for (var i=0; i<this.state.group.trainees.length; i++) {
-			if (this.state.group.trainees[i].id.toString() === traineeId.toString()) {
-				this.state.group.trainees[i][sportsType.propertyName] = newStatus;
-				break;
-			}
-		}
-	},	
 
 	// when user changes the weight value for a trainee, 
 	// save the new weight so that we can commit to store later when
 	// user clicks on submit button
 	handleWeightChange: function(traineeId, newValue) {
 		for (var i=0; i<this.state.group.trainees.length; i++) {
-			if (this.state.group.trainees[i].id.toString() === traineeId.toString()) {
+			if (this.state.group.trainees[i].userId.toString() === traineeId.toString()) {
 				this.state.group.trainees[i].weight = newValue;
 				break;
 			}
@@ -194,55 +376,185 @@ module.exports = React.createClass({
 	// user clicks on submit button
 	handleFatChange: function(traineeId, newValue) {
 		for (var i=0; i<this.state.group.trainees.length; i++) {
-			if (this.state.group.trainees[i].id.toString() === traineeId.toString()) {
+			if (this.state.group.trainees[i].userId.toString() === traineeId.toString()) {
 				this.state.group.trainees[i].bodyfat = newValue;
 				break;
 			}
 		}
 	},
 
+	// helper function
+	pickObjectByUserId(userId, objects) {
+		var obj = null;
+
+		for (var i=0; i<objects.length; i++) {
+			if (objects[i].userId.toString() === userId.toString()) {
+				obj = objects[i];
+			}
+		}
+
+		return obj;
+	},
+
+	// when user changes the remark for a trainee, 
+	// save the new value so that we can commit to store later when
+	// user clicks on submit button
+	handleRemarkChange: function(traineeId, newValue) {
+
+		// coach edited a remark, first check if the corresponding user is 
+		// already in the data array that will be submitted to DB. Update
+		// if it is, or insert into the array if not
+		var remark=this.pickObjectByUserId(traineeId, this.state.newRemarks);
+		if (remark) {
+			remark.remark = newValue;
+		} else {
+ 			this.state.newRemarks.push({
+				userId: traineeId,
+				remark: newValue 				
+ 			})
+		}
+	},
+
+	// when user changes the sport card status for a trainee, 
+	// save the new status so that we can commit to store later when
+	// user clicks on submit button
+	handleSportsCardStatusChange: function(traineeId, newExerciseInfo) {
+		
+		var exercise=this.pickObjectByUserId(traineeId, this.state.newExerciseInfo);
+		if (exercise) {
+			exercise.exerciseInfo=newExerciseInfo;
+		} else {
+ 			this.state.newExerciseInfo.push({
+				userId: traineeId,
+				exerciseInfo: newExerciseInfo
+ 			})
+		}
+	},	
+
+	// when user changes the sport card status for a trainee, 
+	// save the new status so that we can commit to store later when
+	// user clicks on submit button
+	handleBodyCardStatusChange: function(traineeId, bodyWeight, bodyFat) {
+		
+		var bodyInfo=this.pickObjectByUserId(traineeId, this.state.newBodyInfo);
+		if (bodyInfo) {
+			bodyInfo.bodyWeight=bodyWeight.toString();
+			bodyInfo.bodyFat=bodyFat.toString();
+		} else {
+ 			this.state.newBodyInfo.push({
+				userId: traineeId,
+				bodyWeight: bodyWeight.toString(),
+				bodyFat: bodyFat.toString()
+ 			});
+		}
+	},	
+
+	// when user changes the meal card status for a trainee, 
+	// save the new status so that we can commit to store later when
+	// user clicks on submit button
+	handleMealCardStatusChange: function(traineeId, newStatus) {
+
+		var mealInfo=this.pickObjectByUserId(traineeId, this.state.newMealInfo);
+		if (!mealInfo) {
+			mealInfo={};
+			mealInfo['userId'] = traineeId;
+ 			this.state.newMealInfo.push(mealInfo);			
+		}
+
+		mealInfo[this.state.cardType.propertyName]=newStatus.toString();
+	},
+
+	// handleNickNameClick: function(e) {
+	// 	e.preventDefault();
+
+	// 	this.state.group.trainees.sort(function(a,b){
+	// 	  return (a.nickname.localeCompare(b.nickname, ['zh-CN-u-co-pinyin']));
+	// 	});
+
+	// 	this.setState({
+	// 		group: this.state.group
+	// 	})
+	// },
+
+	// helper function
+	clearInfoToBeSubmitted: function() {
+		this.state.newRemarks=[];
+		this.state.newMealInfo=[];
+		this.state.newExerciseInfo=[];
+		this.state.newBodyInfo=[];
+	},
+
 	// Buttons to switch the input card type: 早、中、晚、运动、体重/体脂
 	renderCardTypeButtons: function() {
 
 		return (
-				<ButtonGroup justified>
+			<ButtonToolbar>
+
+				<ButtonGroup>
 				    <Button 
 				    	href="#" 
 						className={this.state.cardType===CardType.Breakfast?'active':null}				    	
 				    	onClick={function(e){
-				    		e.preventDefault(); this.setState({cardType:CardType.Breakfast, showTrainees:true})}.bind(this)}>
-				    	早餐
+				    		e.preventDefault(); 
+				    		if (this.cardType!==CardType.Breakfast) {this.clearInfoToBeSubmitted();}
+				    		this.setState({cardType:CardType.Breakfast, showTrainees:true});
+				    	}.bind(this)}>
+				    	早
 		    		</Button>
 				    <Button 
 				    	href="#" 
 						className={this.state.cardType===CardType.Lunch?'active':null}				    	
 				    	onClick={function(e){
-				    		e.preventDefault(); this.setState({cardType:CardType.Lunch, showTrainees:true})}.bind(this)}>
-				    	午餐
+				    		e.preventDefault(); 
+				    		if (this.cardType!==CardType.Lunch) {this.clearInfoToBeSubmitted();}
+				    		this.setState({cardType:CardType.Lunch, showTrainees:true})}.bind(this)}>
+				    	午
 				    </Button>
 				    <Button 
 				    	href="#" 
 						className={this.state.cardType===CardType.Dinner?'active':null}				    	
 				    	onClick={function(e){
-				    		e.preventDefault(); this.setState({cardType:CardType.Dinner, showTrainees:true})}.bind(this)}>
-				    	晚餐
+				    		e.preventDefault(); 
+				    		if (this.cardType!==CardType.Dinner) {this.clearInfoToBeSubmitted();}
+				    		this.setState({cardType:CardType.Dinner, showTrainees:true})}.bind(this)}>
+				    	晚
 				    </Button>
+				</ButtonGroup>
+				<ButtonGroup>
 				    <Button 
 				    	href="#" 
 						className={this.state.cardType===CardType.Sports?'active':null}				    	
 				    	onClick={function(e){
-				    		e.preventDefault(); this.setState({cardType:CardType.Sports, showTrainees:true})}.bind(this)}>
+				    		e.preventDefault(); 
+				    		if (this.cardType!==CardType.Sports) {this.clearInfoToBeSubmitted();}
+				    		this.setState({cardType:CardType.Sports, showTrainees:true})}.bind(this)}>
 				    	运动
 				    </Button>
+				</ButtonGroup>
+				<ButtonGroup>
 				    <Button 
 				    	href="#" 
 						className={this.state.cardType===CardType.Body?'active':null}				    	
 				    	onClick={function(e){
-				    		e.preventDefault(); this.setState({cardType:CardType.Body, showTrainees:true})}.bind(this)}>
+				    		e.preventDefault(); 
+				    		if (this.cardType!==CardType.Body) {this.clearInfoToBeSubmitted();}				    		
+				    		this.setState({cardType:CardType.Body, showTrainees:true})}.bind(this)}>
 				    	体卡
 				    </Button>
-				</ButtonGroup>			
-			);
+				</ButtonGroup>
+				<ButtonGroup>
+				    <Button 
+				    	href="#" 
+						className={this.state.cardType===CardType.Remarks?'active':null}				    	
+				    	onClick={function(e){
+				    		e.preventDefault(); 
+				    		if (this.cardType!==CardType.Remarks) {this.clearInfoToBeSubmitted();}				    		
+				    		this.setState({cardType:CardType.Remarks, showTrainees:true})}.bind(this)}>
+				    	备注
+				    </Button>
+				</ButtonGroup>				
+			</ButtonToolbar>
+		);
 	},	
 
 	// render table of trainees
@@ -270,24 +582,24 @@ module.exports = React.createClass({
 
 		return traineesSorted.map(function(trainee) {
 			return (<Trainee 
-						key={trainee.id}
-						id={trainee.id}
+						key={trainee.userId}
+						id={trainee.userId}
 						name={trainee.name}
 						nickname={trainee.nickname}
-						mealCardStatus={trainee[this.state.cardType.propertyName]}
-						seven={trainee.seven}
-						keep={trainee.keep}
-						jogging={trainee.jogging}
-						others={trainee.others}
-						weight={trainee.weight}
-						fat={trainee.bodyfat}
-						labels={trainee.labels}
+						mealCardStatus={trainee.cardInfo ? trainee.cardInfo[this.state.cardType.propertyName] : null}
+						seven={trainee.cardInfo ? trainee.cardInfo.seven  : null}
+						keep={trainee.cardInfo ? trainee.cardInfo.keep : null}
+						jogging={trainee.cardInfo ? trainee.cardInfo.run : null}
+						others={trainee.cardInfo ? trainee.cardInfo.otherdetail : null}
+						weight={trainee.cardInfo ? trainee.cardInfo.bodyweight : null}
+						fat={trainee.cardInfo ? trainee.cardInfo.bodyfat : null}
+						remarks={trainee.remarks}
 						cardType={this.state.cardType}
 						handleMealCardStatusChange={this.handleMealCardStatusChange}
 						handleSportsCardStatusChange={this.handleSportsCardStatusChange}
-						handleWeightChange={this.handleWeightChange}
-						handleFatChange={this.handleFatChange}
+						handleBodyCardStatusChange={this.handleBodyCardStatusChange}
 						handleLabelChange={this.handleLabelChange}
+						handleRemarkChange={this.handleRemarkChange}
 					/>
 			);
 		}.bind(this))
@@ -305,8 +617,9 @@ module.exports = React.createClass({
 					<table className="table table-condensed table-hover">
 						<thead>
 							<tr>
-								<th style={{width: '10%'}}>昵称</th>
+								<th style={{width: '9%'}} onClick={this.handleNickNameClick}>昵称</th>
 								<th style={{width: '90%'}}>{this.state.cardType.description}</th>
+								<th style={{width: '1%'}}></th>
 							</tr>
 							{this.renderMealStatusCheckAllButtons()}								
 						</thead>
@@ -388,7 +701,7 @@ module.exports = React.createClass({
 						bsStyle="success"
 						bsSize="small"
 						block>
-						提交
+						{this.state.loading?'请稍候...':'提交'}
 					</Button>
 				</div>
 			</div>

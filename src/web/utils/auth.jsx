@@ -39,6 +39,7 @@ module.exports = {
             this.role = res.role;
             this.infoCompleted = res.infoCompleted;
             this.accountId = res.accountId;
+            this.coachId = res.coachId;
           } catch (e) {
             alert('您的浏览器不支持本地储存信息。请确认您没有启用"无痕浏览"后再尝试登录。');
             if (cb) cb(false);
@@ -78,25 +79,25 @@ module.exports = {
   /*
   ** handles registration
   */
-  register: function(mobile, name, pass, cb) {
+  // register: function(mobile, name, pass, cb) {
 
-    cb = arguments[arguments.length - 1];
+  //   cb = arguments[arguments.length - 1];
 
-    if (mobile && name && pass) {
-      Api.post('accounts', 
-                {mobile: mobile, name: name, password: pass}, 
-                localStorage.token)
-      .then(function(json){
-        cb(json.success);
-        })
-      .catch(function (e) {
-        console.log('Error when calling register: ' + e.toString());
-        cb(false);
-      });    
-    } else {
-      cb(false);
-    }
-  },
+  //   if (mobile && name && pass) {
+  //     Api.post('accounts', 
+  //               {mobile: mobile, name: name, password: pass}, 
+  //               localStorage.token)
+  //     .then(function(json){
+  //       cb(json.success);
+  //       })
+  //     .catch(function (e) {
+  //       console.log('Error when calling register: ' + e.toString());
+  //       cb(false);
+  //     });    
+  //   } else {
+  //     cb(false);
+  //   }
+  // },
 
   /*
   ** handles logging out
@@ -133,6 +134,10 @@ module.exports = {
     return this.accountId;
   },
 
+  getCoachId: function() {
+    return this.coachId;
+  },
+
   getToken: function() {
     return localStorage.token;
   },
@@ -145,13 +150,13 @@ module.exports = {
     return Constants.RoleName[this.role];
   },
 
-  getInfoCompleted: function() {
-    return this.infoCompleted;
-  },
-
-  setInfoCompleted: function(infoCompleted) {
-    this.infoCompleted = infoCompleted;
-  },
+  // getInfoCompleted: function() {
+  //   return this.infoCompleted;
+  // },
+  //
+  // setInfoCompleted: function(infoCompleted) {
+  //   this.infoCompleted = infoCompleted;
+  // },
 
   loggedIn: function() {
     return !!localStorage.token;
@@ -163,8 +168,9 @@ module.exports = {
   // will be set once a login is successfully called
   accountName: '',
   accountId: null,
+  coachId: null,
   role: null,
-  infoCompleted: false
+//  infoCompleted: false
 }
 
 /*
@@ -173,23 +179,47 @@ module.exports = {
 function loginRequest(mobile, pass, cb) {
 
   Api.post(
-    'accounts/login', 
-    {mobile: mobile, password: pass})
+    'login', 
+    [{key: 'mobnum', value: mobile},
+     {key: 'password', value: pass}],
+     null, //token
+     Api.PostType.STRING)
   .then(function(json){
-    if (json.success) {
+    if (json.code === 200) {
       cb({
         authenticated: true,
-        status: json.status,
-        accountId: json.data.id,
-        token: json.data.token,
-        name: json.data.name,
-        role: json.data.roleTypeId,
-        infoCompleted: json.data.infoCompleted
+        status: json.code,
+        accountId: json.data.userId,
+        token: json.access_token,
+        name: json.data.nickname,
+        role: json.data.role,
+        coachId: json.data.coachid,
+        gender: json.data.gender
       })
     } else {
       cb({authenticated: false, status: json.status});
     }
-  });
+  });  
+
+//  JSON类型的 POST用下面的code  
+  // Api.post(
+  //   'accounts/login', 
+  //   {mobile: mobile, password: pass})
+  // .then(function(json){
+  //   if (json.success) {
+  //     cb({
+  //       authenticated: true,
+  //       status: json.status,
+  //       accountId: json.data.id,
+  //       token: json.data.token,
+  //       name: json.data.name,
+  //       role: json.data.roleTypeId,
+  //       infoCompleted: json.data.infoCompleted
+  //     })
+  //   } else {
+  //     cb({authenticated: false, status: json.status});
+  //   }
+  // });
 
   // setTimeout(function() {
   //   if (phone === '12345' && pass === 'password1') {

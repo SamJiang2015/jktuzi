@@ -17,30 +17,35 @@ module.exports = React.createClass({
 		}
 	},
 
-	componentDidMount: function() {
+	setStateHelper: function(props) {
 		this.setState({
-			seven: this.props.seven,
-			keep: this.props.keep,
-			jogging: this.props.jogging,
-			others: this.props.others
+			seven: props.seven?props.seven:0,
+			keep: props.keep?props.keep:0,
+			jogging: props.jogging?props.jogging:0,
+			others: props.others?props.others:0
 		});
+	},
+
+	componentDidMount: function() {
+		this.setStateHelper(this.props);
 	 },
 
 	 componentWillReceiveProps: function(newProps) {
-		this.setState({
-			seven: newProps.seven,
-			keep: newProps.keep,
-			jogging: newProps.jogging,
-			others: newProps.others
-		});
-	 },
+		this.setStateHelper(newProps);	 
+	},
 
 	 handleSevenChange: function(e) {
 
 	 	var newValue=e.target.checked ? 1:0;
 
 		// call handler from parent component to pass up the new status
-	 	this.props.handleSportsCardStatusChange(SportsType.Seven, newValue);
+	 	this.props.handleSportsCardStatusChange(
+	 		{
+	 			seven: newValue.toString(),
+	 			keep: this.state.keep.toString(),
+	 			run: this.state.jogging.toString(),
+	 			otherDetail: this.state.others.toString()
+	 		});
 
 	 	this.setState({
 	 		seven: newValue
@@ -52,7 +57,13 @@ module.exports = React.createClass({
 	 	var newValue=e.target.checked ? 1:0;
 
 		// call handler from parent component to pass up the new status
-	 	this.props.handleSportsCardStatusChange(SportsType.Keep, newValue);
+	 	this.props.handleSportsCardStatusChange(	 		
+	 		{
+	 			seven: this.state.seven.toString(),
+	 			keep: newValue.toString(),
+	 			run: this.state.jogging.toString(),
+	 			otherDetail: this.state.others.toString()
+	 		});
 
 	 	this.setState({
 	 		keep: newValue
@@ -64,7 +75,13 @@ module.exports = React.createClass({
 	 	var newValue=e.target.checked ? 1:0;
 
 		// call handler from parent component to pass up the new status
-	 	this.props.handleSportsCardStatusChange(SportsType.Jogging, newValue);
+	 	this.props.handleSportsCardStatusChange(
+	 		{
+	 			seven: this.state.seven.toString(),
+	 			keep: this.state.keep.toString(),
+	 			run: newValue.toString(),
+	 			otherDetail: this.state.others.toString()
+	 		});
 
 	 	this.setState({
 	 		jogging: newValue
@@ -76,7 +93,13 @@ module.exports = React.createClass({
 	 	var newValue=e.target.checked ? 1:0;
 
 		// call handler from parent component to pass up the new status
-	 	this.props.handleSportsCardStatusChange(SportsType.Others, newValue);
+	 	this.props.handleSportsCardStatusChange(
+	 		{
+	 			seven: this.state.seven.toString(),
+	 			keep: this.state.keep.toString(),
+	 			run: this.state.jogging.toString(),
+	 			otherDetail: newValue.toString()
+	 		});
 
 	 	this.setState({
 	 		others: newValue
@@ -90,7 +113,7 @@ module.exports = React.createClass({
 					<input 
 						type="checkbox" 
 						value="seven"  
-						checked={this.state.seven==1?'checked':null}
+						checked={this.state.seven===1?'checked':null}
 						onChange={this.handleSevenChange}/>
 						Seven
 				</label>
@@ -98,7 +121,7 @@ module.exports = React.createClass({
 					<input 
 						type="checkbox" 
 						value="keep"  
-						checked={this.state.keep==1?'checked':null}
+						checked={this.state.keep===1?'checked':null}
 						onChange={this.handleKeepChange}/>
 						Keep
 				</label>
@@ -106,7 +129,7 @@ module.exports = React.createClass({
 					<input 
 						type="checkbox" 
 						value="jogging" 
-						checked={this.state.jogging==1?'checked':null}
+						checked={this.state.jogging===1?'checked':null}
 						onChange={this.handleJoggingChange} />
 						跑步
 				</label>
@@ -114,7 +137,7 @@ module.exports = React.createClass({
 					<input 
 						type="checkbox" 
 						value="others" 
-						checked={this.state.others==1?'checked':null}
+						checked={this.state.others===1?'checked':null}
 						onChange={this.handleOthersChange} />
 						其他
 				</label>				

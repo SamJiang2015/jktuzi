@@ -14,6 +14,7 @@ var Loader = require('react-loader');
 
 var TraineeActions = require('./trainee-actions');
 var TraineeStore = require('./trainee-store');
+var Auth = require('../../utils/auth');
 
 var LabelsEditModal = require('./TraineeLabelsEditModal');
 
@@ -51,47 +52,46 @@ module.exports = React.createClass({
 		return {
 			labels: [],
 			showSelf: false,
-			showLabelEditModal: false
+			showLabelEditModal: false,
+			loading: false
 		};
 	},
 
-	componentDidMount: function() {
+	setStateHelper: function(props) {
 		// todo: put this in an async call
-		TraineeActions.getTraineeLabels(this.props.id);
+		TraineeActions.getTraineeLabels(
+			props.id,
+			Auth.getAccountId(),
+			Auth.getToken(),
+			function(success) {
+				if (success) {
+			    	var labelsFromStore = TraineeStore.findTrainee(props.id);
 
-    	var labelsFromStore = TraineeStore.findTrainee(this.props.id).labels;
+					// need to deep copy so that user can easily roll back unsubmitted
+					// changes by clicking on "Cancel"
+					var copiedLabels = [];
+					for (var i=0; i<labelsFromStore.length; i++) {
+						copiedLabels.push(labelsFromStore[i]);
+					}
 
-		// need to deep copy so that user can easily roll back unsubmitted
-		// changes by clicking on "Cancel"
-		var copiedLabels = [];
-		for (var i=0; i<labelsFromStore.length; i++) {
-			copiedLabels.push(labelsFromStore[i]);
-		}
+				    this.setState({
+				      labels: copiedLabels,
+				      showSelf: props.showModal,
+				      showLabelEditModal: false,
+				      loading: false      
+				    });
+				}
 
-	    this.setState({
-	      labels: copiedLabels,
-	      showSelf: this.props.showModal,
-	      showLabelEditModal: false      
-	    });
+			}.bind(this));
+	},
+
+
+	componentDidMount: function() {
+		this.setStateHelper(this.props);
 	},
 
 	componentWillReceiveProps: function(nextProps) {
-		TraineeActions.getTraineeLabels(nextProps.id);
-
-    	var labelsFromStore = TraineeStore.findTrainee(nextProps.id).labels;
-
-		// need to deep copy so that user can easily roll back unsubmitted
-		// changes by clicking on "Cancel"
-		var copiedLabels = [];
-		for (var i=0; i<labelsFromStore.length; i++) {
-			copiedLabels.push(labelsFromStore[i]);
-		}
-
-	    this.setState({
-	      labels: copiedLabels,
-	      showSelf: nextProps.showModal,
-	      showLabelEditModal: false      
-	    });		
+		this.setStateHelper(nextProps);
 	},	
 
 	close: function() {		
@@ -110,17 +110,39 @@ module.exports = React.createClass({
 		this.setState({
 			labels: labels,
 			showSelf: true,
-			showLabelEditModal: false
+			showLabelEditModal: false,
+			loading: false
 		})
 	},
 
-	submitInfo: function() {
-		// todo: wrap this in an async call
-		TraineeActions.writeTraineeLabels(this.props.id, this.state.labels);
-		alert('您已成功提交'+this.props.nickname+'的标签信息');
+	submitInfo: function(e) {
+		e.preventDefault();
+
 		this.setState({
-			showSelf: false
-		});
+			loading:true
+		});		
+
+		// todo: wrap this in an async call
+		TraineeActions.writeTraineeLabels(
+			this.props.id, 
+			this.state.labels,
+			Auth.getCoachId(),
+			Auth.getAccountId(),
+			Auth.getToken(),
+			function(success) {
+				if (success) {
+					alert('您已成功提交'+this.props.nickname+'的标签信息');
+					this.setState({
+						showSelf: false,
+						loading: false
+					});					
+				} else {
+					alert('抱歉提交未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');
+				}
+			}.bind(this)
+		);
+
+
 	},
 
 	renderLabels: function(){
@@ -198,7 +220,9 @@ module.exports = React.createClass({
 				</Modal.Body>
 				<Modal.Footer>
 					<ButtonToolbar>
-						<Button bsStyle="success" onClick={this.submitInfo}>提交</Button>
+						<Button bsStyle="success" onClick={this.submitInfo}>
+		                	{this.state.loading? '请稍候...':'提交'}
+						</Button>
 						<Button bsStyle="default" onClick={this.close}>取消</Button>
 					</ButtonToolbar>	
 				</Modal.Footer>

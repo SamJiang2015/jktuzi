@@ -16,47 +16,53 @@ module.exports = Reflux.createStore({
   
   findTrainee: function(traineeId) {
     // look for the matching trainee
-    var trainee=null;
-    for (var i=0; i<this.trainees.length; i++) {
-      if (this.trainees[i].id.toString() === traineeId.toString()) {
-        trainee = this.trainees[i];
-        break;
-      }
-    }
 
-    return trainee;
+    return this.trainees[traineeId.toString()];
   },
 
   // retrieve the list of labels of a trainee
-  getTraineeLabels: function(traineeId) {
-    // var trainee = this.findTrainee(traineeId);
+  getTraineeLabels: function(traineeId, accountId, token, cb) {
+      var url = 'labels'; 
 
-    // if (trainee) {
-    //   return trainee.labels;
-    // } else {
-    //   // todo: hit the DB to get the labels 
+      var params = {userId: traineeId, operatorId: accountId};
 
+      Api.get(url, token, params)
+        .then(function(json){
+          if (json.code===200) {
+            this.trainees[traineeId.toString()] = json.bodyLabel;
+            this.triggerChange();
+          }
+
+          if (cb) cb(json.code===200);
+        }.bind(this));
     this.triggerChange();
   },
 
-  writeTraineeLabels: function(traineeId, labels) {
+  writeTraineeLabels: function(traineeId, labels, coachId, accountId, token, cb) {
 
-    // todo: replace this logic below, need to hit DB
-    for (var i=0; i<this.trainees.length; i++) {
-      if (this.trainees[i].id.toString() === traineeId.toString()) {
-        this.trainees[i].labels = labels;
-        break;
-      }
-    }
+    var url = 'labels'; 
 
-    this.triggerChange();
-    
+    var payload = {
+      coachId: coachId,
+      operatorId: accountId,
+      userId: traineeId,
+      labels: labels
+    };
+
+    Api.post(url, payload, token)
+      .then(function(json){
+        if (json.code===200) {
+          this.trainees[traineeId.toString()] = labels;
+          this.triggerChange();
+        }
+
+        if (cb) cb(json.code===200);
+      }.bind(this));    
   },
 
   triggerChange: function() {
-
     this.trigger('change', this.trainees);
   },
 
-  trainees: TestTrainees
+  trainees: {}
 });

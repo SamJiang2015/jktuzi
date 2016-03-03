@@ -28,11 +28,11 @@ module.exports = React.createClass({
 	renderGroup: function() {
 		return this.state.groups.map(function(group) {
 			return (<GroupSummary 
-						key={group.id}
-						id={group.id}
-						name={group.name}
-						enddate={group.enddate}
-						groupTypeId={group.groupTypeId}
+						key={group.classid}
+						id={group.classid}
+						name={group.classname}
+						// enddate={group.enddate}
+						// groupTypeId={group.groupTypeId}
 					/>
 			);
 		}.bind(this))
@@ -44,11 +44,6 @@ module.exports = React.createClass({
 			<div>
 				<p>点击任一班级进行操作</p> 
 				<table className="table table-condensed table-hover table-striped">
-					<thead>
-						<tr>
-							<th>名字</th><th>结束日</th>
-						</tr>
-					</thead>
 					<tbody>
 						{this.renderGroup()}					
 					</tbody>

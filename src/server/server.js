@@ -104,9 +104,20 @@ app.get('/trainer/\*trainer.js', function(req, res) {
 	res.sendFile(__dirname + '/public/js/trainer.js');
 });
 
+// need this if server is deployed under a different domain name than
+// where the web code is deployed. E.g.: API is served by api.example.com
+// whereas the web is served by web.example.com.
+app.options('/*', function(req, res) {
+	res.set('Access-Control-Allow-Origin', '*');
+	res.set('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+	res.set('Access-Control-Allow-Headers', 'Auth, x-access-token, x-user-id, Content-Type, Accept');	
+	res.set('Accept', '*/*');	
+	res.sendStatus(200);
+});
 
 app.use('/api/v1/accounts', accountRoutes);
 app.use('/api/v1/groups', groupRoutes);
+
 
 // note: these catch-all paths must come after the real path handlers (/api/v1/....)
 app.get('/admin*', function(req, res) {
@@ -215,7 +226,7 @@ db.sequelize.sync({
 		where: {mobile: '18888888888'}, defaults: {name: '总督头', password: 'PiPi8888', roleTypeId: RoleType.Admin.id}});
 }).then(function() {
 	return db.account.findOrCreate({
-		where: {mobile: '18877777777'}, defaults: {name: '副总', password: 'password', infoCompleted: 0, roleTypeId: RoleType.Trainer.id}});
+		where: {mobile: '18877777777'}, defaults: {name: '张三', password: 'password', infoCompleted: 0, roleTypeId: RoleType.Trainer.id}});
 }).then(function() {
 	return db.account.findOrCreate({
 		where: {mobile: '18866666666'}, defaults: {name: '新人', password: 'password'}});

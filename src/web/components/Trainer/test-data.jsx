@@ -22,7 +22,7 @@ module.exports = {
 		},
 		{
 			id: 4,
-			labels: null
+			labels: []
 		},
 		{
 			id: 5,
@@ -131,7 +131,19 @@ module.exports = {
 					jogging: 1,
 					others: 0,
 					weight: 70,
-					bodyfat: 25.0
+					bodyfat: 25.0,
+					remarks: [
+						{
+							coachId: 2,
+							coachName: "张三",
+							remark: "早餐吃了三个鸡蛋"
+						},
+						{
+							coachId: 3,
+							coachName: "李四",
+							remark: "晚上感冒喝了粥"							
+						}
+					]
 				},
 				{
 					id: 2,
@@ -145,7 +157,19 @@ module.exports = {
 					jogging: 1,
 					others: 0,
 					weight: 65,
-					bodyfat: null
+					bodyfat: null,
+					remarks: [
+						{
+							coachId: 2,
+							coachName: "张三",
+							remark: "出差中，难以控制饮食"
+						},
+						{
+							coachId: 5,
+							coachName: "赵五",
+							remark: "今天头疼，浑身乏力，需要补充碳水化合物。大量的补充蛋白质。"							
+						}
+					]
 				},
 				{
 					id: 3,

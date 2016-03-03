@@ -7,6 +7,7 @@ var React = require('react');
 var MealCardButtons = require('./MealCardButtons');
 var SportsCardButtons = require('./SportsCardButtons');
 var BodyInputs = require('./BodyInputs');
+var RemarkInputs = require('./RemarkInputs');
 var TraineeInfoModal = require('./TraineeInfoModal');
 
 var CardType = require('../../utils/constants').CardType;
@@ -27,6 +28,7 @@ module.exports = React.createClass({
 			others: null,
 			weight: null,
 			fat: null,
+			remarks: null,
 
 			showModal: false
 		};
@@ -44,7 +46,7 @@ module.exports = React.createClass({
 			others: props.others,
 			weight: props.weight,
 			fat: props.fat,
-			labels: props.labels,
+			remarks: props.remarks,
 
 			showModal: false
 		});
@@ -63,27 +65,20 @@ module.exports = React.createClass({
 		this.props.handleMealCardStatusChange(this.state.id, newStatus);
 	},
 
-	handleSportsCardStatusChange: function(sportsType, newValue) {
+	handleSportsCardStatusChange: function(newExerciseInfo) {
 		// pass the new sports card status to the parent component
-		this.props.handleSportsCardStatusChange(this.state.id, sportsType, newValue);		
+		this.props.handleSportsCardStatusChange(this.state.id, newExerciseInfo);		
 	},
 
-	handleWeightChange: function(newValue) {
-		// pass the new body weight card status to the parent component
-		this.props.handleWeightChange(this.state.id, newValue);		
-	},
-
-	handleFatChange: function(newValue) {
+	handleBodyCardStatusChange: function(bodyWeight, bodyFat) {
 		// pass the new body fat card status to the parent component
-		this.props.handleFatChange(this.state.id, newValue);		
+		this.props.handleBodyCardStatusChange(this.state.id, bodyWeight, bodyFat);		
 	},	
 
-	// once the user clicks on 提交 from the info modal, close it 
-	handleLabelChange: function() {
-		this.setState({
-			showModal: false
-		});
-	},
+	handleRemarkChange: function(newValue) {
+		// pass the new remark content to the parent component
+		this.props.handleRemarkChange(this.state.id, newValue);		
+	},	
 
 	handleClick: function(id, e) {
 		e.preventDefault();
@@ -101,7 +96,6 @@ module.exports = React.createClass({
 					nickname={this.state.nickname}
 					name={this.state.name}
 					showModal={this.state.showModal}
-					handleLabelChange={this.handleLabelChange}
 					/>
 			);
 		}
@@ -139,8 +133,18 @@ module.exports = React.createClass({
 				<BodyInputs 
 					weight={this.state.weight}
 					fat={this.state.fat}
-					handleWeightChange={this.handleWeightChange}
-					handleFatChange={this.handleFatChange}
+					handleBodyCardStatusChange={this.handleBodyCardStatusChange}
+				/>
+			</td>					
+		);
+	},
+
+	renderRemarkInputs: function() {
+		return (
+			<td>
+				<RemarkInputs 
+					remarks={this.state.remarks}
+					handleRemarkChange={this.handleRemarkChange}
 				/>
 			</td>					
 		);
@@ -158,6 +162,8 @@ module.exports = React.createClass({
 				break;
 			case CardType.Body:
 				return this.renderBodyInputs();
+			case CardType.Remarks:
+				return this.renderRemarkInputs();
 			default:
 				return null;
 		}
@@ -177,14 +183,14 @@ module.exports = React.createClass({
 					mealCardClassName="success";
 					break;
 				case MealCardStatus.Fail: 
-					mealCardClassName="danger";
+					mealCardClassName="warning";
 					break;
 				case MealCardStatus.OpenDay: 
 					mealCardClassName="info";
 					break;
 				case MealCardStatus.Miss:
 				default: 
-					mealCardClassName="active";
+					mealCardClassName="danger";
 			}
 		}
 
@@ -192,6 +198,7 @@ module.exports = React.createClass({
 			<tr 
 				className={mealCardClassName}> 			
 				<td
+					style={{opacity: 0.5}}
 				 	onClick={this.handleClick.bind(this, this.state.id)}
 				 	>
 				 	<span className="clickable">{this.state.nickname}</span>
