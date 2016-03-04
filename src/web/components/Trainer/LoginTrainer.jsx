@@ -20,17 +20,35 @@ module.exports = React.createClass({
 
 	getInitialState: function() {
 		return {
+			phone: '17718436520',
+			password: 'abc138',
 			loading: false,
 			error: false,
 			errorMsg: '登录信息不正确'
 		}
 	},
 
+	handlePhoneChange: function(e) {
+		e.preventDefault();
+
+		this.setState({
+			phone:e.target.value
+		});
+	},
+
+	handlePasswordChange: function(e) {
+		e.preventDefault();
+
+		this.setState({
+			password:e.target.value
+		});
+	},
+
 	handleLogin: function(event) {
 		event.preventDefault();
 
-		const phone = this.refs.phone.getValue();
-		const pass = this.refs.pass.getValue();
+		var phone = this.state.phone;
+		var pass = this.state.password;
 
 		this.setState({
 			loading:true
@@ -60,11 +78,11 @@ module.exports = React.createClass({
 	},
 
 	render: function() {
-		const title = (
+		var title = (
 			<h4>欢迎您登录PiPi</h4>
 			);
-		const mobileGlyphicon=<Glyphicon glyph="phone"/>;
-		const passwordGlyphicon=<Glyphicon glyph="lock"/>;
+		var mobileGlyphicon=<Glyphicon glyph="phone"/>;
+		var passwordGlyphicon=<Glyphicon glyph="lock"/>;
 		var errorMsg = <p className="error">{this.state.errorMsg}</p>;	
 		
 		return (
@@ -76,19 +94,19 @@ module.exports = React.createClass({
 		            <form>
 		                <Input 
 		                	type="tel" 
-		                	ref="phone" 
 		                	placeholder="手机"
 		                	defaultValue="17718436520"
 		                	hasFeedback 
 		                	feedbackIcon={mobileGlyphicon} 
+		                	onChange={this.handlePhoneChange}
 		                />
 		                <Input 
 		                	type="password" 
-		                	ref="pass" 
 		                	placeholder="密码" 
 		                	defaultValue="abc138"
 		                	hasFeedback 
 		                	feedbackIcon={passwordGlyphicon} 
+		                	onChange={this.handlePasswordChange}		                	
 		                />
 		                <Button 
 		                	block

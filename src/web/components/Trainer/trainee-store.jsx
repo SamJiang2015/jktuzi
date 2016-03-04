@@ -26,7 +26,7 @@ module.exports = Reflux.createStore({
 
       var params = {userId: traineeId, operatorId: accountId};
 
-      Api.get(url, token, params)
+      Api.get(url, token, params, accountId)
         .then(function(json){
           if (json.code===200) {
             this.trainees[traineeId.toString()] = json.bodyLabel;
@@ -49,7 +49,7 @@ module.exports = Reflux.createStore({
       labels: labels
     };
 
-    Api.post(url, payload, token)
+    Api.post(url, payload, token, accountId)
       .then(function(json){
         if (json.code===200) {
           this.trainees[traineeId.toString()] = labels;

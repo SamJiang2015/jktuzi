@@ -19,14 +19,15 @@ module.exports = Reflux.createStore({
   },
 
   // retrieve the list of groups managed by a trainer from store
-  getGroups: function(coachId, token, cb) {
+  getGroups: function(coachId, token, accountId, cb) {
 
       var url = 'coachclasslist'; 
 
       var params = {coachId: coachId};
 
-      Api.get(url, token, params)
+      Api.get(url, token, params, accountId)
         .then(function(json){
+
           if (json.code===200) {
             this.groups = json.data;
             this.triggerChange();
@@ -54,7 +55,7 @@ module.exports = Reflux.createStore({
 
       var params = {classId: groupId, date: date, operatorId: accountId};
 
-      Api.get(url, token, params)
+      Api.get(url, token, params, accountId)
         .then(function(json){
           if (json.code===200) {
             // cache the cards info in the groups array. 
@@ -83,7 +84,7 @@ module.exports = Reflux.createStore({
       remarks: remarks
     };
 
-    Api.post(url, payload, token)
+    Api.post(url, payload, token, operatorId)
       .then(function(json){
         if (json.code===200) {
             // cache the cards info in the groups array. 
@@ -110,7 +111,7 @@ module.exports = Reflux.createStore({
       cards: exerciseInfo
     };
 
-    Api.post(url, payload, token)
+    Api.post(url, payload, token, operatorId)
       .then(function(json){
         if (json.code===200) {
             // cache the cards info in the groups array. 
@@ -135,7 +136,7 @@ module.exports = Reflux.createStore({
       cards: mealInfo
     };
 
-    Api.post(url, payload, token)
+    Api.post(url, payload, token, operatorId)
       .then(function(json){
         if (json.code===200) {
             // cache the cards info in the groups array. 
@@ -162,7 +163,7 @@ module.exports = Reflux.createStore({
       cards: bodyInfo
     };
 
-    Api.post(url, payload, token)
+    Api.post(url, payload, token, operatorId)
       .then(function(json){
         if (json.code===200) {
             // cache the cards info in the groups array. 
@@ -197,7 +198,7 @@ module.exports = Reflux.createStore({
 
   triggerChange: function() {
 
-    this.trigger('change', this.groups);
+    this.trigger(this.groups);
   },
 
   groups: []

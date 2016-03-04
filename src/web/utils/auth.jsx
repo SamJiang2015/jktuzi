@@ -108,7 +108,10 @@ module.exports = {
       // we don't care what the function returns; it is okay even 
       // if the token was not deleted properly since we already
       // removed it from client side.    
-      Api.delete('accounts/login', localStorage.token)
+      Api.post('logout', 
+        [{key: 'userId', value: this.accountId}],
+        localStorage.token, 
+        Api.PostType.STRING)
           .then(function(json) {
             //do nothing
           });
@@ -183,6 +186,7 @@ function loginRequest(mobile, pass, cb) {
     [{key: 'mobnum', value: mobile},
      {key: 'password', value: pass}],
      null, //token
+     null,
      Api.PostType.STRING)
   .then(function(json){
     if (json.code === 200) {

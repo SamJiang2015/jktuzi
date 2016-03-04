@@ -102,7 +102,12 @@ module.exports = React.createClass({
 			this.props.params.id,
 			date,
 			Auth.getAccountId(),
-			Auth.getToken()); 
+			Auth.getToken(),
+			function(success) {
+				if (!success) {
+					alert('抱歉数据读取未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');
+				}
+			}); 
 	},
 
 	componentWillReceiveProps: function(nextProps) {
@@ -116,7 +121,12 @@ module.exports = React.createClass({
 			nextProps.params.id,
 			date,
 			Auth.getAccountId(),
-			Auth.getToken());
+			Auth.getToken(),
+			function(success) {
+				if (!success) {
+					alert('抱歉数据读取未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');
+				}
+			});
 	},
 
 	handleCardDateChange: function(e) {
@@ -148,6 +158,8 @@ module.exports = React.createClass({
 						cardDate: dateInput,
 						showTrainees: false
 					});
+				} else {
+					alert('抱歉数据读取未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');					
 				}
 			}.bind(this));		
 		}
@@ -214,6 +226,27 @@ module.exports = React.createClass({
 		// need to deep copy so that user can easily roll back unsubmitted
 		// changes by clicking on "Cancel"
 		var deepCopiedGroup = JSON.parse(JSON.stringify(groupFromStore));
+
+		// move breakfast, lunch and dinner out of group.cardinfo, so that
+		// we can easily sort by these three fields
+		if (deepCopiedGroup.trainees) {
+			for (var i=0; i<deepCopiedGroup.trainees.length; i++) {
+				var trainee = deepCopiedGroup.trainees[i];
+				if (trainee.cardInfo) {
+					trainee.breakfast = trainee.cardInfo.breakfast;
+					trainee.lunch = trainee.cardInfo.lunch;
+					trainee.dinner= trainee.cardInfo.dinner;
+				} else {
+					trainee.breakfast = null;
+					trainee.lunch = null;
+					trainee.dinner= null;					
+				}
+			}
+		}
+
+		deepCopiedGroup.trainees.sort(function(a,b){
+		  return (a.nickname.localeCompare(b.nickname));
+		});
 
 		this.setState({
 			group: deepCopiedGroup,

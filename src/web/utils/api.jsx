@@ -19,7 +19,7 @@ module.exports = {
     STRING: 2
   },
 
-  get: function(url, token, params) {
+  get: function(url, token, params, userId) {
     var fullUrl = rootUrl + url;
 
     if (params) {
@@ -40,15 +40,16 @@ module.exports = {
       headers: {
 //        'Auth': token,
         'x-access-token': token,
+        'x-user-id': userId,
         'Accept': 'application/json'           
       }
     })
     .then(function(response){
-      return response.json()
+      return response.json();
     })
   },
 
-  post: function(url, payload, token, type) {
+  post: function(url, payload, token, userId, type) {
     var body;
     var contentType;
 
@@ -83,7 +84,8 @@ module.exports = {
       headers: {
         'Accept': 'application/json',
         'Content-Type': contentType,
-        'x-access-token': token
+        'x-access-token': token,
+        'x-user-id': userId
 //        'Auth': token
       },
       body: body
@@ -91,34 +93,34 @@ module.exports = {
     .then(function(response) {
       return response.json()
     })    
-  },
-
-  put: function(url, payload, token) {
-    return fetch(rootUrl + url, {
-      method: 'put',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',        
-        'Auth': token
-      },
-      body: JSON.stringify(payload)
-    })
-    .then(function(response) {
-      return response.json()
-    })
-  },
-
-  delete: function(url, token) {
-    return fetch(rootUrl + url, {
-      method: 'delete',
-      headers: {
-        'Auth': token,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'        
-      },
-    })
-    .then(function(response) {
-      return response.json()
-    })
   }
+
+  // put: function(url, payload, token) {
+  //   return fetch(rootUrl + url, {
+  //     method: 'put',
+  //     headers: {
+  //       'Accept': 'application/json',
+  //       'Content-Type': 'application/json',        
+  //       'Auth': token
+  //     },
+  //     body: JSON.stringify(payload)
+  //   })
+  //   .then(function(response) {
+  //     return response.json()
+  //   })
+  // },
+
+  // delete: function(url, token) {
+  //   return fetch(rootUrl + url, {
+  //     method: 'delete',
+  //     headers: {
+  //       'Auth': token,
+  //       'Accept': 'application/json',
+  //       'Content-Type': 'application/json'        
+  //     },
+  //   })
+  //   .then(function(response) {
+  //     return response.json()
+  //   })
+  // }
 };

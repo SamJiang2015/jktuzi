@@ -80,6 +80,8 @@ module.exports = React.createClass({
 				      showLabelEditModal: false,
 				      loading: false      
 				    });
+				}  else {
+					alert('抱歉数据读取未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');
 				}
 
 			}.bind(this));

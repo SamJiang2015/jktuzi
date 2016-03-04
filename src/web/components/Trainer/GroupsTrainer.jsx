@@ -4,7 +4,6 @@
 
 var React = require('react');
 var Reflux = require('reflux');
-var Loader = require('react-loader');
 
 // Bootstrap UI components
 var Button = require('react-bootstrap/lib/button');
@@ -28,9 +27,10 @@ module.exports = React.createClass({
     	Reflux.listenTo(GroupsStore, 'onGroupsChange')
   	],
 
-	onGroupsChange: function(event, groups) {
+	onGroupsChange: function(groups) {
   		this.setState({
-  			groups: groups
+  			groups: groups,
+  			loaded: true
   		});
   	},
 
@@ -42,7 +42,7 @@ module.exports = React.createClass({
 			showList: true,
 			showGroupDetail: false,
 
-			loaded: true,
+			loaded: false,
 			error: false,
 			errorMsg: ''
 		};
@@ -52,7 +52,15 @@ module.exports = React.createClass({
 		// trigger fetching of the detailed info for the selected group
 		// the change will be propgated from the store to this component
 		// through the change listening mechanism
-		GroupsActions.getGroups(Auth.getCoachId(), Auth.getToken()); 
+		GroupsActions.getGroups(
+			Auth.getCoachId(), 
+			Auth.getToken(), 
+			Auth.getAccountId(), 
+			function(success) {
+				if (!success) {
+					alert('抱歉数据读取未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');
+				}
+			}); 
 	},
 
 	renderMainArea: function() {
@@ -62,7 +70,11 @@ module.exports = React.createClass({
 					groups={this.state.groups} 
 				/>);
 		} else {
-			return <p>您没有正在管理的班级</p>;
+			if (this.state.loaded) {
+				return <p>您没有正在管理的班级</p>;
+			} else {
+				return <p>正在读取数据，请稍候...</p>
+			}
 		}
  	},
 
@@ -75,9 +87,7 @@ module.exports = React.createClass({
 					</div>
 					<div className="panel-body">
 						<div className="well">
-							<Loader loaded={this.state.loaded}>
-								{this.renderMainArea()}
-							</Loader>
+							{this.renderMainArea()}
 						</div>
 					</div>
 				</div>			
