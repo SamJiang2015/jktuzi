@@ -10,8 +10,6 @@ require('es6-promise').polyfill();
 //var rootUrl = "https://api.s.pipifit.com/";
 var rootUrl = "http://api2.s.pipifit.com/";
 
-console.log('rootUrl: ' + rootUrl);
-
 module.exports = {
 
   PostType: {
@@ -35,6 +33,8 @@ module.exports = {
 
       fullUrl += '?'+qp;
     }
+
+    console.log('Request Url: ' + fullUrl);  
 
     return fetch(fullUrl, {
       headers: {

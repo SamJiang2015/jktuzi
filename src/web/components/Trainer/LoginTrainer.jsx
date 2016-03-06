@@ -20,8 +20,8 @@ module.exports = React.createClass({
 
 	getInitialState: function() {
 		return {
-			phone: '17718436520',
-			password: 'abc138',
+			phone: '',
+			password: '',
 			loading: false,
 			error: false,
 			errorMsg: '登录信息不正确'
@@ -95,7 +95,6 @@ module.exports = React.createClass({
 		                <Input 
 		                	type="tel" 
 		                	placeholder="手机"
-		                	defaultValue="17718436520"
 		                	hasFeedback 
 		                	feedbackIcon={mobileGlyphicon} 
 		                	onChange={this.handlePhoneChange}
@@ -103,7 +102,6 @@ module.exports = React.createClass({
 		                <Input 
 		                	type="password" 
 		                	placeholder="密码" 
-		                	defaultValue="abc138"
 		                	hasFeedback 
 		                	feedbackIcon={passwordGlyphicon} 
 		                	onChange={this.handlePasswordChange}		                	

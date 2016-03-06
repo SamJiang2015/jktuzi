@@ -17,8 +17,6 @@ var Glyphicon = require('react-bootstrap/lib/glyphicon');
 // UI components
 var Trainee = require('./TraineeTrainer');
 
-var Error = require('../common/Errors');
-
 // data layer
 var Auth = require('../../utils/auth');
 var GroupsActions = require('./groups-actions-trainer');
@@ -29,6 +27,8 @@ var CardType = require('../../utils/constants').CardType;
 var SportsType = require('../../utils/constants').SportsType;
 var MealCardStatus = require('../../utils/constants').MealCardStatus;
 var EMPTY = require('../../utils/constants').EMPTY;
+var GetToday = require('../../utils/constants').GetToday;
+var TraineeListSortOrder = require('../../utils/constants').TraineeListSortOrder;
 
 module.exports = React.createClass({
 
@@ -61,10 +61,6 @@ module.exports = React.createClass({
 			}
 		}
 
-		deepCopiedGroup.trainees.sort(function(a,b){
-		  return (a.nickname.localeCompare(b.nickname));
-		});
-
 	    this.setState({
 	      group: deepCopiedGroup,
 	      newRemarks: [],
@@ -78,10 +74,11 @@ module.exports = React.createClass({
 	    return {
 	    	group: null,
 	    	groupFromStore: null, // cache the state from store so that user can cancel changes
+	        sortOrder: TraineeListSortOrder.ByNickName,
 	    	cardType: null,
 	    	checkAllStatus: null,
 	    	showTrainees: false,
-	    	cardDate: new Date().toJSON().slice(0,10),
+	    	cardDate: GetToday(),
 
 	    	newRemarks: [],
 		    newExerciseInfo: [],
@@ -94,7 +91,7 @@ module.exports = React.createClass({
 
 	componentDidMount: function() {
 		// by default, retrieve today's info first
-		var date = new Date().toJSON().slice(0,10);
+		var date = GetToday();
 		// trigger fetching of the detailed info for the selected group
 		// the change will be propgated from the store to this component
 		// through the change listening mechanism
@@ -112,7 +109,7 @@ module.exports = React.createClass({
 
 	componentWillReceiveProps: function(nextProps) {
 		// by default, retrieve today's info first
-		var date = new Date().toJSON().slice(0,10);
+		var date = GetToday();
 
 		// trigger fetching of the detailed info for the selected group
 		// the change will be propgated from the store to this component
@@ -244,13 +241,8 @@ module.exports = React.createClass({
 			}
 		}
 
-		deepCopiedGroup.trainees.sort(function(a,b){
-		  return (a.nickname.localeCompare(b.nickname));
-		});
-
 		this.setState({
 			group: deepCopiedGroup,
-			cardType: this.state.cardType,
 			checkAllStatus: null,
 			newRemarks: [],
 			newBodyInfo: [],
@@ -337,6 +329,31 @@ module.exports = React.createClass({
 				break;
 			case CardType.Body:
 				if (this.state.newBodyInfo.length>0) {
+
+					// check the value input is in the allowed range
+					var passCheck = true;
+					for (var i=0; i<this.state.newBodyInfo.length; i++) {
+						var info = this.state.newBodyInfo[i];
+						if (info.bodyWeight<35 || info.bodyWeight>200) {
+							passCheck=false;
+							alert('您修改过的体重数据' + info.bodyWeight + 'kg超出正常区间。请核实数据然后再提交');
+ 
+						}
+						if (info.bodyFat<5 || info.bodyFat>55) {
+							passCheck=false;
+							alert('您修改过的体脂数据'+ info.bodyFat + '%超出正常区间。请核实数据然后再提交');
+						}						
+					}
+
+					// did not pass the check, simple return.
+					if (!passCheck) {
+						this.setState({
+							loading: false
+						});
+						return;
+					}
+
+					// all data is in the right range, we can submit the data now.
 					GroupsActions.writeBodyInfo(			
 						this.props.params.id, //classId
 						Auth.getCoachId(), //coachId
@@ -531,39 +548,24 @@ module.exports = React.createClass({
 	handleNickNameClick: function(e) {
 		e.preventDefault();
 
-		this.state.group.trainees.sort(function(a,b){
-		  return (a.nickname.localeCompare(b.nickname));
-		});
-
-		this.setState({
-			group: this.state.group
-		})
+		if (this.state.sortOrder !== TraineeListSortOrder.ByNickName) {
+			this.setState({
+				sortOrder: TraineeListSortOrder.ByNickName
+			})
+		}
 	},
 
 	handleCardTypeClick: function(e) {
 		e.preventDefault();
 
-		var compareFunc; 
-
-		switch (this.state.cardType) {
-			case CardType.Breakfast:
-			case CardType.Lunch:
-			case CardType.Dinner:
-				compareFunc=function(a,b) {
-				  return (a[this.state.cardType.propertyName] - b[this.state.cardType.propertyName]);
-						}.bind(this);					
-				break;
-			case CardType.Sports: 
-			default: 
-				compareFunc=function(a,b) {
-					return a.nickname.localeCompare(b.nickname);
-				};
+		if (this.state.cardType === CardType.Breakfast ||
+			this.state.cardType === CardType.Lunch ||
+			this.state.cardType === CardType.Dinner) {
+			
+			this.setState({
+				sortOrder: TraineeListSortOrder.ByMealStatus
+			});
 		}
-		this.state.group.trainees.sort(compareFunc);
-
-		this.setState({
-			group: this.state.group
-		})
 	},
 
 	// Buttons to switch the input card type: 早、中、晚、运动、体重/体脂
@@ -639,6 +641,19 @@ module.exports = React.createClass({
 		if (!this.state.group || !this.state.group.trainees) {
 			return null;
 		}		
+
+		// sort the trainee list based on the sort order selected by the user
+		var compareFunc; 
+		if (this.state.sortOrder === TraineeListSortOrder.ByNickName) {
+			compareFunc=function(a,b) {return a.nickname.localeCompare(b.nickname);};		
+		} else if (this.state.sortOrder === TraineeListSortOrder.ByMealStatus) {
+			compareFunc=function(a,b) {
+			  return (a[this.state.cardType.propertyName] - b[this.state.cardType.propertyName]);}.bind(this);					
+		} else {
+			// should not be here	
+		}
+
+		this.state.group.trainees.sort(compareFunc);
 
 		return this.state.group.trainees.map(function(trainee) {
 			return (<Trainee 
