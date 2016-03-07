@@ -333,24 +333,44 @@ module.exports = React.createClass({
 					// check the value input is in the allowed range
 					var passCheck = true;
 					for (var i=0; i<this.state.newBodyInfo.length; i++) {
+						var errorMsg;
 						var info = this.state.newBodyInfo[i];
-						if (info.bodyWeight<35 || info.bodyWeight>200) {
-							passCheck=false;
-							alert('您修改过的体重数据' + info.bodyWeight + 'kg超出正常区间。请核实数据然后再提交');
- 
-						}
-						if (info.bodyFat<5 || info.bodyFat>55) {
-							passCheck=false;
-							alert('您修改过的体脂数据'+ info.bodyFat + '%超出正常区间。请核实数据然后再提交');
-						}						
-					}
+					 	var weight = parseFloat(info.bodyWeight);
+					 	if (isNaN(weight)) {
+					 		passCheck=false;
+					 	} else {
+							if (weight !==EMPTY && 
+								(weight<35 || weight>200)) {
+									passCheck=false;
+					 		}
+					 	}
 
-					// did not pass the check, simple return.
-					if (!passCheck) {
-						this.setState({
-							loading: false
-						});
-						return;
+					 	if (!passCheck) {
+							errorMsg = '您修改过的体重数据' + info.bodyWeight + 'kg超出正常区间。请核实数据然后再提交';					 													 		
+					 	} else {
+					 		// check bodyFat
+						 	var fat = parseFloat(info.bodyFat);
+						 	if (isNaN(fat)) {
+						 		passCheck=false;
+						 	} else {
+								if (fat !==EMPTY && (fat<5 || fat>55)) {
+									passCheck=false;
+						 		}
+						 	}
+
+							if (!passCheck) {
+								errorMsg = '您修改过的体脂数据'+ info.bodyFat + '%超出正常区间。请核实数据然后再提交';						 	
+						 	}					
+						}
+
+						// did not pass the check, simple return.
+						if (!passCheck) {
+							alert(errorMsg);
+							this.setState({
+								loading: false
+							});
+							return;
+						}
 					}
 
 					// all data is in the right range, we can submit the data now.
@@ -636,7 +656,7 @@ module.exports = React.createClass({
 	},	
 
 	// render table of trainees
-	renderTraineesList: function() {
+	renderTraineesList: function(classId) {
 
 		if (!this.state.group || !this.state.group.trainees) {
 			return null;
@@ -659,6 +679,7 @@ module.exports = React.createClass({
 			return (<Trainee 
 						key={trainee.userId}
 						id={trainee.userId}
+						classId={this.props.params.id}
 						name={trainee.name}
 						nickname={trainee.nickname}
 						mealCardStatus={trainee.cardInfo ? trainee.cardInfo[this.state.cardType.propertyName] : null}

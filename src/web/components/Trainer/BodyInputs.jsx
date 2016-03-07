@@ -51,12 +51,17 @@ module.exports = React.createClass({
 
 	 	var newValue = e.target.value;
 
-	 	newNumber = parseFloat(newValue);
+	 	var newNumber;
+	 	if (newValue.trim()!=='') {
+		 	newNumber = parseFloat(newValue);
+		 } else {
+		 	newNumber = EMPTY;
+		 }
 
 	 	if (!isNaN(newNumber)) {
 			// call handler from parent component to pass up the new status
 			// 四舍五入保留小数点后一位
-		 	this.props.handleBodyCardStatusChange(newNumber.toFixed(1), this.state.fat);
+		 	this.props.handleBodyCardStatusChange(newNumber.toFixed(1), this.state.fat?this.state.fat:EMPTY);
 		}
 
 		this.setState({
@@ -69,12 +74,17 @@ module.exports = React.createClass({
 
 	 	var newValue = e.target.value;
 
-	 	newNumber = parseFloat(newValue);
+	 	var newNumber;
+	 	if (newValue.trim()!=='') {
+		 	newNumber = parseFloat(newValue);
+		} else {
+		 	newNumber = EMPTY;
+		}
 
 	 	if (!isNaN(newNumber)) {
 			// call handler from parent component to pass up the new value
 			// 四舍五入保留小数点后一位
-		 	this.props.handleBodyCardStatusChange(this.state.weight, newNumber.toFixed(1));
+		 	this.props.handleBodyCardStatusChange(this.state.weight?this.state.weight:EMPTY, newNumber.toFixed(1));
 		}
 
 		this.setState({

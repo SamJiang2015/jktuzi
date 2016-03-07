@@ -21,10 +21,10 @@ module.exports = Reflux.createStore({
   },
 
   // retrieve the list of labels of a trainee
-  getTraineeLabels: function(traineeId, accountId, token, cb) {
+  getTraineeLabels: function(traineeId, accountId, classId, token, cb) {
       var url = 'labels'; 
 
-      var params = {userId: traineeId, operatorId: accountId};
+      var params = {userId: traineeId, operatorId: accountId, classId: classId};
 
       Api.get(url, token, params, accountId)
         .then(function(json){
@@ -38,7 +38,7 @@ module.exports = Reflux.createStore({
     this.triggerChange();
   },
 
-  writeTraineeLabels: function(traineeId, labels, coachId, accountId, token, cb) {
+  writeTraineeLabels: function(traineeId, labels, coachId, accountId, classId, token, cb) {
 
     var url = 'labels'; 
 
@@ -46,6 +46,7 @@ module.exports = Reflux.createStore({
       coachId: coachId,
       operatorId: accountId,
       userId: traineeId,
+      classId: classId,
       labels: labels
     };
 

@@ -62,6 +62,7 @@ module.exports = React.createClass({
 		TraineeActions.getTraineeLabels(
 			props.id,
 			Auth.getAccountId(),
+			props.classId,
 			Auth.getToken(),
 			function(success) {
 				if (success) {
@@ -130,6 +131,7 @@ module.exports = React.createClass({
 			this.state.labels,
 			Auth.getCoachId(),
 			Auth.getAccountId(),
+			this.props.classId,
 			Auth.getToken(),
 			function(success) {
 				if (success) {

@@ -19,6 +19,7 @@ module.exports = React.createClass({
 	getInitialState: function(){
 		return {
 			id: null,
+			classId: null,
 			name: '',
 			nickname: '',
 			mealCardStatus: null,
@@ -37,6 +38,7 @@ module.exports = React.createClass({
 	setStateHelper: function(props) {
 		this.setState({
 			id: props.id,
+			classId: props.classId,
 			name: props.name,
 			nickname: props.nickname,
 			mealCardStatus: props.mealCardStatus,
@@ -93,6 +95,7 @@ module.exports = React.createClass({
 			return (
 				<TraineeInfoModal
 					id={this.state.id}
+					classId={this.state.classId}
 					nickname={this.state.nickname}
 					name={this.state.name}
 					showModal={this.state.showModal}
