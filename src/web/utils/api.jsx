@@ -9,6 +9,7 @@ require('es6-promise').polyfill();
 //var rootUrl = 'http://localhost:3000/api/v1/'; 
 //var rootUrl = "https://api.s.pipifit.com/";
 var rootUrl = "http://api2.s.pipifit.com/";
+//var rootUrl = "http://api2.pipifit.com/";
 
 module.exports = {
 
@@ -34,7 +35,7 @@ module.exports = {
       fullUrl += '?'+qp;
     }
 
-    console.log('Request Url: ' + fullUrl);  
+//    console.log('Request Url: ' + fullUrl);  
 
     return fetch(fullUrl, {
       headers: {
@@ -77,7 +78,7 @@ module.exports = {
         body=JSON.stringify(payload);      
     }
 
-    console.log('Request body: ' + body);    
+//    console.log('Request body: ' + body);    
 
     return fetch(rootUrl + url, {
       method: 'post',

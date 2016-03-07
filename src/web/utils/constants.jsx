@@ -9,20 +9,22 @@ Constants = Object.freeze({
 
 	// return today's date in the format of "yyyy-mm-dd"
 	GetToday: function() {
-		// this gives [m, d, year], e.g. ['3','6','2016'], 
-		var dateElements = new Date().toLocaleString().split(',')[0].split('/');
+		return new Date().toJSON().slice(0,10);
 
-		// add the leading 0 for month --> 03
-		if (dateElements[0].length<2) {
-			dateElements[0]='0'+dateElements[0];
-		}
+		// // this gives [m, d, year], e.g. ['3','6','2016'], 
+		// var dateElements = new Date().toLocaleString().split(',')[0].split('/');
 
-		// add the leading 0 for date --> 06
-		if (dateElements[1].length<2) {
-			dateElements[1]='0'+dateElements[1];
-		}
+		// // add the leading 0 for month --> 03
+		// if (dateElements[0].length<2) {
+		// 	dateElements[0]='0'+dateElements[0];
+		// }
 
-		return dateElements[2]+'-'+dateElements[0]+'-'+dateElements[1];
+		// // add the leading 0 for date --> 06
+		// if (dateElements[1].length<2) {
+		// 	dateElements[1]='0'+dateElements[1];
+		// }
+
+		// return dateElements[2]+'-'+dateElements[0]+'-'+dateElements[1];
 	},
 
 	TraineeListSortOrder: {
