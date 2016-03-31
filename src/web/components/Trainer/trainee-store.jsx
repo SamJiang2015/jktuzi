@@ -33,7 +33,7 @@ module.exports = Reflux.createStore({
             this.triggerChange();
           }
 
-          if (cb) cb(json.code===200);
+          if (cb) cb(json.code===200, json);
         }.bind(this));
     this.triggerChange();
   },
@@ -57,7 +57,7 @@ module.exports = Reflux.createStore({
           this.triggerChange();
         }
 
-        if (cb) cb(json.code===200);
+        if (cb) cb(json.code===200, json);
       }.bind(this));    
   },
 

@@ -58,9 +58,10 @@ module.exports = React.createClass({
 			phone, 
 			pass, 
 			[RoleType.Trainer.id], // must be trainer
-			function(loggedIn, status) {
+			function(loggedIn, status, json) {
 			    if (!loggedIn) {
 			    	var errorMsg = '登录信息不正确'; 
+					alert('错误信息：' + JSON.stringify(json));			    	
 			    	this.setState({ loading: false, error: true, errorMsg: errorMsg});
 			    } else {
 			    	this.setState({loading: false, error: false});

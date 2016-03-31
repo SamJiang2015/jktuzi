@@ -5,6 +5,10 @@
 var React = require('react');
 
 var Glyphicon = require('react-bootstrap/lib/glyphicon');
+var OverlayTrigger = require('react-bootstrap/lib/overlaytrigger');
+var Tooltip = require('react-bootstrap/lib/tooltip');
+
+
 var MealCardStatus = require('../../utils/constants').MealCardStatus;
 var EMPTY = require('../../utils/constants').EMPTY;
 
@@ -57,7 +61,13 @@ module.exports = React.createClass({
 
 	},
 
+	handleMouseOverPass: function(e) {
+		e.preventDefault();
+		alert('合格');
+	},
+
 	render: function() {
+
 		return (
 			<div className={"form-group"}>
 				<label className="radio-inline">
@@ -66,7 +76,7 @@ module.exports = React.createClass({
 						value="pass"  
 						checked={this.state.status===MealCardStatus.Pass?'checked':null}					
 						onChange={this.handleChange}/>
-						<Glyphicon glyph="ok-circle"/>
+						合格
 				</label>
 				<label className="radio-inline">								
 					<input 
@@ -74,7 +84,7 @@ module.exports = React.createClass({
 						value="fail" 
 						checked={this.state.status===MealCardStatus.Fail?'checked':null}				
 						onChange={this.handleChange} />
-						<Glyphicon glyph="remove-circle"/>
+						不合格
 				</label>
 				<label className="radio-inline">
 					<input 
@@ -82,7 +92,7 @@ module.exports = React.createClass({
 						value="miss"  
 						checked={this.state.status===MealCardStatus.Miss?'checked':null}
 						onChange={this.handleChange}/>
-						<Glyphicon glyph="ban-circle"/>
+						未打卡
 				</label>				
 				<label className="radio-inline">								
 					<input 
@@ -90,9 +100,69 @@ module.exports = React.createClass({
 						value="openday" 
 						checked={this.state.status===MealCardStatus.OpenDay?'checked':null}				
 						onChange={this.handleChange} />
-						<Glyphicon glyph="cutlery"/>
+						开放日
 				</label>				
 			</div>
-		);
+			);
 	}
+
+	// render: function() {
+	// 	var tooltipPass = (
+ //  			<Tooltip id='ttp'>合格</Tooltip>
+	// 	);
+	// 	var tooltipFail = (
+ //  			<Tooltip id='ttf'>不合格</Tooltip>
+	// 	);
+	// 	var tooltipMiss = (
+ //  			<Tooltip id='ttm'>未打卡</Tooltip>
+	// 	);
+	// 	var tooltipOpenDay = (
+ //  			<Tooltip id='ttod'>开放日</Tooltip>
+	// 	);					
+
+	// 	return (
+	// 		<div className={"form-group"}>
+	// 			<label className="radio-inline">
+	// 				<input 
+	// 					type="radio" 
+	// 					value="pass"  
+	// 					checked={this.state.status===MealCardStatus.Pass?'checked':null}					
+	// 					onChange={this.handleChange}/>
+ //    					<OverlayTrigger placement="top" overlay={tooltipPass}>
+	// 						<Glyphicon glyph="ok-circle"/>
+	// 					</OverlayTrigger>
+	// 			</label>
+	// 			<label className="radio-inline">								
+	// 				<input 
+	// 					type="radio" 
+	// 					value="fail" 
+	// 					checked={this.state.status===MealCardStatus.Fail?'checked':null}				
+	// 					onChange={this.handleChange} />
+	// 					<OverlayTrigger placement="top" overlay={tooltipFail}>
+	// 						<Glyphicon glyph="remove-circle"/>
+	// 					</OverlayTrigger>
+	// 			</label>
+	// 			<label className="radio-inline">
+	// 				<input 
+	// 					type="radio" 
+	// 					value="miss"  
+	// 					checked={this.state.status===MealCardStatus.Miss?'checked':null}
+	// 					onChange={this.handleChange}/>
+ //    					<OverlayTrigger placement="top" overlay={tooltipMiss}>						
+	// 						<Glyphicon glyph="ban-circle"/>
+	// 					</OverlayTrigger>
+	// 			</label>				
+	// 			<label className="radio-inline">								
+	// 				<input 
+	// 					type="radio" 
+	// 					value="openday" 
+	// 					checked={this.state.status===MealCardStatus.OpenDay?'checked':null}				
+	// 					onChange={this.handleChange} />
+ //    					<OverlayTrigger placement="top" overlay={tooltipOpenDay}>
+	// 						<Glyphicon glyph="cutlery"/>
+	// 					</OverlayTrigger>
+	// 			</label>				
+	//  		</div>
+	// 	);
+	// }
 })

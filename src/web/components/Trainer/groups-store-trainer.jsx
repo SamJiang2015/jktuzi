@@ -31,9 +31,13 @@ module.exports = Reflux.createStore({
           if (json.code===200) {
             this.groups = json.data;
             this.triggerChange();
+          } else if (json.code===417) {
+            // server will return 417 (HTTP 200) for empty sets
+            this.groups = [];
+            this.triggerChange();
           }
 
-          if (cb) cb(json.code===200);
+          if (cb) cb(json.code===200 || json.code===417, json);
         }.bind(this));
   },
 
@@ -67,7 +71,7 @@ module.exports = Reflux.createStore({
             this.triggerChange();
           }
 
-          if (cb) cb(json.code===200);
+          if (cb) cb(json.code===200, json);
         }.bind(this));
   },
 
@@ -94,7 +98,7 @@ module.exports = Reflux.createStore({
             group.trainees = json.data;
             this.triggerChange();
         }
-        if (cb) cb(json.code===200);
+        if (cb) cb(json.code===200, json);
       }.bind(this));    
   },
 
@@ -121,7 +125,7 @@ module.exports = Reflux.createStore({
             group.trainees = json.data;
             this.triggerChange();
         }
-        if (cb) cb(json.code===200);
+        if (cb) cb(json.code===200, json);
       }.bind(this));    
   },
 
@@ -146,7 +150,7 @@ module.exports = Reflux.createStore({
             group.trainees = json.data;
             this.triggerChange();
         }
-        if (cb) cb(json.code===200);
+        if (cb) cb(json.code===200, json);
       }.bind(this));    
   },
 
@@ -173,7 +177,7 @@ module.exports = Reflux.createStore({
             group.trainees = json.data;
             this.triggerChange();
         }
-        if (cb) cb(json.code===200);
+        if (cb) cb(json.code===200, json);
       }.bind(this));    
   },
 

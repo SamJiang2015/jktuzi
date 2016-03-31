@@ -31,7 +31,7 @@ module.exports = {
     // }
 
     if (mobile && pass) {
-      loginRequest(mobile, pass, function(res) {
+      loginRequest(mobile, pass, function(res, json) {
         if (res.authenticated) {
           try {
             localStorage.token = res.token;
@@ -41,8 +41,7 @@ module.exports = {
             this.accountId = res.accountId;
             this.coachId = res.coachId;
           } catch (e) {
-            alert('您的浏览器不支持本地储存信息。请确认您没有启用"无痕浏览"后再尝试登录。');
-            if (cb) cb(false);
+            if (cb) cb(false, 400, '您的浏览器不支持本地储存信息。请确认您没有启用"无痕浏览"后再尝试登录。');
             this.onChange(false);
             return;
           }
@@ -57,7 +56,7 @@ module.exports = {
             }
             if (!roleCheckSuccess) {
               this.onChange(false);
-              if(cb) cb(false, 400);
+              if(cb) cb(false, 400, '您不是教练身份');
               this.logout();
               return;
             }  
@@ -66,13 +65,14 @@ module.exports = {
           if (cb) cb(true)
           this.onChange(true);
         } else {
-          if (cb) cb(false, res.status);
+          if (cb) cb(false, res.status, json);
           this.onChange(false);    
         }
       }.bind(this));
     } else {
+      // empty string
       this.onChange(false);
-      if(cb) cb(false, 400);
+      if(cb) cb(false, 400, '账户和密码不能为空');
     } 
   },
 
@@ -201,7 +201,7 @@ function loginRequest(mobile, pass, cb) {
         gender: json.data.gender
       })
     } else {
-      cb({authenticated: false, status: json.status});
+      cb({authenticated: false, status: json.status}, json);
     }
   });  
 

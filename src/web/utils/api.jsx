@@ -7,9 +7,8 @@ require('es6-promise').polyfill();
 //var rootUrl = 'http://pipifit.carp.mopaasapp.com/api/v1/';
 
 //var rootUrl = 'http://localhost:3000/api/v1/'; 
-//var rootUrl = "https://api.s.pipifit.com/";
-var rootUrl = "http://api2.s.pipifit.com/";
-//var rootUrl = "http://api2.pipifit.com/";
+var rootUrl = "https://api2s.pipifit.com/";
+//var rootUrl = "https://api2.pipifit.com/";
 
 module.exports = {
 
@@ -35,7 +34,7 @@ module.exports = {
       fullUrl += '?'+qp;
     }
 
-//    console.log('Request Url: ' + fullUrl);  
+    console.log('GET request Url: ' + fullUrl);  
 
     return fetch(fullUrl, {
       headers: {
@@ -78,7 +77,7 @@ module.exports = {
         body=JSON.stringify(payload);      
     }
 
-//    console.log('Request body: ' + body);    
+    console.log('POST request body: ' + body);    
 
     return fetch(rootUrl + url, {
       method: 'post',
@@ -87,7 +86,6 @@ module.exports = {
         'Content-Type': contentType,
         'x-access-token': token,
         'x-user-id': userId
-//        'Auth': token
       },
       body: body
     })

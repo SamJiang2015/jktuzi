@@ -64,7 +64,7 @@ module.exports = React.createClass({
 			Auth.getAccountId(),
 			props.classId,
 			Auth.getToken(),
-			function(success) {
+			function(success, json) {
 				if (success) {
 			    	var labelsFromStore = TraineeStore.findTrainee(props.id);
 
@@ -83,6 +83,7 @@ module.exports = React.createClass({
 				    });
 				}  else {
 					alert('抱歉数据读取未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');
+					alert('错误信息：'+JSON.stringify(json));					
 				}
 
 			}.bind(this));
@@ -133,7 +134,7 @@ module.exports = React.createClass({
 			Auth.getAccountId(),
 			this.props.classId,
 			Auth.getToken(),
-			function(success) {
+			function(success, json) {
 				if (success) {
 					alert('您已成功提交'+this.props.nickname+'的标签信息');
 					this.setState({
@@ -142,6 +143,7 @@ module.exports = React.createClass({
 					});					
 				} else {
 					alert('抱歉提交未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');
+					alert('错误信息：'+JSON.stringify(json));					
 				}
 			}.bind(this)
 		);

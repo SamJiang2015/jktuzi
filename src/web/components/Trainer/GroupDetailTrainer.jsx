@@ -12,10 +12,14 @@ var ButtonToolbar = require('react-bootstrap/lib/buttontoolbar');
 var ButtonGroup = require('react-bootstrap/lib/buttongroup');
 var Button = require('react-bootstrap/lib/button');
 var Input = require('react-bootstrap/lib/input');
-var Glyphicon = require('react-bootstrap/lib/glyphicon');
+
+// var Glyphicon = require('react-bootstrap/lib/glyphicon');
+// var OverlayTrigger = require('react-bootstrap/lib/overlaytrigger');
+// var Tooltip = require('react-bootstrap/lib/tooltip');
 
 // UI components
 var Trainee = require('./TraineeTrainer');
+var ConfirmModal = require('./ConfirmationModal');
 
 // data layer
 var Auth = require('../../utils/auth');
@@ -27,8 +31,9 @@ var CardType = require('../../utils/constants').CardType;
 var SportsType = require('../../utils/constants').SportsType;
 var MealCardStatus = require('../../utils/constants').MealCardStatus;
 var EMPTY = require('../../utils/constants').EMPTY;
-var GetToday = require('../../utils/constants').GetToday;
+var Helper = require('../../utils/helper');
 var TraineeListSortOrder = require('../../utils/constants').TraineeListSortOrder;
+var DynamicSelect = require('../Common/DynamicSelect');
 
 module.exports = React.createClass({
 
@@ -63,10 +68,13 @@ module.exports = React.createClass({
 
 	    this.setState({
 	      group: deepCopiedGroup,
+	      showConfirmModal: false,
 	      newRemarks: [],
 	      newExerciseInfo: [],
 	      newMealInfo: [],
-	      newBodyInfo: []
+	      newBodyInfo: [],
+	      loading: false,
+	      checkAllStatus: null
 	    });
 	},
 
@@ -78,7 +86,9 @@ module.exports = React.createClass({
 	    	cardType: null,
 	    	checkAllStatus: null,
 	    	showTrainees: false,
-	    	cardDate: GetToday(),
+	    	showConfirmModal: false,
+	    	cardDate: Helper.GetToday(),
+	    	cardDateValues: Helper.GetDateValues(),
 
 	    	newRemarks: [],
 		    newExerciseInfo: [],
@@ -91,7 +101,7 @@ module.exports = React.createClass({
 
 	componentDidMount: function() {
 		// by default, retrieve today's info first
-		var date = GetToday();
+		var date = Helper.GetToday();
 		// trigger fetching of the detailed info for the selected group
 		// the change will be propgated from the store to this component
 		// through the change listening mechanism
@@ -100,16 +110,17 @@ module.exports = React.createClass({
 			date,
 			Auth.getAccountId(),
 			Auth.getToken(),
-			function(success) {
+			function(success, json) {
 				if (!success) {
-					alert('抱歉数据读取未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');
+					alert('抱歉数据读取未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们.');
+					alert('错误信息：'+JSON.stringify(json));
 				}
 			}); 
 	},
 
 	componentWillReceiveProps: function(nextProps) {
 		// by default, retrieve today's info first
-		var date = GetToday();
+		var date = Helper.GetToday();
 
 		// trigger fetching of the detailed info for the selected group
 		// the change will be propgated from the store to this component
@@ -119,47 +130,32 @@ module.exports = React.createClass({
 			date,
 			Auth.getAccountId(),
 			Auth.getToken(),
-			function(success) {
+			function(success, json) {
 				if (!success) {
 					alert('抱歉数据读取未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');
+					alert('错误信息：'+JSON.stringify(json));					
 				}
 			});
 	},
 
-	handleCardDateChange: function(e) {
-		e.preventDefault();
-
-		var dateInput = e.target.value;
-
-		// date is in the format of "YYYY-MM-DD"
-		// m[1] is year 'YYYY' * m[2] is month 'MM' * m[3] is day 'DD'				
-		var m = dateInput.match(/(\d{4})-(\d{2})-(\d{2})/);
-
-		var inputDate = new Date(m[1], m[2]-1, m[3]);
-        var startDate = new Date();
-        startDate.setDate(startDate.getDate() - 7);// 7 days before today        
-        var endDate = new Date();
-
-        if(inputDate < startDate || inputDate > endDate) {
-            alert("您只能编辑过去7天以内的信息");
-        } else {
+	handleCardDateChange: function(date) {
 
 		GroupsActions.getGroupCards(
 			this.props.params.id,
-			dateInput, //date
+			date, //date
 			Auth.getAccountId(),
 			Auth.getToken(),
-			function(success) {      
+			function(success, json) {      
 				if (success) {  		
 					this.setState({
-						cardDate: dateInput,
+						cardDate: date,
 						showTrainees: false
 					});
 				} else {
-					alert('抱歉数据读取未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');					
+					alert('抱歉数据读取未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');	
+					alert('错误信息：'+JSON.stringify(json));				
 				}
 			}.bind(this));		
-		}
 	},
 
 	// when user clicks on one of these buttons, meal status for all trainees
@@ -213,10 +209,9 @@ module.exports = React.createClass({
 		});
 	},
 
-	// when user clicks on cancel, just re-render the page using the data
+	// to cancel changes made, just re-render the page using the data
 	// loaded from DB
-	handleCancel: function(e) {
-		e.preventDefault();
+	handleCancel: function() {
 
 		var groupFromStore = GroupsStore.pickGroupById(this.props.params.id);
 
@@ -247,7 +242,8 @@ module.exports = React.createClass({
 			newRemarks: [],
 			newBodyInfo: [],
 			newMealInfo: [],
-			newExerciseInfo: []
+			newExerciseInfo: [],
+			showConfirmModal: false
 		})
 	},
 
@@ -262,6 +258,11 @@ module.exports = React.createClass({
 			this.state.newExerciseInfo.length===0 &&
 			this.state.newRemarks.length===0) {
 			alert('您还没有修改信息');
+
+			this.setState({
+				showTrainees: false,
+				cardType: null
+			});		
 			return;
 		}
 
@@ -282,17 +283,19 @@ module.exports = React.createClass({
 						this.state.cardType.propertyName, // URI path
 						this.state.newMealInfo, // new info
 						Auth.getToken(),
-						function(success) {
+						function(success, json) {
 							if (success) {
 								alert('您已成功提交餐卡信息');
 								this.setState({
 									loading: false,
+	    							checkAllStatus: null,									
 									showTrainees: false,
 									cardType: null,
-									newMealInfo: [],
+									newMealInfo: []
 								})
 							} else {
 								alert('抱歉提交未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');							
+								alert('错误信息：'+JSON.stringify(json));
 								this.setState({
 									loading: false						
 								});							
@@ -309,17 +312,19 @@ module.exports = React.createClass({
 						this.state.cardDate, // date
 						this.state.newExerciseInfo, // new info
 						Auth.getToken(),
-						function(success) {
+						function(success, json) {
 							if (success) {
 								alert('您已成功提交运动卡信息');
 								this.setState({
 									showTrainees: false,
 									cardType: null,
 									newExerciseInfo: [],
-									loading: false
+									loading: false,
+	    							checkAllStatus: null									
 								})
 							} else {
 								alert('抱歉提交未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');							
+								alert('错误信息：'+JSON.stringify(json));
 								this.setState({
 									loading: false						
 								});														
@@ -335,28 +340,36 @@ module.exports = React.createClass({
 					for (var i=0; i<this.state.newBodyInfo.length; i++) {
 						var errorMsg;
 						var info = this.state.newBodyInfo[i];
-					 	var weight = parseFloat(info.bodyWeight);
-					 	if (isNaN(weight)) {
-					 		passCheck=false;
-					 	} else {
-							if (weight !==EMPTY && 
-								(weight<35 || weight>200)) {
-									passCheck=false;
-					 		}
-					 	}
+						if (isNaN(info.bodyWeight)) {
+							passCheck=false;
+						} else {
+					 		var weight = parseFloat(info.bodyWeight);
+						 	if (isNaN(weight)) {
+						 		passCheck=false;
+						 	} else {
+								if (weight !==EMPTY && 
+									(weight<35 || weight>350)) {
+										passCheck=false;
+						 		}
+						 	}
+						 }
 
 					 	if (!passCheck) {
 							errorMsg = '您修改过的体重数据' + info.bodyWeight + 'kg超出正常区间。请核实数据然后再提交';					 													 		
 					 	} else {
 					 		// check bodyFat
-						 	var fat = parseFloat(info.bodyFat);
-						 	if (isNaN(fat)) {
-						 		passCheck=false;
-						 	} else {
-								if (fat !==EMPTY && (fat<5 || fat>55)) {
-									passCheck=false;
-						 		}
-						 	}
+					 		if (isNaN(info.bodyFat)) {
+					 			passCheck = false;
+					 		} else {
+							 	var fat = parseFloat(info.bodyFat);
+							 	if (isNaN(fat)) {
+							 		passCheck=false;
+							 	} else {
+									if (fat !==EMPTY && (fat<5 || fat>55)) {
+										passCheck=false;
+							 		}
+							 	}
+							}
 
 							if (!passCheck) {
 								errorMsg = '您修改过的体脂数据'+ info.bodyFat + '%超出正常区间。请核实数据然后再提交';						 	
@@ -381,17 +394,19 @@ module.exports = React.createClass({
 						this.state.cardDate, // date,
 						this.state.newBodyInfo, // new info
 						Auth.getToken(),
-						function(success) {
+						function(success, json) {
 							if (success) {
 								alert('您已成功提交体卡信息');
 								this.setState({
 									showTrainees: false,
 									cardType: null,
 									newBodyInfo: [],
-									loading: false
+									loading: false,
+									checkAllStatus: null
 								})
 							} else {
-								alert('抱歉提交未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');							
+								alert('抱歉提交未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');
+								alert('错误信息：'+JSON.stringify(json));															
 								this.setState({
 									loading: false						
 								});														
@@ -408,17 +423,19 @@ module.exports = React.createClass({
 						this.state.cardDate, // date
 						this.state.newRemarks, // remarks
 						Auth.getToken(),
-						function(success) {
+						function(success, json) {
 							if (success) {
 								alert('您已成功提交备注信息');
 								this.setState({
 									showTrainees: false,
 									cardType: null,
 									newRemarks: [],
-									loading: false
+									loading: false,
+	    							checkAllStatus: null
 								})
 							} else {
 								alert('抱歉提交未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');							
+								alert('错误信息：'+JSON.stringify(json));								
 								this.setState({
 									loading: false						
 								});														
@@ -600,7 +617,7 @@ module.exports = React.createClass({
 						className={this.state.cardType===CardType.Breakfast?'active':null}				    	
 				    	onClick={function(e){
 				    		e.preventDefault(); 
-				    		this.setState({cardType:CardType.Breakfast, showTrainees:true});
+				    		this.setState({cardType:CardType.Breakfast, loading: false, checkAllStatus: null, showTrainees:true, showConfirmModal:false});
 				    	}.bind(this)}>
 				    	早
 		    		</Button>
@@ -609,7 +626,7 @@ module.exports = React.createClass({
 						className={this.state.cardType===CardType.Lunch?'active':null}				    	
 				    	onClick={function(e){
 				    		e.preventDefault(); 
-				    		this.setState({cardType:CardType.Lunch, showTrainees:true})}.bind(this)}>
+				    		this.setState({cardType:CardType.Lunch, loading: false, checkAllStatus: null, showTrainees:true, showConfirmModal:false})}.bind(this)}>
 				    	午
 				    </Button>
 				    <Button 
@@ -617,7 +634,7 @@ module.exports = React.createClass({
 						className={this.state.cardType===CardType.Dinner?'active':null}				    	
 				    	onClick={function(e){
 				    		e.preventDefault(); 
-				    		this.setState({cardType:CardType.Dinner, showTrainees:true})}.bind(this)}>
+				    		this.setState({cardType:CardType.Dinner, loading: false, checkAllStatus: null, showTrainees:true, showConfirmModal:false})}.bind(this)}>
 				    	晚
 				    </Button>
 				</ButtonGroup>
@@ -627,7 +644,7 @@ module.exports = React.createClass({
 						className={this.state.cardType===CardType.Sports?'active':null}				    	
 				    	onClick={function(e){
 				    		e.preventDefault(); 
-				    		this.setState({cardType:CardType.Sports, showTrainees:true})}.bind(this)}>
+				    		this.setState({cardType:CardType.Sports, loading: false, checkAllStatus: null, showTrainees:true, showConfirmModal:false})}.bind(this)}>
 				    	运动
 				    </Button>
 				</ButtonGroup>
@@ -637,7 +654,7 @@ module.exports = React.createClass({
 						className={this.state.cardType===CardType.Body?'active':null}				    	
 				    	onClick={function(e){
 				    		e.preventDefault(); 		    		
-				    		this.setState({cardType:CardType.Body, showTrainees:true})}.bind(this)}>
+				    		this.setState({cardType:CardType.Body, loading: false, checkAllStatus: null, showTrainees:true, showConfirmModal:false})}.bind(this)}>
 				    	体卡
 				    </Button>
 				</ButtonGroup>
@@ -647,7 +664,7 @@ module.exports = React.createClass({
 						className={this.state.cardType===CardType.Remarks?'active':null}				    	
 				    	onClick={function(e){
 				    		e.preventDefault(); 			    		
-				    		this.setState({cardType:CardType.Remarks, showTrainees:true})}.bind(this)}>
+				    		this.setState({cardType:CardType.Remarks, loading: false, checkAllStatus: null, showTrainees:true, showConfirmModal:false})}.bind(this)}>
 				    	备注
 				    </Button>
 				</ButtonGroup>				
@@ -720,7 +737,7 @@ module.exports = React.createClass({
 							{this.renderMealStatusCheckAllButtons()}								
 						</thead>
 						<tbody>
-							{this.renderTraineesList()}					
+							{this.renderTraineesList()}			
 						</tbody>
 					</table>
 				</div>
@@ -738,6 +755,19 @@ module.exports = React.createClass({
 			return null;
 		}
 
+		// var tooltipPass = (
+  // 			<Tooltip id='ttp'>合格</Tooltip>
+		// );
+		// var tooltipFail = (
+  // 			<Tooltip id='ttf'>不合格</Tooltip>
+		// );
+		// var tooltipMiss = (
+  // 			<Tooltip id='ttm'>未打卡</Tooltip>
+		// );
+		// var tooltipOpenDay = (
+  // 			<Tooltip id='ttod'>开放日</Tooltip>
+		// );				
+
 		return (
 			<tr><td></td><td>
 				<div className="form-group">
@@ -747,7 +777,7 @@ module.exports = React.createClass({
 							value="pass"  
 							checked={this.state.checkAllStatus===MealCardStatus.Pass?'checked':null}
 							onChange={this.handleCheckAllChange}/>
-							<Glyphicon glyph="ok-circle"/>
+    						合格						
 					</label>
 					<label className="checkbox-inline">								
 						<input 
@@ -755,7 +785,7 @@ module.exports = React.createClass({
 							value="fail" 
 							checked={this.state.checkAllStatus===MealCardStatus.Fail?'checked':null}
 							onChange={this.handleCheckAllChange} />
-							<Glyphicon glyph="remove-circle"/>
+							不合格								
 					</label>
 					<label className="checkbox-inline">
 						<input 
@@ -763,7 +793,7 @@ module.exports = React.createClass({
 							value="miss"  
 							checked={this.state.checkAllStatus===MealCardStatus.Miss?'checked':null}
 							onChange={this.handleCheckAllChange}/>
-							<Glyphicon glyph="ban-circle"/>
+    						未打卡								
 					</label>					
 					<label className="checkbox-inline">								
 						<input 
@@ -771,7 +801,7 @@ module.exports = React.createClass({
 							value="openday" 
 							checked={this.state.checkAllStatus===MealCardStatus.OpenDay?'checked':null}
 							onChange={this.handleCheckAllChange} />
-							<Glyphicon glyph="cutlery"/>
+    						开放日								
 					</label>				
 				</div>
 			</td></tr>
@@ -780,13 +810,24 @@ module.exports = React.createClass({
 
 	// submit and cancel buttons
 	renderSCButtons: function() {
-		return (
+		return (			
+	<nav className="navbar navbar-default navbar-fixed-bottom">
+  		<div className="container">	
+  			<div className="row">
+  				<div className="col-xs-2 col-xs-offset-4">
+  					<span>{this.state.cardDate}</span>
+  				</div>
+  				<div className="col-xs-2">
+  					<span>{this.state.cardType.description}</span>
+  				</div>  				
+  			</div>
 			<div className="row">		
 	            <div className="col-xs-3 col-xs-offset-3">					
 					<Button 	
-						onClick={this.handleCancel} 
+						onClick={function(){this.setState({showConfirmModal: true})}.bind(this)} 
 						bsStyle="warning"
 						bsSize="small"
+						className="navbar-btn"
 						block>
 						取消
 					</Button>
@@ -796,11 +837,18 @@ module.exports = React.createClass({
 						onClick={this.handleSubmit} 
 						bsStyle="success"
 						bsSize="small"
+						className="navbar-btn"						
 						block>
 						{this.state.loading?'请稍候...':'提交'}
 					</Button>
 				</div>
+				<ConfirmModal
+					show={this.state.showConfirmModal}
+					cardType={this.state.cardType.description}
+					action={this.handleCancel}/>
 			</div>
+  		</div>
+	</nav>			
 		);			
 	},
 
@@ -818,11 +866,11 @@ module.exports = React.createClass({
 									<p>选择打卡日期和类型：</p>
 								</div>
 								<div className="col-sm-4">
-									<Input 
-										type="date" 
-										value={this.state.cardDate}						
+									<DynamicSelect  
+										value={this.state.cardDate}
+										selectItems={this.state.cardDateValues}						
 										className="form-control" 
-										onChange={this.handleCardDateChange}/>
+										handleChange={this.handleCardDateChange}/>
 								</div>
 							</div>
 							{this.renderCardTypeButtons()}

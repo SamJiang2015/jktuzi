@@ -17,18 +17,14 @@ module.exports = React.createClass({
 	},
 
 	setStateHelper: function(props) {
-		var weight=parseFloat(props.weight);
-		var fat=parseFloat(props.fat);
+		var weight=props.weight;
+		var fat=props.fat;
 
-		if (!isNaN(weight) && weight !== EMPTY) {
-			weight = weight.toFixed(1);
-		} else {
+		if (!isNaN(weight) && parseFloat(weight) == EMPTY) {
 			weight=null;
 		}
 
-		if (!isNaN(fat) && fat !== EMPTY) {
-			fat = fat.toFixed(1);
-		} else {
+		if (!isNaN(fat) && parseFloat(fat) == EMPTY) {
 			fat=null;
 		}
 
@@ -53,16 +49,18 @@ module.exports = React.createClass({
 
 	 	var newNumber;
 	 	if (newValue.trim()!=='') {
-		 	newNumber = parseFloat(newValue);
+	 		if (!isNaN(newValue)) {
+				// 四舍五入保留小数点后一位
+		 		newNumber = parseFloat(newValue).toFixed(1);
+		 	} else {
+		 		newNumber = newValue;
+		 	}
 		 } else {
 		 	newNumber = EMPTY;
 		 }
 
-	 	if (!isNaN(newNumber)) {
-			// call handler from parent component to pass up the new status
-			// 四舍五入保留小数点后一位
-		 	this.props.handleBodyCardStatusChange(newNumber.toFixed(1), this.state.fat?this.state.fat:EMPTY);
-		}
+		// call handler from parent component to pass up the new status
+		this.props.handleBodyCardStatusChange(newNumber, this.state.fat?this.state.fat:EMPTY);
 
 		this.setState({
 			weight: newValue
@@ -76,16 +74,18 @@ module.exports = React.createClass({
 
 	 	var newNumber;
 	 	if (newValue.trim()!=='') {
-		 	newNumber = parseFloat(newValue);
+	 		if (!isNaN(newValue)) {
+				// 四舍五入保留小数点后一位	 			
+		 		newNumber = parseFloat(newValue).toFixed(1);
+		 	} else {
+		 		newNumber = newValue;
+		 	}
 		} else {
 		 	newNumber = EMPTY;
 		}
 
-	 	if (!isNaN(newNumber)) {
-			// call handler from parent component to pass up the new value
-			// 四舍五入保留小数点后一位
-		 	this.props.handleBodyCardStatusChange(this.state.weight?this.state.weight:EMPTY, newNumber.toFixed(1));
-		}
+		// call handler from parent component to pass up the new value
+		this.props.handleBodyCardStatusChange(this.state.weight?this.state.weight:EMPTY, newNumber);
 
 		this.setState({
 			fat: newValue
@@ -104,10 +104,8 @@ module.exports = React.createClass({
             <div className="form-group">
                 <div className="col-sm-4 col-sm-offset-2">
 					<Input 
-						type="number" 
+						type="text" 
 						addonAfter="kg"
-						min="30"
-						max="350"
 						value={this.state.weight}  												
 						className="form-control" 
 						onChange={this.handleWeightChange}
@@ -115,10 +113,8 @@ module.exports = React.createClass({
                 </div>
                 <div className="col-sm-4">
 					<Input 
-						type="number"  
+						type="text"  
 						addonAfter="%"
-						min="5"
-						max="50"
 						value={this.state.fat}  												
 						className="form-control"					 
 						onChange={this.handleFatChange}
