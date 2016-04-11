@@ -92,13 +92,6 @@ module.exports = React.createClass({
 		});			 	
 	 },
 
-	handleFocus: function(e) {
-		var target = e.target;
-		setTimeout(function() {
-		    target.select();
-		  }, 0);
-	},
-
 	render: function() {
 		return (
             <div className="form-group">
@@ -108,8 +101,7 @@ module.exports = React.createClass({
 						addonAfter="kg"
 						value={this.state.weight}  												
 						className="form-control" 
-						onChange={this.handleWeightChange}
-						onFocus={this.handleFocus}/>
+						onChange={this.handleWeightChange}/>
                 </div>
                 <div className="col-sm-4">
 					<Input 
@@ -117,8 +109,7 @@ module.exports = React.createClass({
 						addonAfter="%"
 						value={this.state.fat}  												
 						className="form-control"					 
-						onChange={this.handleFatChange}
-						onFocus={this.handleFocus}/>
+						onChange={this.handleFatChange}/>
                 </div>
             </div>
 		);

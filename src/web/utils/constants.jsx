@@ -8,9 +8,18 @@ Constants = Object.freeze({
 	EMPTY: -1,
 
 
+	LifeStatusDisplay: [
+		'朝九晚五', '苦逼加班汪', '睡到自醒，数钱抽筋'
+	],
+
+	PractiseHobbyDisplay: [
+		'>=2', '1', '<1'
+	],	
+
 	TraineeListSortOrder: {
 		ByNickName: 0,
-		ByMealStatus: 1
+		ByMealStatus: 1,
+		ByName: 2
 	},
 
 	RoleValue: {

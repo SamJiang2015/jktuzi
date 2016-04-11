@@ -24,6 +24,8 @@ var Button = require('react-bootstrap/lib/button');
 var ButtonToolbar = require('react-bootstrap/lib/Buttontoolbar');
 
 var LabelDisplay = require('../../utils/constants').LabelDisplay;
+var LifeStatusDisplay = require('../../utils/constants').LifeStatusDisplay;
+var PractiseHobbyDisplay = require('../../utils/constants').PractiseHobbyDisplay;
 
 module.exports = React.createClass({
 
@@ -50,9 +52,20 @@ module.exports = React.createClass({
 
 	getInitialState: function(){
 		return {
+            gender: null,
+            birthday: null,
+            city: null,
+            college: null,
+            lifeStatus: null,
+            practiseHobby: null,
+            height: null,
+            curWeight: null,
+            factori: null,
+            hopeWeight: null,			
 			labels: [],
 			showSelf: false,
 			showLabelEditModal: false,
+			labelChanged: false,
 			loading: false
 		};
 	},
@@ -66,7 +79,8 @@ module.exports = React.createClass({
 			Auth.getToken(),
 			function(success, json) {
 				if (success) {
-			    	var labelsFromStore = TraineeStore.findTrainee(props.id);
+					var trainee = TraineeStore.findTrainee(props.id);
+			    	var labelsFromStore = trainee.bodyLabels;
 
 					// need to deep copy so that user can easily roll back unsubmitted
 					// changes by clicking on "Cancel"
@@ -75,12 +89,56 @@ module.exports = React.createClass({
 						copiedLabels.push(labelsFromStore[i]);
 					}
 
-				    this.setState({
-				      labels: copiedLabels,
-				      showSelf: props.showModal,
-				      showLabelEditModal: false,
-				      loading: false      
-				    });
+					if (trainee.infoSynced) {
+					    this.setState({
+				            gender: trainee.gender,
+				            birthday: trainee.birthday,
+				            city: trainee.city,
+				            college: trainee.college,
+				            lifeStatus: trainee.lifeStatus,
+				            practiseHobby: trainee.practiseHobby,
+				            height: trainee.height,
+				            curWeight: trainee.curWeight,
+				            factori: trainee.fatori,
+				            hopeWeight: trainee.hopeWeight,
+						    labels: copiedLabels,
+						    
+						    showSelf: props.showModal,
+						    showLabelEditModal: false,
+						    labelChanged: false,
+						    loading: false      
+					    });
+					} else {
+						// haven't called DB to get the user's registration info
+						TraineeActions.getTraineeInfo(
+							props.id,
+							Auth.getAccountId(),
+							Auth.getToken(),
+							function(success, json) {
+								if (success) {
+									    this.setState({
+								            gender: trainee.gender,
+								            birthday: trainee.birthday,
+								            city: trainee.city,
+								            college: trainee.college,
+								            lifeStatus: trainee.lifeStatus,
+								            practiseHobby: trainee.practiseHobby,
+								            height: trainee.height,
+								            curWeight: trainee.curWeight,
+								            factori: trainee.fatori,
+								            hopeWeight: trainee.hopeWeight,
+								            labels: copiedLabels,
+										    
+										    showSelf: props.showModal,
+										    showLabelEditModal: false,
+										    loading: false      
+									    });
+								}  else {
+									alert('抱歉数据读取未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');
+									alert('错误信息：'+JSON.stringify(json));					
+								}
+							}.bind(this));						
+					}
 				}  else {
 					alert('抱歉数据读取未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');
 					alert('错误信息：'+JSON.stringify(json));					
@@ -88,7 +146,6 @@ module.exports = React.createClass({
 
 			}.bind(this));
 	},
-
 
 	componentDidMount: function() {
 		this.setStateHelper(this.props);
@@ -100,13 +157,15 @@ module.exports = React.createClass({
 
 	close: function() {		
 		this.setState({
-			showSelf: false
+			showSelf: false,
+			labelChanged: false
 		})
 	},
 
 	open: function() {
 		this.setState({
-			showSelf: true
+			showSelf: true,
+			labelChanged: false
 		})
 	},	
 
@@ -115,6 +174,7 @@ module.exports = React.createClass({
 			labels: labels,
 			showSelf: true,
 			showLabelEditModal: false,
+			labelChanged: true,
 			loading: false
 		})
 	},
@@ -139,6 +199,7 @@ module.exports = React.createClass({
 					alert('您已成功提交'+this.props.nickname+'的标签信息');
 					this.setState({
 						showSelf: false,
+						labelChanged: false,
 						loading: false
 					});					
 				} else {
@@ -186,14 +247,45 @@ module.exports = React.createClass({
 					<h4>{this.props.nickname}</h4>
 				</div>
 				<div className="panel-body">
-					<table className="table table-responsive table-condensed">
+					<table className="table table-responsive table-striped table-condensed">
 						<tbody>
 							<tr> 
 								<td>姓名</td> 
 								<td>{this.props.name}</td>
 								<td></td>
 								<td></td>
+							</tr>						
+							<tr> 
+								<td>性别</td> <td>{this.state.gender===1?'男':'女'}</td><td></td><td></td>
 							</tr>
+							<tr> 
+								<td>出生年月</td> <td>{this.state.birthday}</td><td></td><td></td>
+							</tr>
+							<tr> 
+								<td>城市</td> <td>{this.state.city}</td><td></td><td></td>
+							</tr>
+							<tr> 
+								<td>毕业院校</td> <td>{this.state.college}</td><td></td><td></td>
+							</tr>
+							<tr> 
+								<td>生活状态</td> <td>{this.state.lifeStatus?LifeStatusDisplay[this.state.lifeStatus]:''}</td><td></td><td></td>
+							</tr>
+							<tr> 
+								<td>运动习惯</td> <td>{this.state.practiseHobby? PractiseHobbyDisplay[this.state.practiseHobby] + '次/周':''}</td><td></td><td></td>
+							</tr>
+							<tr> 
+								<td>身高</td> <td>{this.state.height!=='-1'? this.state.height + '厘米':''}</td><td></td><td></td>
+							</tr>
+							<tr> 
+								<td>原体重</td> <td>{this.state.curWeight!=='-1'?this.state.curWeight+'公斤':''}</td><td></td><td></td>
+							</tr>
+							<tr> 
+								<td>原体脂</td> <td>{this.state.factori!=='-1'? this.state.factori+'％':''}</td><td></td><td></td>
+							</tr>
+							<tr> 
+								<td>期望体重</td> <td>{this.state.hopeWeight!=='-1'?this.state.hopeWeight+'公斤':''}</td><td></td><td></td>
+							</tr>
+
 							<tr>
 								<td>标签</td>
 								<td className="traineeLabelsDisplay">{this.renderLabels()}</td>						
@@ -226,7 +318,7 @@ module.exports = React.createClass({
 				</Modal.Body>
 				<Modal.Footer>
 					<ButtonToolbar>
-						<Button bsStyle="success" onClick={this.submitInfo}>
+						<Button disabled={this.state.labelChanged?null:'disabled'} bsStyle="success" onClick={this.submitInfo}>
 		                	{this.state.loading? '请稍候...':'提交'}
 						</Button>
 						<Button bsStyle="default" onClick={this.close}>取消</Button>

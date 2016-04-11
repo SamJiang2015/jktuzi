@@ -592,6 +592,16 @@ module.exports = React.createClass({
 		}
 	},
 
+	handleNameClick: function(e) {
+		e.preventDefault();
+
+		if (this.state.sortOrder !== TraineeListSortOrder.ByName) {
+			this.setState({
+				sortOrder: TraineeListSortOrder.ByName
+			})
+		}
+	},	
+
 	handleCardTypeClick: function(e) {
 		e.preventDefault();
 
@@ -683,6 +693,8 @@ module.exports = React.createClass({
 		var compareFunc; 
 		if (this.state.sortOrder === TraineeListSortOrder.ByNickName) {
 			compareFunc=function(a,b) {return a.nickname.localeCompare(b.nickname);};		
+		} else if (this.state.sortOrder === TraineeListSortOrder.ByName) {
+			compareFunc=function(a,b) {return a.name.localeCompare(b.name);};		
 		} else if (this.state.sortOrder === TraineeListSortOrder.ByMealStatus) {
 			compareFunc=function(a,b) {
 			  return (a[this.state.cardType.propertyName] - b[this.state.cardType.propertyName]);}.bind(this);					
@@ -730,8 +742,9 @@ module.exports = React.createClass({
 					<table className="table table-condensed table-hover">
 						<thead>
 							<tr>
-								<th style={{width: '9%'}} onClick={this.handleNickNameClick}>昵称</th>
-								<th style={{width: '90%'}} onClick={this.handleCardTypeClick}>{this.state.cardType.description}</th>
+								<th style={{width: '9%'}} onClick={this.handleNameClick}>昵称</th>							
+								<th style={{width: '9%'}} onClick={this.handleNickNameClick}>姓名</th>
+								<th style={{width: '81%'}} onClick={this.handleCardTypeClick}>{this.state.cardType.description}</th>
 								<th style={{width: '1%'}}></th>
 							</tr>
 							{this.renderMealStatusCheckAllButtons()}								
@@ -769,7 +782,7 @@ module.exports = React.createClass({
 		// );				
 
 		return (
-			<tr><td></td><td>
+			<tr><td></td><td></td><td>
 				<div className="form-group">
 					<label className="checkbox-inline">
 						<input 
@@ -813,16 +826,12 @@ module.exports = React.createClass({
 		return (			
 	<nav className="navbar navbar-default navbar-fixed-bottom">
   		<div className="container">	
-  			<div className="row">
-  				<div className="col-xs-2 col-xs-offset-4">
-  					<span>{this.state.cardDate}</span>
-  				</div>
-  				<div className="col-xs-2">
-  					<span>{this.state.cardType.description}</span>
-  				</div>  				
-  			</div>
 			<div className="row">		
-	            <div className="col-xs-3 col-xs-offset-3">					
+  				<div className="col-xs-3">
+  					<span>{this.state.cardDate}/{this.state.cardType.description}</span>
+  				</div>
+
+	            <div className="col-xs-3">					
 					<Button 	
 						onClick={function(){this.setState({showConfirmModal: true})}.bind(this)} 
 						bsStyle="warning"

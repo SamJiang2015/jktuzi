@@ -20,16 +20,51 @@ module.exports = Reflux.createStore({
     return this.trainees[traineeId.toString()];
   },
 
+  getTraineeInfo: function(traineeId, accountId, token, cb) {
+    var url= 'userinfo';
+    traineeId=traineeId.toString();
+    var params = {userId: traineeId};
+
+    Api.get(url, token, params, accountId)
+      .then(function(json){
+          if (json.code===200) {
+            
+            if (!this.trainees[traineeId]) {
+              this.trainees[traineeId] = {infoSynced: true};
+            }
+
+            this.trainees[traineeId].gender = json.gender;
+            this.trainees[traineeId].birthday = json.birthday;
+            this.trainees[traineeId].city = json.city;
+            this.trainees[traineeId].college = json.college;
+            this.trainees[traineeId].lifeStatus = json.lifeStatus;
+            this.trainees[traineeId].practiseHobby = json.practiseHobby;
+            this.trainees[traineeId].height = json.height;
+            this.trainees[traineeId].curWeight = json.curWeight;
+            this.trainees[traineeId].fatori = json.fatori;
+            this.trainees[traineeId].hopeWeight = json.hopeWeight;
+
+            this.triggerChange();
+          }
+
+          if (cb) cb(json.code===200, json);
+        }.bind(this)        
+        );
+  },
+
   // retrieve the list of labels of a trainee
   getTraineeLabels: function(traineeId, accountId, classId, token, cb) {
       var url = 'labels'; 
-
+      traineeId=traineeId.toString();
       var params = {userId: traineeId, operatorId: accountId, classId: classId};
 
       Api.get(url, token, params, accountId)
         .then(function(json){
           if (json.code===200) {
-            this.trainees[traineeId.toString()] = json.bodyLabel;
+             if (!this.trainees[traineeId]) {
+              this.trainees[traineeId] = {};
+            }
+            this.trainees[traineeId.toString()].bodyLabels = json.bodyLabel;
             this.triggerChange();
           }
 
@@ -53,7 +88,7 @@ module.exports = Reflux.createStore({
     Api.post(url, payload, token, accountId)
       .then(function(json){
         if (json.code===200) {
-          this.trainees[traineeId.toString()] = labels;
+          this.trainees[traineeId.toString()].bodyLabels = labels;
           this.triggerChange();
         }
 

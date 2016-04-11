@@ -45,7 +45,7 @@ module.exports = {
 	GetDateValues: function() {
 
         var startDate = new Date();
-        startDate.setDate(startDate.getDate() - 7);// 7 days before today        
+        startDate.setDate(startDate.getDate() - 13);// 7 days before today        
         var endDate = new Date();
 
         var dateValues = [];

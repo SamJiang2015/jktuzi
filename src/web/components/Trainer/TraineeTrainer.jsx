@@ -201,11 +201,14 @@ module.exports = React.createClass({
 			<tr 
 				className={mealCardClassName}> 			
 				<td
-					style={{opacity: 0.5}}
+					style={{opacity: 0.9}}
 				 	onClick={this.handleClick.bind(this, this.state.id)}
 				 	>
 				 	<span className="clickable">{this.state.nickname}</span>
 				 </td>
+				<td>
+				 	{this.state.name}
+				 </td>				 
 				{this.renderCards()}
 				<td>{this.renderTraineeInfoModal()}</td>
 			</tr>

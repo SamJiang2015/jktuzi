@@ -77,7 +77,9 @@ module.exports = {
         body=JSON.stringify(payload);      
     }
 
-    console.log('POST request body: ' + body);    
+    if (url !=='login') {
+      console.log('POST request body: ' + body);    
+    }
 
     return fetch(rootUrl + url, {
       method: 'post',
