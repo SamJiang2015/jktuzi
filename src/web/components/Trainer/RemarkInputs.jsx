@@ -86,9 +86,9 @@ module.exports = React.createClass({
 			return (
         		<li
         			key={remark.coachId}>
-        			<span className="trainerName">
+        			<div className="trainerName">
         				{'['+remark.coachName+'教练:]'}
-        			</span>        			
+        			</div>        			
         			{remark.remark}
         		</li>				
 			);			
@@ -104,10 +104,9 @@ module.exports = React.createClass({
 				<li 
 					className="ownRemark"
 					onClick={this.handleClick}>
-					<span>
-					{this.state.ownRemark.remark.trim()===''?null:'[我:]'}
-					</span>        			
-					{this.state.ownRemark.remark.trim()===''?'点击输入备注':this.state.ownRemark.remark}
+					<div className="clickable">
+						{this.state.ownRemark.remark.trim()===''?'点击输入备注':'[我:] '+this.state.ownRemark.remark}
+					</div>
 				</li>				
 			);
 	},

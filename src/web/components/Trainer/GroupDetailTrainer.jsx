@@ -149,7 +149,7 @@ module.exports = React.createClass({
 		} 
 
 		this.setState({
-			dateSet: true,
+			dateSet: false,
 			dateError: false,
 			showTrainees: false,
 			loading: true,
@@ -165,12 +165,14 @@ module.exports = React.createClass({
 				if (success) {  		
 					this.setState({
 						cardDate: date,
+						dateSet: true,
 						loading: false
 					});
 				} else {
-					alert('抱歉数据读取未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');	
+					alert('抱歉数据读取未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康平台)联系我们');	
 					alert('错误信息：'+JSON.stringify(json));		
 					this.setState({
+						dateSet: false,
 						loading: false
 					});							
 				}
@@ -275,7 +277,7 @@ module.exports = React.createClass({
 									newMealInfo: []
 								})
 							} else {
-								alert('抱歉提交未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');							
+								alert('抱歉提交未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康平台)联系我们');							
 								alert('错误信息：'+JSON.stringify(json));
 								this.setState({
 									loading: false						
@@ -304,7 +306,7 @@ module.exports = React.createClass({
 	    							checkAllStatus: null									
 								})
 							} else {
-								alert('抱歉提交未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');							
+								alert('抱歉提交未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康平台)联系我们');							
 								alert('错误信息：'+JSON.stringify(json));
 								this.setState({
 									loading: false						
@@ -386,7 +388,7 @@ module.exports = React.createClass({
 									checkAllStatus: null
 								})
 							} else {
-								alert('抱歉提交未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');
+								alert('抱歉提交未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康平台)联系我们');
 								alert('错误信息：'+JSON.stringify(json));															
 								this.setState({
 									loading: false						
@@ -415,7 +417,7 @@ module.exports = React.createClass({
 	    							checkAllStatus: null
 								})
 							} else {
-								alert('抱歉提交未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');							
+								alert('抱歉提交未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康平台)联系我们');							
 								alert('错误信息：'+JSON.stringify(json));								
 								this.setState({
 									loading: false						
@@ -920,7 +922,7 @@ module.exports = React.createClass({
 						<div className="well">
 							<div className="row">
 								<div className="col-sm-2">
-									<p>选择打卡日期</p>
+									<p>1. 选择打卡日期</p>
 								</div>
 								<div className="col-sm-3">
 									<DatePicker 
@@ -939,13 +941,13 @@ module.exports = React.createClass({
 										{(this.state.dateSet && this.state.dateError)?'请检查您输入的日期':null}
 									</div>
 									<div>
-										<p>{(this.state.loading)?'正在同步数据，请稍候':null}</p>
+										<p>{(this.state.loading)?'正在同步数据，请稍候...':null}</p>
 									</div>
 								</div>
 							</div>
 							<div className="row">
 								<div className="col-sm-2">
-									<p>选择打卡类型</p>
+									<p>2. 选择打卡类型</p>
 								</div>
 								<div className="col-sm-10">
 									{this.renderCardTypeButtons()}
