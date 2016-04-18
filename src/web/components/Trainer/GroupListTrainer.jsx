@@ -31,6 +31,7 @@ module.exports = React.createClass({
 						key={group.classid}
 						id={group.classid}
 						name={group.classname}
+						startDate={group.classstarttime}
 						// enddate={group.enddate}
 						// groupTypeId={group.groupTypeId}
 					/>
@@ -44,6 +45,12 @@ module.exports = React.createClass({
 			<div>
 				<p>点击任一班级进行操作</p> 
 				<table className="table table-condensed table-hover table-striped">
+					<thead>
+						<tr>
+							<th>班级名称</th>
+							<th>开始日期</th>
+						</tr>
+					</thead>
 					<tbody>
 						{this.renderGroup()}					
 					</tbody>

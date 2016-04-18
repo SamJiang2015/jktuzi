@@ -113,6 +113,7 @@ module.exports = React.createClass({
 		                	{this.state.loading? '请稍候...':'登录'}
 		                </Button>
 		                {this.state.error && errorMsg}
+		                <p className="info">*请使用最新版的IE(10/11)，火狐，Chrome或Safari浏览器访问*</p>
 		            </form>
 		        </Panel>
 	        </div>

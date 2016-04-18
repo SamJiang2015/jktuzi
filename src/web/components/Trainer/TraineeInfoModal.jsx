@@ -318,7 +318,7 @@ module.exports = React.createClass({
 				</Modal.Body>
 				<Modal.Footer>
 					<ButtonToolbar>
-						<Button disabled={this.state.labelChanged?null:'disabled'} bsStyle="success" onClick={this.submitInfo}>
+						<Button disabled={this.state.labelChanged?null:true} bsStyle="success" onClick={this.submitInfo}>
 		                	{this.state.loading? '请稍候...':'提交'}
 						</Button>
 						<Button bsStyle="default" onClick={this.close}>取消</Button>

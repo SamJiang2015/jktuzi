@@ -13,6 +13,9 @@ var ButtonGroup = require('react-bootstrap/lib/buttongroup');
 var Button = require('react-bootstrap/lib/button');
 var Input = require('react-bootstrap/lib/input');
 
+var DatePicker = require('react-bootstrap-datetimepicker');
+var moment=require('moment');
+
 // var Glyphicon = require('react-bootstrap/lib/glyphicon');
 // var OverlayTrigger = require('react-bootstrap/lib/overlaytrigger');
 // var Tooltip = require('react-bootstrap/lib/tooltip');
@@ -48,6 +51,8 @@ module.exports = React.createClass({
 		// need to deep copy so that user can easily roll back unsubmitted
 		// changes by clicking on "Cancel"
 		var deepCopiedGroup = JSON.parse(JSON.stringify(groupFromStore));
+		deepCopiedGroup.startDate = groupFromStore.startDate;
+		deepCopiedGroup.endDate = groupFromStore.endDate;
 
 		// move breakfast, lunch and dinner out of group.cardinfo, so that
 		// we can easily sort by these three fields
@@ -69,11 +74,15 @@ module.exports = React.createClass({
 	    this.setState({
 	      group: deepCopiedGroup,
 	      showConfirmModal: false,
+	      showTrainees: false,
+	      cardType: null,
 	      newRemarks: [],
 	      newExerciseInfo: [],
 	      newMealInfo: [],
 	      newBodyInfo: [],
 	      loading: false,
+	      dateError: false,
+	      dateSet: true,
 	      checkAllStatus: null
 	    });
 	},
@@ -87,58 +96,65 @@ module.exports = React.createClass({
 	    	checkAllStatus: null,
 	    	showTrainees: false,
 	    	showConfirmModal: false,
-	    	cardDate: Helper.GetToday(),
-	    	cardDateValues: Helper.GetDateValues(),
+
+	    	cardDate: moment().format("YYYY-MM-DD"),
 
 	    	newRemarks: [],
 		    newExerciseInfo: [],
 		    newMealInfo:[],		    
 		    newBodyInfo: [],    	
 
-	    	loading: false
+	    	loading: false,	    	
+	    	dateSet: false,
+	    	dateError: false
 	    }
 	},
 
+	setStateHelper: function(props) {
+		var groupFromStore = GroupsStore.pickGroupById(props.params.id);
+	    this.setState({
+	      group: groupFromStore,
+	      cardDate: moment().format("YYYY-MM-DD"),	      
+	      showConfirmModal: false,
+	      showTrainees: false,
+	      newRemarks: [],
+	      newExerciseInfo: [],
+	      newMealInfo: [],
+	      newBodyInfo: [],
+	      loading: false,
+	      dateSet: false,
+	      dateError: false,
+	      checkAllStatus: null
+	    });
+	},
+
 	componentDidMount: function() {
-		// by default, retrieve today's info first
-		var date = Helper.GetToday();
-		// trigger fetching of the detailed info for the selected group
-		// the change will be propgated from the store to this component
-		// through the change listening mechanism
-		GroupsActions.getGroupCards(
-			this.props.params.id,
-			date,
-			Auth.getAccountId(),
-			Auth.getToken(),
-			function(success, json) {
-				if (!success) {
-					alert('抱歉数据读取未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们.');
-					alert('错误信息：'+JSON.stringify(json));
-				}
-			}); 
+		this.setStateHelper(this.props);
 	},
 
 	componentWillReceiveProps: function(nextProps) {
-		// by default, retrieve today's info first
-		var date = Helper.GetToday();
-
-		// trigger fetching of the detailed info for the selected group
-		// the change will be propgated from the store to this component
-		// through the change listening mechanism
-		GroupsActions.getGroupCards(
-			nextProps.params.id,
-			date,
-			Auth.getAccountId(),
-			Auth.getToken(),
-			function(success, json) {
-				if (!success) {
-					alert('抱歉数据读取未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');
-					alert('错误信息：'+JSON.stringify(json));					
-				}
-			});
+		this.setStateHelper(nextProps);
 	},
 
 	handleCardDateChange: function(date) {
+
+		if (!Helper.isValidDate(date, this.state.group.startDate, this.state.group.endDate)) {
+			this.setState({
+				dateError: true,
+				showTrainees: false,
+				cardType: null				
+			});
+
+			return;
+		} 
+
+		this.setState({
+			dateSet: true,
+			dateError: false,
+			showTrainees: false,
+			loading: true,
+			cardType: null
+		});
 
 		GroupsActions.getGroupCards(
 			this.props.params.id,
@@ -149,11 +165,14 @@ module.exports = React.createClass({
 				if (success) {  		
 					this.setState({
 						cardDate: date,
-						showTrainees: false
+						loading: false
 					});
 				} else {
 					alert('抱歉数据读取未成功，请稍候再试。如果持续有问题，请通过我们的微信公众号(PiPi健康)联系我们');	
-					alert('错误信息：'+JSON.stringify(json));				
+					alert('错误信息：'+JSON.stringify(json));		
+					this.setState({
+						loading: false
+					});							
 				}
 			}.bind(this));		
 	},
@@ -207,44 +226,6 @@ module.exports = React.createClass({
 			group: this.state.group,
 			checkAllStatus: checkAllStatus
 		});
-	},
-
-	// to cancel changes made, just re-render the page using the data
-	// loaded from DB
-	handleCancel: function() {
-
-		var groupFromStore = GroupsStore.pickGroupById(this.props.params.id);
-
-		// need to deep copy so that user can easily roll back unsubmitted
-		// changes by clicking on "Cancel"
-		var deepCopiedGroup = JSON.parse(JSON.stringify(groupFromStore));
-
-		// move breakfast, lunch and dinner out of group.cardinfo, so that
-		// we can easily sort by these three fields
-		if (deepCopiedGroup.trainees) {
-			for (var i=0; i<deepCopiedGroup.trainees.length; i++) {
-				var trainee = deepCopiedGroup.trainees[i];
-				if (trainee.cardInfo) {
-					trainee.breakfast = trainee.cardInfo.breakfast;
-					trainee.lunch = trainee.cardInfo.lunch;
-					trainee.dinner= trainee.cardInfo.dinner;
-				} else {
-					trainee.breakfast = null;
-					trainee.lunch = null;
-					trainee.dinner= null;					
-				}
-			}
-		}
-
-		this.setState({
-			group: deepCopiedGroup,
-			checkAllStatus: null,
-			newRemarks: [],
-			newBodyInfo: [],
-			newMealInfo: [],
-			newExerciseInfo: [],
-			showConfirmModal: false
-		})
 	},
 
 	// when user clicks on submit, write the corresponding card info saved in this 
@@ -615,6 +596,47 @@ module.exports = React.createClass({
 		}
 	},
 
+	// helper function to check whether it is 
+	// okay to switch card type.  If the user
+	// has unsubmitted changes, do not allow to 
+	// proceed.
+	okayToChangeCardTypeOrDate: function(newCardType) {
+		var okayToChange = true;
+
+		if (newCardType !== this.state.cardType) {
+			switch(this.state.cardType) {
+				case CardType.Breakfast:
+				case CardType.Lunch:
+				case CardType.Dinner:
+					if (this.state.newMealInfo.length>0) {
+						okayToChange = false;
+					}
+					break;
+				case CardType.Sports:
+					if (this.state.newExerciseInfo.length>0) {
+						okayToChange = false;
+					}
+					break;
+				case CardType.Body: 
+					if (this.state.newBodyInfo.length>0) {
+						okayToChange = false;
+					}
+					break;				
+				case CardType.Remarks: 
+					if (this.state.newRemarks.length>0) {
+						okayToChange = false;
+					}
+					break;				
+			}
+		}
+		
+		if (!okayToChange) {
+			alert('您对'+this.state.cardDate+this.state.cardType.description+'的修改尚未提交。请先点击“提交”或“取消”。');
+		}
+
+		return okayToChange;
+	},
+
 	// Buttons to switch the input card type: 早、中、晚、运动、体重/体脂
 	renderCardTypeButtons: function() {
 
@@ -624,57 +646,81 @@ module.exports = React.createClass({
 				<ButtonGroup>
 				    <Button 
 				    	href="#" 
-						className={this.state.cardType===CardType.Breakfast?'active':null}				    	
+						className={this.state.cardType===CardType.Breakfast?'active':null}
+						disabled={(!this.state.dateSet || this.state.dateError)?true:null}				    	
 				    	onClick={function(e){
 				    		e.preventDefault(); 
-				    		this.setState({cardType:CardType.Breakfast, loading: false, checkAllStatus: null, showTrainees:true, showConfirmModal:false});
-				    	}.bind(this)}>
+				    		if (!this.state.dateSet || this.state.dateError) {return;}
+				    		if (this.state.cardType !== CardType.Breakfast && this.okayToChangeCardTypeOrDate(CardType.Breakfast)) {
+				    			this.setState({cardType:CardType.Breakfast, loading: false, checkAllStatus: null, showTrainees:true, showConfirmModal:false});
+				    		}}.bind(this)}>
 				    	早
 		    		</Button>
 				    <Button 
 				    	href="#" 
 						className={this.state.cardType===CardType.Lunch?'active':null}				    	
+						disabled={(!this.state.dateSet || this.state.dateError)?true:null}							
 				    	onClick={function(e){
 				    		e.preventDefault(); 
-				    		this.setState({cardType:CardType.Lunch, loading: false, checkAllStatus: null, showTrainees:true, showConfirmModal:false})}.bind(this)}>
+				    		if (!this.state.dateSet || this.state.dateError) {return;}
+				    		if (this.state.cardType !== CardType.Lunch && this.okayToChangeCardTypeOrDate(CardType.Lunch)) {				    		
+				    			this.setState({cardType:CardType.Lunch, loading: false, checkAllStatus: null, showTrainees:true, showConfirmModal:false});
+				    		}}.bind(this)}>
+				    
 				    	午
 				    </Button>
 				    <Button 
 				    	href="#" 
-						className={this.state.cardType===CardType.Dinner?'active':null}				    	
+						className={this.state.cardType===CardType.Dinner?'active':null}				
+						disabled={(!this.state.dateSet || this.state.dateError)?true:null}							    	
 				    	onClick={function(e){
 				    		e.preventDefault(); 
-				    		this.setState({cardType:CardType.Dinner, loading: false, checkAllStatus: null, showTrainees:true, showConfirmModal:false})}.bind(this)}>
+				    		if (!this.state.dateSet || this.state.dateError) {return;}
+				    		if (this.state.cardType !== CardType.Dinner && this.okayToChangeCardTypeOrDate(CardType.Dinner)) {				    		
+				    			this.setState({cardType:CardType.Dinner, loading: false, checkAllStatus: null, showTrainees:true, showConfirmModal:false});
+				    		}}.bind(this)}>
 				    	晚
 				    </Button>
 				</ButtonGroup>
 				<ButtonGroup>
 				    <Button 
 				    	href="#" 
-						className={this.state.cardType===CardType.Sports?'active':null}				    	
+						className={this.state.cardType===CardType.Sports?'active':null}				
+						disabled={(!this.state.dateSet || this.state.dateError)?true:null}							    	
 				    	onClick={function(e){
 				    		e.preventDefault(); 
-				    		this.setState({cardType:CardType.Sports, loading: false, checkAllStatus: null, showTrainees:true, showConfirmModal:false})}.bind(this)}>
+				    		if (!this.state.dateSet || this.state.dateError) {return;}
+				    		if (this.state.cardType !== CardType.Sports && this.okayToChangeCardTypeOrDate(CardType.Sports)) {				    		
+				    			this.setState({cardType:CardType.Sports, loading: false, checkAllStatus: null, showTrainees:true, showConfirmModal:false});
+				    		}}.bind(this)}>
 				    	运动
 				    </Button>
 				</ButtonGroup>
 				<ButtonGroup>
 				    <Button 
 				    	href="#" 
-						className={this.state.cardType===CardType.Body?'active':null}				    	
+						className={this.state.cardType===CardType.Body?'active':null}				
+						disabled={(!this.state.dateSet || this.state.dateError)?true:null}							    	
 				    	onClick={function(e){
-				    		e.preventDefault(); 		    		
-				    		this.setState({cardType:CardType.Body, loading: false, checkAllStatus: null, showTrainees:true, showConfirmModal:false})}.bind(this)}>
+				    		e.preventDefault(); 		    
+				    		if (!this.state.dateSet || this.state.dateError) {return;}		
+				    		if (this.state.cardType !== CardType.Body && this.okayToChangeCardTypeOrDate(CardType.Body)) {				    		
+				    			this.setState({cardType:CardType.Body, loading: false, checkAllStatus: null, showTrainees:true, showConfirmModal:false});
+				    		}}.bind(this)}>
 				    	体卡
 				    </Button>
 				</ButtonGroup>
 				<ButtonGroup>
 				    <Button 
 				    	href="#" 
-						className={this.state.cardType===CardType.Remarks?'active':null}				    	
+						className={this.state.cardType===CardType.Remarks?'active':null}	
+						disabled={(!this.state.dateSet || this.state.dateError)?true:null}										    	
 				    	onClick={function(e){
-				    		e.preventDefault(); 			    		
-				    		this.setState({cardType:CardType.Remarks, loading: false, checkAllStatus: null, showTrainees:true, showConfirmModal:false})}.bind(this)}>
+				    		e.preventDefault(); 			   
+				    		if (!this.state.dateSet || this.state.dateError) {return;} 		
+				    		if (this.state.cardType !== CardType.Remarks && this.okayToChangeCardTypeOrDate(CardType.Remarks)) {				    		
+				    			this.setState({cardType:CardType.Remarks, loading: false, checkAllStatus: null, showTrainees:true, showConfirmModal:false});
+				    		}}.bind(this)}>
 				    	备注
 				    </Button>
 				</ButtonGroup>				
@@ -827,11 +873,8 @@ module.exports = React.createClass({
 	<nav className="navbar navbar-default navbar-fixed-bottom">
   		<div className="container">	
 			<div className="row">		
-  				<div className="col-xs-3">
-  					<span>{this.state.cardDate}/{this.state.cardType.description}</span>
-  				</div>
 
-	            <div className="col-xs-3">					
+	            <div className="col-xs-3 col-xs-offset-3">					
 					<Button 	
 						onClick={function(){this.setState({showConfirmModal: true})}.bind(this)} 
 						bsStyle="warning"
@@ -851,10 +894,14 @@ module.exports = React.createClass({
 						{this.state.loading?'请稍候...':'提交'}
 					</Button>
 				</div>
+  				<div className="col-xs-3">
+  					<p className="navbar-text">{this.state.cardDate}/{this.state.cardType.description}</p>
+  				</div>				
 				<ConfirmModal
 					show={this.state.showConfirmModal}
+					message="您确认将放弃所有编辑吗"
 					cardType={this.state.cardType.description}
-					action={this.handleCancel}/>
+					action={this.onGroupCardsChange}/>
 			</div>
   		</div>
 	</nav>			
@@ -862,6 +909,7 @@ module.exports = React.createClass({
 	},
 
 	render: function() {
+
 		return (
 			<div className="groups trainer-group">
 				<div className="panel panel-info">
@@ -872,17 +920,37 @@ module.exports = React.createClass({
 						<div className="well">
 							<div className="row">
 								<div className="col-sm-2">
-									<p>选择打卡日期和类型：</p>
+									<p>选择打卡日期</p>
+								</div>
+								<div className="col-sm-3">
+									<DatePicker 
+									 	dateTime={this.state.cardDate}
+										format="YYYY-MM-DD"
+										inputFormat="YYYY-MM-DD"
+										onChange={this.handleCardDateChange}
+										viewMode="date"
+										maxDate={this.state.group?this.state.group.endDate:null}
+										minDate={this.state.group?this.state.group.startDate.clone().add(1, "days"):null} // have to add 1 to overcome a bug in datetimefield
+										defaultText="点击日历图标"
+									/>
 								</div>
 								<div className="col-sm-4">
-									<DynamicSelect  
-										value={this.state.cardDate}
-										selectItems={this.state.cardDateValues}						
-										className="form-control" 
-										handleChange={this.handleCardDateChange}/>
+									<div className="error">
+										{(this.state.dateSet && this.state.dateError)?'请检查您输入的日期':null}
+									</div>
+									<div>
+										<p>{(this.state.loading)?'正在同步数据，请稍候':null}</p>
+									</div>
 								</div>
 							</div>
-							{this.renderCardTypeButtons()}
+							<div className="row">
+								<div className="col-sm-2">
+									<p>选择打卡类型</p>
+								</div>
+								<div className="col-sm-10">
+									{this.renderCardTypeButtons()}
+								</div>
+							</div>
 						</div>
 						{this.renderTraineesTable()}					
 					</div>
@@ -890,5 +958,35 @@ module.exports = React.createClass({
 			</div>
 		);	
 	}
+
+	// render: function() {
+	// 	return (
+	// 		<div className="groups trainer-group">
+	// 			<div className="panel panel-info">
+	// 				<div className="panel-heading">	
+	// 					<h5>{this.state.group? this.state.group.classname : ''}</h5>
+	// 				</div>
+	// 				<div className="panel-body">
+	// 					<div className="well">
+	// 						<div className="row">
+	// 							<div className="col-sm-2">
+	// 								<p>选择打卡日期和类型：</p>
+	// 							</div>
+	// 							<div className="col-sm-4">
+	// 								<DynamicSelect  
+	// 									value={this.state.cardDate}
+	// 									selectItems={this.state.cardDateValues}						
+	// 									className="form-control" 
+	// 									handleChange={this.handleCardDateChange}/>
+	// 							</div>
+	// 						</div>
+	// 						{this.renderCardTypeButtons()}
+	// 					</div>
+	// 					{this.renderTraineesTable()}					
+	// 				</div>
+	// 			</div>			
+	// 		</div>
+	// 	);	
+	// }
 
 })

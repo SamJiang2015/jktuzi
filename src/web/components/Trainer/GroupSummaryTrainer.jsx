@@ -16,8 +16,8 @@ module.exports = React.createClass({
 			id: null,
 			name: '',
 			startdate: '',
-			enddate:'',
-			groupTypeId: null
+//			enddate:'',
+//			groupTypeId: null
 		};
 	},
 
@@ -25,9 +25,9 @@ module.exports = React.createClass({
 		this.setState({
 			id: props.id,
 			name: props.name,
-			startdate: props.startdate,
-			enddate: props.enddate,
-			groupTypeId: props.groupTypeId,
+			startdate: props.startDate,
+//			enddate: props.enddate,
+//			groupTypeId: props.groupTypeId,
 		});
 	},
 
@@ -66,6 +66,7 @@ module.exports = React.createClass({
 			<tr className='group'
 		        onClick={this.handleClick.bind(this, this.state.id)}>
 				<td>{this.state.name}</td>
+				<td>{this.state.startdate}</td>
 			</tr>
 		);
 	}

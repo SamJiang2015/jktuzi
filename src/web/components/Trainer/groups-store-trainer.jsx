@@ -3,6 +3,7 @@
 //
 
 var Reflux = require('reflux');
+var moment = require('moment');
 
 var GroupsActions = require('./groups-actions-trainer');
 var Api = require('../../utils/api');
@@ -30,6 +31,21 @@ module.exports = Reflux.createStore({
 
           if (json.code===200) {
             this.groups = json.data;
+            // set the start and end dates for the groups
+            for (var i=0; i<this.groups.length; i++) {
+              this.groups[i].startDate = moment(this.groups[i].classstarttime, "YYYY-MM-DD", true);
+              if (this.groups[i].startDate.isValid()) {
+                var endDate = moment(this.groups[i].classstarttime, "YYYY-MM-DD", true).add(27, "days");
+                var today=moment();
+                if (endDate>today) {
+                  endDate = today;
+                }
+                this.groups[i].endDate = endDate;
+              } else {
+                // should not be here
+                console.log('服务器返回班级开始日期错误:'+this.groups[i].classstarttime);
+              }
+            }
             this.triggerChange();
           } else if (json.code===417) {
             // server will return 417 (HTTP 200) for empty sets

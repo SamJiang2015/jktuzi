@@ -204,7 +204,7 @@ module.exports = React.createClass({
 					style={{opacity: 0.9}}
 				 	onClick={this.handleClick.bind(this, this.state.id)}
 				 	>
-				 	<span className="clickable">{this.state.nickname}</span>
+				 	<div className="clickable">{this.state.nickname}</div>
 				 </td>
 				<td>
 				 	{this.state.name}

@@ -3,6 +3,7 @@
 //
 
 //var Constants = require('./constants');
+var moment=require('moment');
 
 module.exports = {
 
@@ -45,7 +46,7 @@ module.exports = {
 	GetDateValues: function() {
 
         var startDate = new Date();
-        startDate.setDate(startDate.getDate() - 13);// 7 days before today        
+        startDate.setDate(startDate.getDate() - 30);// 7 days before today        
         var endDate = new Date();
 
         var dateValues = [];
@@ -62,6 +63,19 @@ module.exports = {
         }
 
         return dateValues;
-	}	
+	},
 
+
+	// check if the date is in the format of "yyyy-mm-dd";
+	// then check if the date is within the past 31 days
+	isValidDate: function(str, startDate, endDate) {
+		var date = moment(str, 'YYYY-MM-DD', true);
+		if (date.isValid()) {
+			if (date<=endDate && date>=startDate) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

@@ -40,7 +40,7 @@ module.exports = React.createClass({
 
         <Modal show={this.state.showSelf} onHide={this.close}>
           <Modal.Body>
-            <h4>您确认将放弃所有编辑吗</h4>
+            <h4>{this.props.message}</h4>
           </Modal.Body>
           <Modal.Footer>
 				<ButtonToolbar>

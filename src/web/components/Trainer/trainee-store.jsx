@@ -30,9 +30,10 @@ module.exports = Reflux.createStore({
           if (json.code===200) {
             
             if (!this.trainees[traineeId]) {
-              this.trainees[traineeId] = {infoSynced: true};
+              this.trainees[traineeId] = {};
             }
-
+            
+            this.trainees[traineeId].infoSynced = true;
             this.trainees[traineeId].gender = json.gender;
             this.trainees[traineeId].birthday = json.birthday;
             this.trainees[traineeId].city = json.city;

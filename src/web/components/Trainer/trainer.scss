@@ -11,7 +11,12 @@
 
 .loginTrainer button {
 	background-color: #f79956;
-	color: ghostwhite
+	color: ghostwhite;
+}
+
+.info {
+	margin-top: 5px;
+	font-size: 0.6em;
 }
 
 .loginTrainer {
@@ -24,13 +29,13 @@
 	.panel {			
 		top: 40px;
 	}
-	
-	.error {
-		color: red;
-		font-weight: bold;
-		text-align: center;
-		font-size: 1.2em;
-	}
+}
+
+.error {
+	color: red;
+	font-weight: bold;
+	text-align: center;
+	font-size: 1.2em;
 }
 
 .fixedPosition {

@@ -21,6 +21,7 @@
     "pg-hstore": "^2.3.2",
     "react": "^0.14.3",
     "react-bootstrap": "^0.28.1",
+    "react-bootstrap-datetimepicker": "0.0.22",
     "react-dom": "^0.14.3",
     "react-loader": "^2.0.0",
     "react-progress-button": "^3.0.0",
